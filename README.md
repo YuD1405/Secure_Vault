@@ -15,11 +15,11 @@
 ```bash
 /SecureVault/
 ├── main.py                  # Chạy chương trình chính
-├── frontend/                # Giao diện người dùng
+├── gui/                # Giao diện người dùng
 │   ├── index.html
 │   ├── styles.css
 │   └── scripts.js
-├── gui/                     # API liên kết modules và frontend      
+├── flaskapi/                     # API liên kết modules và frontend      
 │   └── app.py            
 ├── modules/                 # Các chức năng được chia theo module
 │   ├── auth.py              # Xử lý đăng ký, đăng nhập, MFA
