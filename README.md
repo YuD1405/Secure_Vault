@@ -15,9 +15,12 @@
 ```bash
 /SecureVault/
 ├── main.py                  # Chạy chương trình chính
-├── gui/                     # Giao diện người dùng (Tkinter / PyQt5)
-│   ├── login_ui.py
-│   └── dashboard_ui.py
+├── frontend/                # Giao diện người dùng
+│   ├── index.html
+│   ├── styles.css
+│   └── scripts.js
+├── gui/                     # API liên kết modules và frontend      
+│   └── app.py            
 ├── modules/                 # Các chức năng được chia theo module
 │   ├── auth.py              # Xử lý đăng ký, đăng nhập, MFA
 │   ├── key_manager.py       # Quản lý RSA, AES
