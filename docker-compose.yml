@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: securevault_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: secure_vault
+      MYSQL_USER: vault_user
+      MYSQL_PASSWORD: vault123
+    ports:
+      - "3307:3306"  # host:container
+    volumes:
+      - db_data:/var/lib/mysql
+
+  flask:
+    build: .
+    container_name: securevault_app
+    restart: always
+    environment:
+      MYSQL_HOST: db
+      MYSQL_USER: vault_user
+      MYSQL_PASSWORD: vault123
+      MYSQL_DB: secure_vault
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    volumes:
+      - .:/app  # Mount mã nguồn
+
+volumes:
+  db_data:
