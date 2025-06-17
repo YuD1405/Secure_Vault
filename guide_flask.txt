@@ -1,0 +1,4 @@
+Flow chương trình:
+python main.py -> http://127.0.0.1:5000
+POST: fe -> api (routes) -> modules 
+GET: modules -> api (routes) -> fe 
