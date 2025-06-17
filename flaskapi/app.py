@@ -7,7 +7,9 @@ mysql = MySQL()
 
 
 def create_app():
-    app = Flask(__name__)
+    template_path = os.path.join(os.path.dirname(__file__), "..", "frontend", "templates")
+    static_path = os.path.join(os.path.dirname(__file__), "..", "frontend", "static")
+    app = Flask(__name__, template_folder=template_path, static_folder=static_path)
     CORS(app)
 
     # Load biến môi trường nếu có

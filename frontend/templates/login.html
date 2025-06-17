@@ -2,19 +2,32 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Secure Vault - Login</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='validation.js') }}" defer></script>
 </head>
 
 <body>
-  <form action="/login" method="post">
-    <h2>Login</h2>
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="passphrase" placeholder="Passphrase" required>
-    <button type="submit">Login</button>
-    <p>Don't have an account? <a href="/signup">Sign up</a></p>
-  </form>
+  <div class="wrapper">
+    <h1>Login</h1>
+    {% if error %}
+    <p id="error-message">{{ error }}</p>
+    {% endif %}
+    <form method="POST" action="{{ url_for('main.login') }}">
+      <div>
+        <label for="email-input">@</label>
+        <input type="email" name="email" id="email-input" placeholder="Email" required>
+      </div>
+      <div>
+        <label for="password-input">🔒</label>
+        <input type="password" name="passphrase" id="password-input" placeholder="Passphrase" required>
+      </div>
+      <button type="submit">Login</button>
+    </form>
+    <p>New here? <a href="{{ url_for('main.signup') }}">Create an Account</a></p>
+  </div>
 </body>
 
 </html>
