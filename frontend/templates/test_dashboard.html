@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Secure Vault</title>
+  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}"> -->
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Welcome to your Dashboard</h1>
+      <p>Here are the available functions:</p>
+    </header>
+
+    <!-- Dashboard buttons -->
+    <div class="dashboard-buttons">
+      <a href="{{ url_for('crypto.manage_keys') }}" class="button">1. Manage RSA Keys</a><br>
+      <a href="{{ url_for('crypto.encrypt_file') }}" class="button">2. Encrypt File</a><br>
+      <a href="{{ url_for('crypto.decrypt_file') }}" class="button">3. Decrypt File</a><br>
+      <a href="{{ url_for('utils.digital_signature') }}" class="button">4. Sign File</a><br>
+      <a href="{{ url_for('utils.digital_signature') }}" class="button">5. Verify Signature</a><br>
+      <a href="{{ url_for('utils.generate_qr') }}" class="button">6. Generate & Scan QR Code</a><br>
+      <a href="{{ url_for('utils.log_security') }}" class="button">7. Security Logs</a><br>
+      <a href="{{ url_for('auth.update_account') }}" class="button">8. Update Account Info</a><br>
+      <a href="{{ url_for('auth.recover_account') }}" class="button">9. Account Recovery</a><br>
+    </div>
+
+    <!-- Logout Button -->
+    <div class="logout-button">
+      <a href="{{ url_for('auth.logout') }}" class="button">Logout</a>
+    </div>
+  </div>
+
+  <!-- <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script> -->
+</body>
+</html>
