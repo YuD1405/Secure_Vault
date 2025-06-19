@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🔐 Security Logs</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/log_security.css') }}">
+</head>
+<body>
+  <h2>📋 Security Log Viewer</h2>
+
+  <button id="refreshBtn">🔄 Refresh Logs</button>
+
+  <div id="logContainer">
+    <table id="logTable">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Level</th>
+          <th>User</th>
+          <th>Action</th>
+          <th>Status</th>
+          <th>File</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td>{{ log.timestamp }}</td>
+          <td>{{ log.level }}</td>
+          <td>{{ log.user }}</td>
+          <td>{{ log.action }}</td>
+          <td>{{ log.status }}</td>
+          <td>{{ log.file }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script src="{{ url_for('static', filename='scripts/log_security.js') }}"></script>
+</body>
+</html>
