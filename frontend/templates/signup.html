@@ -12,6 +12,14 @@
 <body>
     <div class="wrapper">
         <h1>SIGNUP</h1>
+
+        {# MESSAGE NOTIFICATION#}
+        {% if error %}
+        <div class="message-box error-msg">{{ error }}</div>
+        {% elif success %}
+        <div class="message-box success-msg">{{ success }}</div>
+        {% endif %}
+
         <form method="POST" action="{{ url_for('auth.signup') }}">
             <div class="input-group">
                 <label for="name">👤</label>
@@ -61,6 +69,35 @@
 
         <p>Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></p>
     </div>
+
+    {# POPUP RECOVERY KEY#}
+    {% if recovery_code %}
+    <div class="popup" id="popup">
+        <h2>This is your recovery key</h2>
+        <p style="font-weight: bold; color: red;">{{ recovery_code }}</p>
+        <p>Please copy and store it safely. It won't be shown again.</p>
+        <div style="margin-top: 20px;">
+            <button id="redirect-btn">Redirect to login page?</button>
+            <button id="stay-btn" style="margin-left: 10px;">Stay here</button>
+        </div>
+    </div>
+    
+    <script>
+        setTimeout(function () {
+            document.getElementById('popup').style.display = 'block';
+        }, 2000);
+
+        // Chuyển sang login page
+        document.getElementById("redirect-btn").onclick = function () {
+            window.location.href = "{{ url_for('auth.login') }}";
+        };
+
+        // Ẩn popup nếu người dùng chọn "Stay here"
+        document.getElementById("stay-btn").onclick = function () {
+            document.getElementById("popup").style.display = "none";
+        };
+    </script>
+    {% endif %}
 </body>
 
 </html>

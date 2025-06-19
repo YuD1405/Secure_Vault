@@ -29,17 +29,17 @@ def register_user(data: dict) -> tuple:
     pass2 = data.get("repeat_passphrase", "")
 
     if not all([email, name, dob, phone, address, pass1, pass2]):
-        return False, "All fields are required."
+        return False, "All fields are required.", None
     if not is_valid_email(email):
-        return False, "Invalid email format."
+        return False, "Invalid email format.", None
     if not is_valid_date(dob):
-        return False, "Invalid date format."
+        return False, "Invalid date format.", None
     if not is_valid_phone(phone):
-        return False, "Phone must be 10 digits."
+        return False, "Phone must be 10 digits.", None
     if not is_strong_passphrase(pass1):
-        return False, "Passphrase too weak (min 8 chars, upper, digit, symbol)."
+        return False, "Passphrase too weak (min 8 chars, upper, digit, symbol).", None
     if pass1 != pass2:
-        return False, "Passphrases do not match."
+        return False, "Passphrases do not match.", None
 
     salt = generate_salt()
     hashed = hash_with_salt(pass1, salt)
@@ -49,7 +49,7 @@ def register_user(data: dict) -> tuple:
     cur.execute("SELECT id FROM users WHERE email = %s", (email,))
     if cur.fetchone():
         cur.close()
-        return False, "Account already exists."
+        return False, "Account already exists.", None
 
     try:
         cur.execute("""
@@ -58,12 +58,12 @@ def register_user(data: dict) -> tuple:
         """, (email, name, dob, phone, address, salt, hashed,'user', recovery_code))
         mysql.connection.commit()
         log_user_action(email, "Register", "Success")
-        return True, f"Registration successful. Your recovery code: {recovery_code}"
+        return True, f"Registration successful!", recovery_code
     except Exception as e:
         mysql.connection.rollback()
         print(f"Error during registration: {e}")  # Log the error for debugging
         log_user_action(email, "Register", "Fail")
-        return False, "An error occurred during registration."
+        return False, "An error occurred during registration.", None
     finally:
         cur.close()
 

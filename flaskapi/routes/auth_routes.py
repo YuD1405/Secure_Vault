@@ -25,9 +25,9 @@ def login():
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
-        success, message = register_user(request.form)
+        success, message, recovery_code = register_user(request.form)
         if success:
-            return render_template("login.html", success=message)
+            return render_template("signup.html", success=message, recovery_code=recovery_code)
         else:
             return render_template("signup.html", error=message)
     return render_template("signup.html")
