@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Signup</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login_signup.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/signup.css') }}">
     <script src="{{ url_for('static', filename='scripts/validation.js') }}" defer></script>
 </head>
 
@@ -20,50 +20,55 @@
         <div class="message-box success-msg">{{ success }}</div>
         {% endif %}
 
-        <form method="POST" action="{{ url_for('auth.signup') }}">
-            <div class="input-group">
-                <label for="name">👤</label>
-                <input type="text" name="name" id="name" placeholder="Full Name" required />
-                <span class="error-message" id="name-error"></span>
+        <form method="POST" action="{{ url_for('auth.signup') }}" class="two-column-form">
+            <div class="form-column">
+                <h3>Personal Information</h3>
+                <div class="input-group">
+                    <label for="name">👤</label>
+                    <input type="text" name="name" id="name" placeholder="Full Name" required />
+                    <span class="error-message" id="name-error"></span>
+                </div>
+
+                <div class="input-group">
+                    <label for="dob">📅</label>
+                    <input type="date" name="dob" id="dob" required />
+                    <span class="error-message" id="dob-error"></span>
+                </div>
+
+                <div class="input-group">
+                    <label for="phone">📱</label>
+                    <input type="text" name="phone" id="phone" placeholder="Phone Number" required />
+                    <span class="error-message" id="phone-error"></span>
+                </div>
+
+                <div class="input-group">
+                    <label for="address">🏠</label>
+                    <input type="text" name="address" id="address" placeholder="Address" required />
+                    <span class="error-message" id="address-error"></span>
+                </div>
             </div>
 
-            <div class="input-group">
-                <label for="dob">📅</label>
-                <input type="date" name="dob" id="dob" required />
-                <span class="error-message" id="dob-error"></span>
-            </div>
+            <div class="form-column">
+                <h3>Account Information</h3>
+                <div class="input-group">
+                    <label for="email">@</label>
+                    <input type="email" name="email" id="email" placeholder="Email" required />
+                    <span class="error-message" id="email-error"></span>
+                </div>
 
-            <div class="input-group">
-                <label for="phone">📱</label>
-                <input type="text" name="phone" id="phone" placeholder="Phone Number" required />
-                <span class="error-message" id="phone-error"></span>
-            </div>
+                <div class="input-group">
+                    <label for="passphrase">🔒</label>
+                    <input type="password" name="passphrase" id="passphrase" placeholder="Passphrase" required />
+                    <span class="error-message" id="passphrase-error"></span>
+                </div>
 
-            <div class="input-group">
-                <label for="address">🏠</label>
-                <input type="text" name="address" id="address" placeholder="Address" required />
-                <span class="error-message" id="address-error"></span>
+                <div class="input-group">
+                    <label for="repeat_passphrase">🔁</label>
+                    <input type="password" name="repeat_passphrase" id="repeat_passphrase" placeholder="Repeat Passphrase"
+                        required />
+                    <span class="error-message" id="repeat_passphrase-error"></span>
+                </div>
             </div>
-
-            <div class="input-group">
-                <label for="email">@</label>
-                <input type="email" name="email" id="email" placeholder="Email" required />
-                <span class="error-message" id="email-error"></span>
-            </div>
-
-            <div class="input-group">
-                <label for="passphrase">🔒</label>
-                <input type="password" name="passphrase" id="passphrase" placeholder="Passphrase" required />
-                <span class="error-message" id="passphrase-error"></span>
-            </div>
-
-            <div class="input-group">
-                <label for="repeat_passphrase">🔁</label>
-                <input type="password" name="repeat_passphrase" id="repeat_passphrase" placeholder="Repeat Passphrase"
-                    required />
-                <span class="error-message" id="repeat_passphrase-error"></span>
-            </div>
-
             <button type="submit">SIGN UP</button>
         </form>
 

@@ -79,7 +79,7 @@ def process_login(email, passphrase):
     now = datetime.now()
     if not user:
         log_user_action(email, "Login failed - No such user", "Failed")
-        return {"success": False, "message": "Email hoặc mật khẩu sai"}
+        return {"success": False, "message": "Wrong email or password"}
 
     # Đếm sai trong 2 phút
     if user['last_failed_login']:
@@ -92,7 +92,7 @@ def process_login(email, passphrase):
 
     if user['is_locked']:
         if (now - user['last_failed_login']) < timedelta(minutes=5):
-            return {"success": False, "message": "Tài khoản đang bị khóa. Vui lòng thử lại sau vài phút."}
+            return {"success": False, "message": "Your account is locked. Please try again later."}
         else:
             # Mở khóa sau 5 phút
             cur.execute(
@@ -111,7 +111,7 @@ def process_login(email, passphrase):
         """, (failed, now, is_locked, email))
         mysql.connection.commit()
         log_user_action(email, "Login failed - wrong pass", "Failed")
-        return {"success": False, "message": "Email hoặc mật khẩu sai"}
+        return {"success": False, "message": "Wrong email or password"}
 
     # Đúng pass → reset
     cur.execute("""

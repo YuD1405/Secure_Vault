@@ -5,32 +5,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/login_signup.css') }}">
-  <script src="{{ url_for('static', filename='scripts/validation.js') }}" defer></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
 </head>
 
 <body>
   <div class="wrapper">
     <h1>Login</h1>
     <form method="POST" action="{{ url_for('auth.login') }}">
-      <!-- <div>
-        <label for="email-input">@</label>
-        <input type="email" name="email" id="email-input" placeholder="Email" required>
-      </div>
-      <div>
-        <label for="password-input">🔒</label>
-        <input type="password" name="passphrase" id="password-input" placeholder="Passphrase" required>
-      </div> -->
+      
+      {% if error %}
+      <div class="message-box error-msg">{{ error }}</div>
+      {% endif %}
       <div class="input-group">
         <label for="email">@</label>
         <input type="email" name="email" id="email" placeholder="Email" required />
-        <span class="error-message" id="email-error"></span>
       </div>
 
       <div class="input-group">
         <label for="passphrase">🔒</label>
         <input type="password" name="passphrase" id="passphrase" placeholder="Passphrase" required />
-        <span class="error-message" id="passphrase-error"></span>
       </div>
     
       <button type="submit">Login</button>

@@ -18,3 +18,12 @@
 [2025-06-19 19:17:52] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login failed - wrong pass | Status: Failed
 [2025-06-19 21:32:21] [INFO]: [pqduy22@clc.fitus.edu.vn] Action: Register | Status: Success
 [2025-06-19 21:34:26] [INFO]: [123@clc.fitus.edu.vn] Action: Register | Status: Success
+[2025-06-19 21:42:44] [INFO]: [buon@gmail.com] Action: Register | Status: Success
+[2025-06-19 21:46:08] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-19 21:48:49] [INFO]: [bbb@gmail.com] Action: Register | Status: Success
+[2025-06-19 22:57:07] [INFO]: [123@clc.fitus.edu.vn] Action: Login failed - wrong pass | Status: Failed
+[2025-06-19 22:58:50] [INFO]: [123@clc.fitus.edu.vn] Action: Login failed - wrong pass | Status: Failed
+[2025-06-19 22:59:36] [INFO]: [1@gmail.com] Action: Login failed - No such user | Status: Failed
+[2025-06-19 23:05:52] [INFO]: [1@gmail.com] Action: Login failed - No such user | Status: Failed
+[2025-06-19 23:06:59] [INFO]: [13@clc.fitus.edu.vn] Action: Login failed - No such user | Status: Failed
+[2025-06-19 23:07:03] [INFO]: [13@clc.fitus.edu.vn] Action: Login failed - No such user | Status: Failed

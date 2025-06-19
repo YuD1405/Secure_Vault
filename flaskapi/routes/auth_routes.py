@@ -20,7 +20,7 @@ def login():
             return redirect(url_for('auth.dashboard'))
         else:
             return render_template('login.html', error=result.get("message"))
-    return render_template('login.html')
+    return render_template('login.html',error = None)
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():
