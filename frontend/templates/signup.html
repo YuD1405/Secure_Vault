@@ -5,14 +5,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Signup</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="{{ url_for('static', filename='validation.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login_signup.css') }}">
+    <script src="{{ url_for('static', filename='scripts/validation.js') }}" defer></script>
 </head>
 
 <body>
     <div class="wrapper">
         <h1>SIGNUP</h1>
-        <form method="POST" action="{{ url_for('main.signup') }}">
+        <form method="POST" action="{{ url_for('auth.signup') }}">
             <div class="input-group">
                 <label for="name">👤</label>
                 <input type="text" name="name" id="name" placeholder="Full Name" required />
@@ -59,7 +59,7 @@
             <button type="submit">SIGN UP</button>
         </form>
 
-        <p>Already have an account? <a href="{{ url_for('main.login') }}">Login here</a></p>
+        <p>Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></p>
     </div>
 </body>
 

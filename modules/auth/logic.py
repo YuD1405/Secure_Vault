@@ -1,9 +1,23 @@
-from flaskapi.app import mysql
+from flaskapi.extensions import mysql 
 from modules.auth.validator import (
     is_valid_email, is_valid_date, is_valid_phone,
     is_strong_passphrase, sanitize_input
 )
+from modules.utils.logger import log_user_action
+import os
+import random
+import string
+import hashlib
+from datetime import datetime, timedelta
 
+def generate_salt(length=16):
+    return os.urandom(length).hex()
+
+def hash_with_salt(passphrase, salt):
+    return hashlib.sha256((passphrase + salt).encode()).hexdigest()
+
+def generate_recovery_code(length=12):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 def register_user(data: dict) -> tuple:
     email = sanitize_input(data.get("email", ""))
@@ -27,8 +41,9 @@ def register_user(data: dict) -> tuple:
     if pass1 != pass2:
         return False, "Passphrases do not match."
 
-    from hashlib import sha256
-    hashed = sha256(pass1.encode()).hexdigest()
+    salt = generate_salt()
+    hashed = hash_with_salt(pass1, salt)
+    recovery_code = generate_recovery_code()
 
     cur = mysql.connection.cursor()
     cur.execute("SELECT id FROM users WHERE email = %s", (email,))
@@ -36,10 +51,73 @@ def register_user(data: dict) -> tuple:
         cur.close()
         return False, "Account already exists."
 
-    cur.execute(
-        "INSERT INTO users (email, name, dob, phone, address, passphrase) VALUES (%s, %s, %s, %s, %s, %s)",
-        (email, name, dob, phone, address, hashed)
-    )
+    try:
+        cur.execute("""
+            INSERT INTO users (email, fullname, dob, phone, address, salt, hashed_passphrase,role, recovery_code)
+            VALUES (%s, %s, %s, %s, %s, %s, %s,%s, %s)
+        """, (email, name, dob, phone, address, salt, hashed,'user', recovery_code))
+        mysql.connection.commit()
+        log_user_action(email, "Register", "Success")
+        return True, f"Registration successful. Your recovery code: {recovery_code}"
+    except Exception as e:
+        mysql.connection.rollback()
+        print(f"Error during registration: {e}")  # Log the error for debugging
+        log_user_action(email, "Register", "Fail")
+        return False, "An error occurred during registration."
+    finally:
+        cur.close()
+
+
+def process_login(email, passphrase):
+    email = sanitize_input(email)
+    passphrase = sanitize_input(passphrase)
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+    user = cur.fetchone()
+
+    now = datetime.now()
+    if not user:
+        log_user_action(email, "Login failed - No such user", "Failed")
+        return {"success": False, "message": "Email hoặc mật khẩu sai"}
+
+    # Đếm sai trong 2 phút
+    if user['last_failed_login']:
+        time_diff = now - user['last_failed_login']
+        if time_diff > timedelta(minutes=2):
+            cur.execute(
+                "UPDATE users SET failed_attempts = 0 WHERE email = %s", (email,))
+            mysql.connection.commit()
+            user['failed_attempts'] = 0
+
+    if user['is_locked']:
+        if (now - user['last_failed_login']) < timedelta(minutes=5):
+            return {"success": False, "message": "Tài khoản đang bị khóa. Vui lòng thử lại sau vài phút."}
+        else:
+            # Mở khóa sau 5 phút
+            cur.execute(
+                "UPDATE users SET is_locked = FALSE, failed_attempts = 0 WHERE email = %s", (email,))
+            mysql.connection.commit()
+
+    # Kiểm tra mật khẩu
+    hashed = hashlib.sha256((passphrase + user['salt']).encode()).hexdigest()
+    if hashed != user['hashed_passphrase']:
+        failed = user['failed_attempts'] + 1
+        is_locked = failed >= 5
+        cur.execute("""
+            UPDATE users 
+            SET failed_attempts = %s, last_failed_login = %s, is_locked = %s 
+            WHERE email = %s
+        """, (failed, now, is_locked, email))
+        mysql.connection.commit()
+        log_user_action(email, "Login failed - wrong pass", "Failed")
+        return {"success": False, "message": "Email hoặc mật khẩu sai"}
+
+    # Đúng pass → reset
+    cur.execute("""
+        UPDATE users SET failed_attempts = 0, last_failed_login = NULL WHERE email = %s
+    """, (email,))
     mysql.connection.commit()
-    cur.close()
-    return True, "Registration successful."
+    log_user_action(email, "Login success", "Pending MFA")
+
+    return {"success": True}

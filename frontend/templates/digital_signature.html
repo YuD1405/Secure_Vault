@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/digital_signature.css') }}">
+  <title>Upload File</title>
+</head>
+<body>
+  <h2>📤 Upload File từ máy</h2>
+
+  <!-- Form Upload File -->
+  <form id="uploadForm" enctype="multipart/form-data" method="POST">
+    <label for="file">Chọn file cần ký:</label>
+    <input type="file" name="file_to_sign" required />
+    <button type="submit">Gửi</button>
+  </form>
+
+  <p id="uploadResult"></p>
+
+  <hr>
+
+  <!-- Form Verify Signature -->
+  <h3>🔍 Verify Signature</h3>
+  <form id="verifyForm" enctype="multipart/form-data" method="POST">
+    <label for="verifyFile">Chọn file để xác minh chữ ký:</label>
+    <input type="file" name="file_to_verify" required />
+    
+    <label for="signature">Chọn chữ ký để xác minh:</label>
+    <input type="file" name="signature" required />
+
+    <label for="public_key_path">Đường dẫn đến Public Key:</label>
+    <input type="text" name="public_key_path" placeholder="data/keys/public.pem" required />
+
+    <button type="submit">Verify Chữ Ký</button>
+  </form>
+
+  <p id="verifyResult"></p>
+
+  <script src="{{ url_for('static', filename='scripts/digital_signature.js') }}"></script>
+</body>
+</html>

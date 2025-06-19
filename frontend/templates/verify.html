@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Multi-Factor Authentication</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login_signup.css') }}">
+    <style>
+        .mfa-options {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .mfa-button {
+            padding: 10px 30px;
+            border: 2px solid var(--accent-color);
+            border-radius: 16px;
+            background-color: var(--base-color);
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .mfa-button.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .mfa-button.inactive {
+            background-color: #ddd;
+            color: #666;
+            border-color: #ccc;
+        }
+
+        .mfa-content {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #qr-img {
+            margin: 10px auto;
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+    <script defer>
+        function showOption(option) {
+            document.getElementById('otp-form').style.display = option === 'otp' ? 'block' : 'none';
+            document.getElementById('totp-form').style.display = option === 'totp' ? 'block' : 'none';
+            document.getElementById('otp-btn').classList.toggle('active', option === 'otp');
+            document.getElementById('otp-btn').classList.toggle('inactive', option !== 'otp');
+            document.getElementById('totp-btn').classList.toggle('active', option === 'totp');
+            document.getElementById('totp-btn').classList.toggle('inactive', option !== 'totp');
+        }
+    </script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <h1>Multi-Factor Authentication</h1>
+        <div class="mfa-options">
+            <button id="otp-btn" class="mfa-button active" onclick="showOption('otp')">OTP via mail</button>
+            <button id="totp-btn" class="mfa-button inactive" onclick="showOption('totp')">GG Authenticator</button>
+        </div>
+
+        <div class="mfa-content">
+            <div id="otp-form">
+                <p>Your OTP was sent to {{ email }}. OTP will time out in <span id="countdown">5:00</span></p>
+                <form method="POST" action="{{ url_for('auth.verify_otp') }}">
+                    <input type="text" name="otp" placeholder="Enter OTP" required />
+                    <button type="submit">Verify OTP</button>
+                </form>
+                <form method="POST" action="{{ url_for('auth.resend_otp') }}">
+                    <button type="submit">Resend OTP</button>
+                </form>
+            </div>
+
+            <div id="totp-form" style="display:none;">
+                <img id="qr-img" src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+                <form method="POST" action="{{ url_for('auth.verify_totp') }}">
+                    <input type="text" name="otp" placeholder="6-digit code from Google Authenticator" required />
+                    <button type="submit">Verify TOTP</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let timer = 300;
+        const countdown = document.getElementById("countdown");
+        setInterval(() => {
+            if (timer <= 0) return;
+            timer--;
+            const min = Math.floor(timer / 60);
+            const sec = timer % 60;
+            countdown.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+        }, 1000);
+    </script>
+</body>
+
+</html>
