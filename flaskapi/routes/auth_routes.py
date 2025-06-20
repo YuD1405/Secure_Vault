@@ -1,29 +1,30 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, get_flashed_messages
-import hashlib
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from modules.auth.logic import register_user, process_login
-from modules.auth.mfa import verify_otp_code, verify_totp_code, generate_and_send_otp, generate_qr_code, expire_otp_code
-from flaskapi.extensions import mysql
-import time
-# from modules.auth.mfa_totp import get_totp_uri, generate_qr_base64
-# from modules.auth.mfa_otp import generate_otp, validate_otp, send_otp_via_email
+from modules.auth.mfa import (verify_otp_code, verify_totp_code,
+                              generate_and_send_otp, generate_qr_code, expire_otp_code)
 
 auth_bp = Blueprint('auth', __name__)
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    if session.get('user_id'):
+        return redirect(url_for('auth.dashboard'))
+    
     if request.method == 'POST':
         email = request.form['email']
         passphrase = request.form['passphrase']
         result = process_login(email, passphrase)
         if result.get("success"):
-            session['email'] = email  # lưu email để gửi OTP
-            return redirect(url_for('auth.verify'))  # chuyển hướng đến trang xác thực OTP
+            session['email'] = email
+            session.pop('otp_sent', None)
+            return redirect(url_for('auth.verify'))
         elif result.get("locked"):
             return render_template("login.html", locked=True)
         else:
             return render_template("login.html", error=result.get("message"))
-    return render_template('login.html',error = None)
+    return render_template('login.html', error=None)
+
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -43,33 +44,47 @@ def verify():
         flash("Session expired. Please login again.", "error")
         return redirect(url_for('auth.login'))
 
+    selected_method = session.get("selected_method", "email")
     qr_code = generate_qr_code(email)
 
-    # Mặc định gửi OTP nếu vừa vào lần đầu
-    if request.method == 'GET':
+    # Gửi OTP qua mail khi GET lần đầu
+    if request.method == 'GET' and 'otp_sent' not in session:
         generate_and_send_otp(email)
+        session['otp_sent'] = True
 
-    # Xử lý POST: xác minh OTP/TOTP
     if request.method == 'POST':
-        method = request.form.get('method')  # email hoặc totp
+        method = request.form.get('method')
         otp_input = request.form.get('otp')
+        is_resend = request.form.get('resend')
+
+        session['selected_method'] = method  # giữ lại tab
+
+        if is_resend == '1' and method == 'email':
+            generate_and_send_otp(email)
+            flash("A new OTP has been sent to your email.", "success")
+            return redirect(url_for('auth.verify'))
 
         if method == 'email':
             if verify_otp_code(email, otp_input):
+                session.pop('otp_sent', None)
                 session['user_id'] = email
                 return redirect(url_for('auth.dashboard'))
             else:
-                flash("Invalid or expired OTP", "error")
+                flash("Invalid or expired OTP", "email_error")
+
         elif method == 'totp':
-            expire_otp_code(email)  # ⚠️ Hủy hiệu lực OTP nếu chọn TOTP
+            expire_otp_code(email)
             if verify_totp_code(email, otp_input):
+                session.pop('otp_sent', None)
                 session['user_id'] = email
                 return redirect(url_for('auth.dashboard'))
             else:
-                flash("Invalid TOTP code", "error")
+                flash("Invalid TOTP code", "totp_error")
 
-    return render_template("verify.html", email=email, qr_code=qr_code)
-
+    return render_template("verify.html",
+                           email=email,
+                           qr_code=qr_code,
+                           selected_method=session.get("selected_method", "email"))
 
 
 
@@ -82,12 +97,14 @@ def dashboard():
 
 @auth_bp.route("/logout")
 def logout():
-    #session.clear()
+    session.clear()
     return redirect(url_for("auth.login"))
+
 
 @auth_bp.route("/recover_account")
 def recover_account():
     return "Khôi phục account"
+
 
 @auth_bp.route("/update_account")
 def update_account():

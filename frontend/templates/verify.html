@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/verify.css') }}">
     <script defer>
         function showOption(option) {
-            // Toggle giao diện
             document.getElementById('otp-form').style.display = option === 'otp' ? 'block' : 'none';
             document.getElementById('totp-form').style.display = option === 'totp' ? 'block' : 'none';
 
@@ -17,7 +16,7 @@
             document.getElementById('totp-btn').classList.toggle('inactive', option !== 'totp');
 
             if (option === 'otp') {
-                startCountdown();  // nếu chọn lại OTP, thì bắt đầu đếm ngược
+                startCountdown();
             }
         }
 
@@ -26,7 +25,11 @@
             const countdown = document.getElementById("countdown");
             timer = 300;
             const interval = setInterval(() => {
-                if (timer <= 0) return;
+                if (timer <= 0) {
+                    clearInterval(interval);
+                    countdown.textContent = "Expired";
+                    return;
+                }
                 timer--;
                 const min = Math.floor(timer / 60);
                 const sec = timer % 60;
@@ -35,7 +38,8 @@
         }
 
         window.onload = () => {
-            showOption('otp'); // Mặc định chọn OTP để hiện luôn form
+            const method = "{{ selected_method }}";
+            showOption(method === "totp" ? "totp" : "otp");
         }
     </script>
 </head>
@@ -49,6 +53,18 @@
             <button id="totp-btn" class="mfa-button inactive" onclick="showOption('totp')">GG Authenticator</button>
         </div>
 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        {% if (category == selected_method + '_error') or category == 'success' %}
+        <div class="message-box {{ 'error-msg' if 'error' in category else 'success-msg' }}">{{ message }}</div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+
+
         <div class="mfa-content">
             <div id="otp-form" style="display:none;">
                 <p>Your OTP was sent to {{ email }}. OTP will time out in <span id="countdown">5:00</span></p>
@@ -56,9 +72,14 @@
                     <input type="hidden" name="method" value="email" />
                     <div class="input-group">
                         <label for="otp">🔑</label>
-                        <input type="text" id="otp" name="otp" placeholder="Enter OTP" required />          
+                        <input type="text" id="otp" name="otp" placeholder="Enter OTP" required />
                     </div>
                     <button type="submit">Verify OTP</button>
+                </form>
+                <form method="POST" style="margin-top: 10px;">
+                    <input type="hidden" name="method" value="email" />
+                    <input type="hidden" name="resend" value="1" />
+                    <button type="submit" style="background-color:#ccc;color:#000;">Resend OTP</button>
                 </form>
             </div>
 
@@ -69,7 +90,8 @@
                     <input type="hidden" name="method" value="totp" />
                     <div class="input-group">
                         <label for="otp">🔑</label>
-                        <input type="text" id="otp" name="otp" placeholder="6-digit code from Google Authenticator" required />          
+                        <input type="text" id="otp" name="otp" placeholder="6-digit code from Google Authenticator"
+                            required />
                     </div>
                     <button type="submit">Verify TOTP</button>
                 </form>

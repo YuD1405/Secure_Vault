@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, session
 from flask_cors import CORS
 import os
 from flaskapi.routes import register_all_routes 
@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 def create_app():
     load_dotenv()
+    
     template_path = os.path.join(os.path.dirname(__file__), "..", "frontend", "templates")
     static_path = os.path.join(os.path.dirname(__file__), "..", "frontend", "static")
     app = Flask(__name__, template_folder=template_path, static_folder=static_path)
