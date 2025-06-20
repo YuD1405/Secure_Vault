@@ -91,16 +91,15 @@ def process_login(email, passphrase):
             user['failed_attempts'] = 0
 
     if user['is_locked']:
-        if (now - user['last_failed_login']) < timedelta(minutes=5):
-            return {"success": False, "message": "Your account is locked. Please try again later."}
+        delta = now - user['last_failed_login']
+        if delta < timedelta(minutes=5):
+            return {"success": False, "locked": True}
         else:
-            # Mở khóa sau 5 phút
-            cur.execute(
-                "UPDATE users SET is_locked = FALSE, failed_attempts = 0 WHERE email = %s", (email,))
+            cur.execute("UPDATE users SET is_locked = FALSE, failed_attempts = 0 WHERE email = %s", (email,))
             mysql.connection.commit()
 
     # Kiểm tra mật khẩu
-    hashed = hashlib.sha256((passphrase + user['salt']).encode()).hexdigest()
+    hashed = hash_with_salt(passphrase, user['salt'])
     if hashed != user['hashed_passphrase']:
         failed = user['failed_attempts'] + 1
         is_locked = failed >= 5

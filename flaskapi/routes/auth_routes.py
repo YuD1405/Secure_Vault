@@ -15,11 +15,11 @@ def login():
         passphrase = request.form['passphrase']
         result = process_login(email, passphrase)
         if result.get("success"):
-            # session['pre_otp_email'] = email
-            # return redirect(url_for('auth.verify'))
-            return redirect(url_for('auth.dashboard'))
+            return render_template("login.html", success="Login successful! Redirecting to MFA...")
+        elif result.get("locked"):
+            return render_template("login.html", locked=True)
         else:
-            return render_template('login.html', error=result.get("message"))
+            return render_template("login.html", error=result.get("message"))
     return render_template('login.html',error = None)
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
@@ -33,75 +33,75 @@ def signup():
     return render_template("signup.html")
 
 
-# @auth_bp.route('/verify', methods=['GET', 'POST'])
-# def verify():
-#     email = session.get("pre_otp_email")
-#     if not email:
-#         return redirect(url_for('auth.login'))
+@auth_bp.route('/verify', methods=['GET', 'POST'])
+def verify():
+    email = session.get("pre_otp_email")
+    if not email:
+        return redirect(url_for('auth.login'))
 
-#     # gửi OTP nếu chưa có
+    # gửi OTP nếu chưa có
     
-#     otp = generate_otp(email)
-#     send_otp_via_email(email, otp)  # bạn cần viết hàm này (SMTP)
-#     session['otp_attempt'] = 0
+    otp = generate_otp(email)
+    send_otp_via_email(email, otp)  # bạn cần viết hàm này (SMTP)
+    session['otp_attempt'] = 0
 
-#     return render_template("verify.html", email=email, qr_code="")
+    return render_template("verify.html", email=email, qr_code="")
 
 
-# @auth_bp.route('/generate_totp', methods=['POST'])
-# def generate_totp():
-#     email = session.get("pre_otp_email")
+@auth_bp.route('/generate_totp', methods=['POST'])
+def generate_totp():
+    email = session.get("pre_otp_email")
     
-#     # bạn cần tạo hàm này để lấy mfa_secret từ DB
-#     from database import get_user_secret
-#     secret = get_user_secret(email)
-#     uri = get_totp_uri(email, secret)
-#     qr = generate_qr_base64(uri)
-#     return render_template("verify.html", email=email, qr_code=qr)
+    # bạn cần tạo hàm này để lấy mfa_secret từ DB
+    from database import get_user_secret
+    secret = get_user_secret(email)
+    uri = get_totp_uri(email, secret)
+    qr = generate_qr_base64(uri)
+    return render_template("verify.html", email=email, qr_code=qr)
 
 
-# @auth_bp.route('/verify_otp', methods=['POST'])
-# def verify_otp():
-#     otp = request.form.get('otp')
-#     email = session.get("pre_otp_email")
-#     if validate_otp(email, otp):
-#         session['user_email'] = email
-#         return redirect(url_for('dashboard.index'))
-#     else:
-#         flash("Invalid or expired OTP")
-#         return redirect(url_for('auth.verify'))
+@auth_bp.route('/verify_otp', methods=['POST'])
+def verify_otp():
+    otp = request.form.get('otp')
+    email = session.get("pre_otp_email")
+    if validate_otp(email, otp):
+        session['user_email'] = email
+        return redirect(url_for('dashboard.index'))
+    else:
+        flash("Invalid or expired OTP")
+        return redirect(url_for('auth.verify'))
 
 
-# @auth_bp.route('/verify_totp', methods=['POST'])
-# def verify_totp():
-#     from database import get_user_secret
-#     import pyotp
-#     email = session.get("pre_otp_email")
-#     secret = get_user_secret(email)
-#     totp = pyotp.TOTP(secret)
-#     otp = request.form.get("otp")
-#     session['otp_attempt'] += 1
-#     if session['otp_attempt'] >= 5:
-#         lock_user(email)
-#         flash("Too many failed attempts. Account locked.")
-#         return redirect(url_for('auth.login'))
+@auth_bp.route('/verify_totp', methods=['POST'])
+def verify_totp():
+    from database import get_user_secret
+    import pyotp
+    email = session.get("pre_otp_email")
+    secret = get_user_secret(email)
+    totp = pyotp.TOTP(secret)
+    otp = request.form.get("otp")
+    session['otp_attempt'] += 1
+    if session['otp_attempt'] >= 5:
+        lock_user(email)
+        flash("Too many failed attempts. Account locked.")
+        return redirect(url_for('auth.login'))
 
-#     if totp.verify(otp):
-#         session['user_email'] = email
-#         return redirect(url_for('dashboard.index'))
-#     else:
-#         flash("Incorrect TOTP. Try again.")
-#         return redirect(url_for('auth.verify'))
+    if totp.verify(otp):
+        session['user_email'] = email
+        return redirect(url_for('dashboard.index'))
+    else:
+        flash("Incorrect TOTP. Try again.")
+        return redirect(url_for('auth.verify'))
 
 
-# @auth_bp.route('/resend_otp', methods=['POST'])
-# def resend_otp():
-#     email = session.get("pre_otp_email")
-#     from modules.mfa_otp import generate_otp
-#     otp = generate_otp(email)
-#     send_otp_via_email(email, otp)
-#     flash("OTP resent.")
-#     return redirect(url_for('auth.verify'))
+@auth_bp.route('/resend_otp', methods=['POST'])
+def resend_otp():
+    email = session.get("pre_otp_email")
+    from modules.mfa_otp import generate_otp
+    otp = generate_otp(email)
+    send_otp_via_email(email, otp)
+    flash("OTP resent.")
+    return redirect(url_for('auth.verify'))
 
 @auth_bp.route("/dashboard")
 def dashboard():

@@ -27,3 +27,20 @@
 [2025-06-19 23:05:52] [INFO]: [1@gmail.com] Action: Login failed - No such user | Status: Failed
 [2025-06-19 23:06:59] [INFO]: [13@clc.fitus.edu.vn] Action: Login failed - No such user | Status: Failed
 [2025-06-19 23:07:03] [INFO]: [13@clc.fitus.edu.vn] Action: Login failed - No such user | Status: Failed
+[2025-06-20 10:14:36] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-20 10:16:12] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-20 10:16:38] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-20 11:13:36] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-20 11:16:43] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-20 11:17:44] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-20 11:18:16] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-20 18:24:55] [INFO]: [123@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-20 18:49:43] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login failed - wrong pass | Status: Failed
+[2025-06-20 18:49:48] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login failed - wrong pass | Status: Failed
+[2025-06-20 18:49:53] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login failed - wrong pass | Status: Failed
+[2025-06-20 18:49:58] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login failed - wrong pass | Status: Failed
+[2025-06-20 18:50:06] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login failed - wrong pass | Status: Failed
+[2025-06-20 18:56:41] [INFO]: [123@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-20 18:57:08] [INFO]: [123@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-20 18:58:32] [INFO]: [123@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-20 19:00:50] [INFO]: [123@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA

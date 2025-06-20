@@ -16,6 +16,57 @@
       {% if error %}
       <div class="message-box error-msg">{{ error }}</div>
       {% endif %}
+
+      <!-- Login thành công -->
+      {% if success %}
+      <div class="message-box success-msg">{{ success }}</div>
+      <script>
+        let redirectTimeLeft = 5;
+        const redirectCountdown = setInterval(() => {
+          redirectTimeLeft--;
+          if (redirectTimeLeft <= 0) {
+            clearInterval(redirectCountdown);
+            window.location.href = "/auth/verify";
+          }
+        }, 1000);
+      </script>
+      {% endif %}
+
+      {% if locked %}
+      <div class="message-box error-msg">
+        Your account is locked. Try again in <span id="countdown">5:00</span>.
+      </div>
+      
+      <script>
+        // Hàm đếm ngược bắt đầu ngay khi load trang
+        window.onload = function () {
+          let lockTimeLeft = 300; // 5 phút = 300 giây
+
+          const countdownEl = document.getElementById("countdown");
+          const loginBtn = document.querySelector("button[type='submit']");
+          if (loginBtn) loginBtn.disabled = true;
+
+          const lockTimer = setInterval(() => {
+            // Tính phút và giây
+            const mins = Math.floor(lockTimeLeft / 60);
+            const secs = lockTimeLeft % 60;
+            countdownEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+            lockTimeLeft--;
+
+            // Nếu hết thời gian thì bật lại nút & ẩn cảnh báo
+            if (lockTimeLeft < 0) {
+              clearInterval(lockTimer);
+              if (loginBtn) loginBtn.disabled = false;
+              const msgBox = document.querySelector(".message-box");
+              if (msgBox) msgBox.style.display = "none";
+            }
+          }, 1000);
+        };
+      </script>
+      {% endif %}
+
+
       <div class="input-group">
         <label for="email">@</label>
         <input type="email" name="email" id="email" placeholder="Email" required />

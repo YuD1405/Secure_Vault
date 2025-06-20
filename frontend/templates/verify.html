@@ -4,47 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Multi-Factor Authentication</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login_signup.css') }}">
-    <style>
-        .mfa-options {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-
-        .mfa-button {
-            padding: 10px 30px;
-            border: 2px solid var(--accent-color);
-            border-radius: 16px;
-            background-color: var(--base-color);
-            color: var(--text-color);
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .mfa-button.active {
-            background-color: var(--accent-color);
-            color: white;
-        }
-
-        .mfa-button.inactive {
-            background-color: #ddd;
-            color: #666;
-            border-color: #ccc;
-        }
-
-        .mfa-content {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        #qr-img {
-            margin: 10px auto;
-            width: 200px;
-            height: 200px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/verify.css') }}">
     <script defer>
         function showOption(option) {
             document.getElementById('otp-form').style.display = option === 'otp' ? 'block' : 'none';
