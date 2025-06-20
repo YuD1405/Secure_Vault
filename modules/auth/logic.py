@@ -1,4 +1,4 @@
-from flaskapi.extensions import mysql 
+from flaskapi.extensions import mysql
 from modules.auth.validator import (
     is_valid_email, is_valid_date, is_valid_phone,
     is_strong_passphrase, sanitize_input
@@ -8,16 +8,21 @@ import os
 import random
 import string
 import hashlib
+import pyotp
 from datetime import datetime, timedelta
+
 
 def generate_salt(length=16):
     return os.urandom(length).hex()
 
+
 def hash_with_salt(passphrase, salt):
     return hashlib.sha256((passphrase + salt).encode()).hexdigest()
 
+
 def generate_recovery_code(length=12):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+
 
 def register_user(data: dict) -> tuple:
     email = sanitize_input(data.get("email", ""))
@@ -44,6 +49,7 @@ def register_user(data: dict) -> tuple:
     salt = generate_salt()
     hashed = hash_with_salt(pass1, salt)
     recovery_code = generate_recovery_code()
+    mfa_secret = pyotp.random_base32()
 
     cur = mysql.connection.cursor()
     cur.execute("SELECT id FROM users WHERE email = %s", (email,))
@@ -53,9 +59,9 @@ def register_user(data: dict) -> tuple:
 
     try:
         cur.execute("""
-            INSERT INTO users (email, fullname, dob, phone, address, salt, hashed_passphrase,role, recovery_code)
-            VALUES (%s, %s, %s, %s, %s, %s, %s,%s, %s)
-        """, (email, name, dob, phone, address, salt, hashed,'user', recovery_code))
+            INSERT INTO users (email, fullname, dob, phone, address, salt, hashed_passphrase, role, mfa_secret, recovery_code)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (email, name, dob, phone, address, salt, hashed, 'user', mfa_secret, recovery_code))
         mysql.connection.commit()
         log_user_action(email, "Register", "Success")
         return True, f"Registration successful!", recovery_code
@@ -95,7 +101,8 @@ def process_login(email, passphrase):
         if delta < timedelta(minutes=5):
             return {"success": False, "locked": True}
         else:
-            cur.execute("UPDATE users SET is_locked = FALSE, failed_attempts = 0 WHERE email = %s", (email,))
+            cur.execute(
+                "UPDATE users SET is_locked = FALSE, failed_attempts = 0 WHERE email = %s", (email,))
             mysql.connection.commit()
 
     # Kiểm tra mật khẩu

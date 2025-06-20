@@ -17,21 +17,6 @@
       <div class="message-box error-msg">{{ error }}</div>
       {% endif %}
 
-      <!-- Login thành công -->
-      {% if success %}
-      <div class="message-box success-msg">{{ success }}</div>
-      <script>
-        let redirectTimeLeft = 5;
-        const redirectCountdown = setInterval(() => {
-          redirectTimeLeft--;
-          if (redirectTimeLeft <= 0) {
-            clearInterval(redirectCountdown);
-            window.location.href = "/auth/verify";
-          }
-        }, 1000);
-      </script>
-      {% endif %}
-
       {% if locked %}
       <div class="message-box error-msg">
         Your account is locked. Try again in <span id="countdown">5:00</span>.
