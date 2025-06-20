@@ -92,7 +92,7 @@ def verify():
 def dashboard():
     if not session.get("user_id"):
         return redirect(url_for("auth.login"))
-    return "Đây là dashboard người dùng"
+    return render_template("user_dashboard.html", email=session.get("email"))
 
 
 @auth_bp.route("/logout")

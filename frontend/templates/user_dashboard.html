@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard - Secure Vault</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo" data-href="{{ url_for('auth.dashboard') }}" onclick="redirectToDashboard()">
+                Secure Vault
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="{{ url_for('crypto.manage_keys') }}">1. Manage RSA Keys</a>
+                <a href="{{ url_for('crypto.encrypt_file') }}">2. Encrypt File</a>
+                <a href="{{ url_for('crypto.decrypt_file') }}">3. Decrypt File</a>
+                <a href="{{ url_for('utils.digital_signature') }}">4. Sign File</a>
+                <a href="{{ url_for('utils.digital_signature') }}">5. Verify Signature</a>
+                <a href="{{ url_for('utils.generate_qr') }}">6. Generate & Scan QR Code</a>
+                <a href="{{ url_for('utils.log_security') }}">7. Security Logs</a>
+                <a href="{{ url_for('auth.update_account') }}">8. Update Account Info</a>
+                <a href="{{ url_for('auth.recover_account') }}">9. Account Recovery</a>
+                <a href="{{ url_for('auth.logout') }}">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h2>Welcome to your Dashboard</h2>
+            <p>Select a function on the left to get started.</p>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script>
+</body>
+
+</html>
