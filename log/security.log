@@ -1,2 +1,3 @@
 [2025-06-19 10:11:12] [INFO]: [anonymous] Action: Verify signature | Status: Success | File: ava.jpg
 [2025-06-19 10:11:23] [WARNING]: [anonymous] Action: Verify signature | Status: Failure | File: ava.jpg
+[2025-06-19 14:20:00] [ERROR]: [DUY@example.com] Action: Sign file | Status: Success | File: doc.pdf

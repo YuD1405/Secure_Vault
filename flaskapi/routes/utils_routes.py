@@ -6,13 +6,12 @@ import os
 
 utils_bp = Blueprint('utils', __name__)
 
-
-# Render Page
+# Render Page (temp)
 @utils_bp.route('/digital_signature', methods=['GET'])
 def digital_signature():
     return render_template('digital_signature.html')  
 
-# Route 8 – File Signing
+# Requirement 8 – File Signing
 @utils_bp.route('/sign_file', methods=['POST'])
 def signing_file_route():
     file = request.files.get('file_to_sign')
@@ -36,7 +35,7 @@ def signing_file_route():
     log_user_action("anonymous", "Sign file", "Success", f"File: {file.filename}", level="info")
     return jsonify({'message': 'Đã ký số thành công!'})
 
-# Route 9 – Verify Digital Signature
+# Requirement 9 – Verify Digital Signature
 @utils_bp.route('/verify_signature', methods=['POST'])
 def verify_signature_route():
     file = request.files.get('file_to_verify')
@@ -66,11 +65,60 @@ def verify_signature_route():
     else:
         log_user_action("anonymous", "Verify signature", "Failure", f"File: {file.filename}", level="warning")
         return jsonify({"success": False, "message": "Signature is invalid."}), 400
+
 # Placeholder routes
 @utils_bp.route("/generate_qr")
 def generate_qr():
     return "Gen Qr"
 
+# Requirement 11 – Security logging
 @utils_bp.route("/log_security")
 def log_security():
-    return "Logging"
+    log_file_path = 'log/security.log'
+    logs = []
+
+    if os.path.exists(log_file_path):
+        with open(log_file_path, 'r') as f:
+            for line in f:
+                try:
+                    # Format: [timestamp] [LEVEL]: [user] Action: ... | Status: ... | File: ...
+                    time_start = line.find('[') + 1
+                    time_end = line.find(']')
+                    timestamp = line[time_start:time_end]
+
+                    level_start = line.find('[', time_end + 1) + 1
+                    level_end = line.find(']', level_start)
+                    level = line[level_start:level_end]
+
+                    user_start = line.find('[', level_end + 1) + 1
+                    user_end = line.find(']', user_start)
+                    user = line[user_start:user_end]
+
+                    # Nội dung còn lại
+                    rest = line[user_end + 2:].strip()
+
+                    # Tách các trường còn lại
+                    action = status = file = ""
+                    parts = [p.strip() for p in rest.split('|')]
+                    for part in parts:
+                        if part.startswith("Action:"):
+                            action = part.replace("Action:", "").strip()
+                        elif part.startswith("Status:"):
+                            status = part.replace("Status:", "").strip()
+                        elif part.startswith("File:"):
+                            file = part.replace("File:", "").strip()
+
+                    logs.append({
+                        "timestamp": timestamp,
+                        "level": level,
+                        "user": user,
+                        "action": action,
+                        "status": status,
+                        "file": file
+                    })
+
+                except:
+                    pass  
+
+    return render_template("log_security.html", logs=logs)
+
