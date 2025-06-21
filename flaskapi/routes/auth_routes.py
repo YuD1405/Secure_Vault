@@ -108,4 +108,4 @@ def recover_account():
 
 @auth_bp.route("/update_account")
 def update_account():
-    return "Upd account"
+    return render_template("update_account.html", email=session.get("email"))

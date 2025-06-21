@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 
 crypto_bp = Blueprint('crypto', __name__)
 
@@ -12,4 +12,4 @@ def decrypt_file():
 
 @crypto_bp.route("/manage_keys")
 def manage_keys():
-    return "manage_keys"
+    return render_template("manage_keys.html")

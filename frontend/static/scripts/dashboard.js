@@ -1,16 +1,15 @@
-function redirectToDashboard() {
-  const url = document.querySelector(".logo").dataset.href;
-  window.location.href = url;
-}
-
-// Đánh dấu mục đang active
 document.addEventListener("DOMContentLoaded", () => {
-  const links = document.querySelectorAll(".sidebar-menu a");
-  const currentUrl = window.location.href;
+  const sidebar = document.querySelector(".sidebar");
+  const mainToggle = document.querySelector(".main");
+  const tabToggle = document.querySelector(".tab-pane");
 
-  links.forEach((link) => {
-    if (currentUrl.includes(link.href)) {
-      link.classList.add("active");
-    }
+  sidebar.addEventListener("mouseover", () => {
+    mainToggle.classList.add("active");
+  });
+
+  sidebar.addEventListener("mouseout", () => {
+    mainToggle.classList.remove("active");
   });
 });
+
+

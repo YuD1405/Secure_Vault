@@ -45,4 +45,3 @@ CREATE TABLE otp_codes (
   created_at DATETIME,
   expires_at DATETIME
 );
-
