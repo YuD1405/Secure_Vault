@@ -5,62 +5,104 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Signup</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login_signup.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/signup.css') }}">
     <script src="{{ url_for('static', filename='scripts/validation.js') }}" defer></script>
 </head>
 
 <body>
     <div class="wrapper">
         <h1>SIGNUP</h1>
-        <form method="POST" action="{{ url_for('auth.signup') }}">
-            <div class="input-group">
-                <label for="name">👤</label>
-                <input type="text" name="name" id="name" placeholder="Full Name" required />
-                <span class="error-message" id="name-error"></span>
+
+        {# MESSAGE NOTIFICATION#}
+        {% if error %}
+        <div class="message-box error-msg">{{ error }}</div>
+        {% elif success %}
+        <div class="message-box success-msg">{{ success }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('auth.signup') }}" class="two-column-form">
+            <div class="form-column">
+                <h3>Personal Information</h3>
+                <div class="input-group">
+                    <label for="name">👤</label>
+                    <input type="text" name="name" id="name" placeholder="Full Name" required />
+                    <span class="error-message" id="name-error"></span>
+                </div>
+
+                <div class="input-group">
+                    <label for="dob">📅</label>
+                    <input type="date" name="dob" id="dob" required />
+                    <span class="error-message" id="dob-error"></span>
+                </div>
+
+                <div class="input-group">
+                    <label for="phone">📱</label>
+                    <input type="text" name="phone" id="phone" placeholder="Phone Number" required />
+                    <span class="error-message" id="phone-error"></span>
+                </div>
+
+                <div class="input-group">
+                    <label for="address">🏠</label>
+                    <input type="text" name="address" id="address" placeholder="Address" required />
+                    <span class="error-message" id="address-error"></span>
+                </div>
             </div>
 
-            <div class="input-group">
-                <label for="dob">📅</label>
-                <input type="date" name="dob" id="dob" required />
-                <span class="error-message" id="dob-error"></span>
-            </div>
+            <div class="form-column">
+                <h3>Account Information</h3>
+                <div class="input-group">
+                    <label for="email">@</label>
+                    <input type="email" name="email" id="email" placeholder="Email" required />
+                    <span class="error-message" id="email-error"></span>
+                </div>
 
-            <div class="input-group">
-                <label for="phone">📱</label>
-                <input type="text" name="phone" id="phone" placeholder="Phone Number" required />
-                <span class="error-message" id="phone-error"></span>
-            </div>
+                <div class="input-group">
+                    <label for="passphrase">🔒</label>
+                    <input type="password" name="passphrase" id="passphrase" placeholder="Passphrase" required />
+                    <span class="error-message" id="passphrase-error"></span>
+                </div>
 
-            <div class="input-group">
-                <label for="address">🏠</label>
-                <input type="text" name="address" id="address" placeholder="Address" required />
-                <span class="error-message" id="address-error"></span>
+                <div class="input-group">
+                    <label for="repeat_passphrase">🔁</label>
+                    <input type="password" name="repeat_passphrase" id="repeat_passphrase" placeholder="Repeat Passphrase"
+                        required />
+                    <span class="error-message" id="repeat_passphrase-error"></span>
+                </div>
             </div>
-
-            <div class="input-group">
-                <label for="email">@</label>
-                <input type="email" name="email" id="email" placeholder="Email" required />
-                <span class="error-message" id="email-error"></span>
-            </div>
-
-            <div class="input-group">
-                <label for="passphrase">🔒</label>
-                <input type="password" name="passphrase" id="passphrase" placeholder="Passphrase" required />
-                <span class="error-message" id="passphrase-error"></span>
-            </div>
-
-            <div class="input-group">
-                <label for="repeat_passphrase">🔁</label>
-                <input type="password" name="repeat_passphrase" id="repeat_passphrase" placeholder="Repeat Passphrase"
-                    required />
-                <span class="error-message" id="repeat_passphrase-error"></span>
-            </div>
-
             <button type="submit">SIGN UP</button>
         </form>
 
         <p>Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></p>
     </div>
+
+    {# POPUP RECOVERY KEY#}
+    {% if recovery_code %}
+    <div class="popup" id="popup">
+        <h2>This is your recovery key</h2>
+        <p style="font-weight: bold; color: red;">{{ recovery_code }}</p>
+        <p>Please copy and store it safely. It won't be shown again.</p>
+        <div style="margin-top: 20px;">
+            <button id="redirect-btn">Redirect to login page?</button>
+            <button id="stay-btn" style="margin-left: 10px;">Stay here</button>
+        </div>
+    </div>
+    
+    <script>
+        setTimeout(function () {
+            document.getElementById('popup').style.display = 'block';
+        }, 2000);
+
+        // Chuyển sang login page
+        document.getElementById("redirect-btn").onclick = function () {
+            window.location.href = "{{ url_for('auth.login') }}";
+        };
+
+        // Ẩn popup nếu người dùng chọn "Stay here"
+        document.getElementById("stay-btn").onclick = function () {
+            document.getElementById("popup").style.display = "none";
+        };
+    </script>
+    {% endif %}
 </body>
 
 </html>

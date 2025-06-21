@@ -1,0 +1,6 @@
+[2025-06-21 22:06:11] [INFO]: [hihihi@gmail.com] Action: Register | Status: Success
+[2025-06-21 22:06:37] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-21 22:08:15] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-21 22:09:58] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-21 22:12:09] [INFO]: [anonymous] Action: Sign file | Status: Success | File: sec_bg.png
+[2025-06-21 22:12:47] [INFO]: [anonymous] Action: Verify signature | Status: Success | File: sec_bg.png

@@ -11,7 +11,7 @@
   <!-- Form Upload File -->
   <form id="uploadForm" enctype="multipart/form-data" method="POST">
     <label for="file">Chọn file cần ký:</label>
-    <input type="file" name="file" required />
+    <input type="file" name="file_to_sign" required />
     <button type="submit">Gửi</button>
   </form>
 
@@ -23,7 +23,7 @@
   <h3>🔍 Verify Signature</h3>
   <form id="verifyForm" enctype="multipart/form-data" method="POST">
     <label for="verifyFile">Chọn file để xác minh chữ ký:</label>
-    <input type="file" name="file" required />
+    <input type="file" name="file_to_verify" required />
     
     <label for="signature">Chọn chữ ký để xác minh:</label>
     <input type="file" name="signature" required />

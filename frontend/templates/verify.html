@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Multi-Factor Authentication</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/verify.css') }}">
+    <script defer>
+        function showOption(option) {
+            document.getElementById('otp-form').style.display = option === 'otp' ? 'block' : 'none';
+            document.getElementById('totp-form').style.display = option === 'totp' ? 'block' : 'none';
+
+            document.getElementById('otp-btn').classList.toggle('active', option === 'otp');
+            document.getElementById('otp-btn').classList.toggle('inactive', option !== 'otp');
+            document.getElementById('totp-btn').classList.toggle('active', option === 'totp');
+            document.getElementById('totp-btn').classList.toggle('inactive', option !== 'totp');
+
+            if (option === 'otp') {
+                startCountdown();
+            }
+        }
+
+        let timer = 300;
+        function startCountdown() {
+            const countdown = document.getElementById("countdown");
+            timer = 300;
+            const interval = setInterval(() => {
+                if (timer <= 0) {
+                    clearInterval(interval);
+                    countdown.textContent = "Expired";
+                    return;
+                }
+                timer--;
+                const min = Math.floor(timer / 60);
+                const sec = timer % 60;
+                countdown.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        window.onload = () => {
+            const method = "{{ selected_method }}";
+            showOption(method === "totp" ? "totp" : "otp");
+        }
+    </script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <h1>Multi-Factor Authentication</h1>
+
+        <div class="mfa-options">
+            <button id="otp-btn" class="mfa-button" onclick="showOption('otp')">OTP via mail</button>
+            <button id="totp-btn" class="mfa-button inactive" onclick="showOption('totp')">GG Authenticator</button>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        {% if (category == selected_method + '_error') or category == 'success' %}
+        <div class="message-box {{ 'error-msg' if 'error' in category else 'success-msg' }}">{{ message }}</div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+
+
+        <div class="mfa-content">
+            <div id="otp-form" style="display:none;">
+                <p>Your OTP was sent to {{ email }}. OTP will time out in <span id="countdown">5:00</span></p>
+                <form method="POST">
+                    <input type="hidden" name="method" value="email" />
+                    <div class="input-group">
+                        <label for="otp">🔑</label>
+                        <input type="text" id="otp" name="otp" placeholder="Enter OTP" required />
+                    </div>
+                    <button type="submit">Verify OTP</button>
+                </form>
+                <form method="POST" style="margin-top: 10px;">
+                    <input type="hidden" name="method" value="email" />
+                    <input type="hidden" name="resend" value="1" />
+                    <button type="submit" style="background-color:#ccc;color:#000;">Resend OTP</button>
+                </form>
+            </div>
+
+            <div id="totp-form" style="display:none;">
+                <p>Scan the QR code below with Google Authenticator:</p>
+                <img id="qr-img" src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+                <form method="POST">
+                    <input type="hidden" name="method" value="totp" />
+                    <div class="input-group">
+                        <label for="otp">🔑</label>
+                        <input type="text" id="otp" name="otp" placeholder="6-digit code from Google Authenticator"
+                            required />
+                    </div>
+                    <button type="submit">Verify TOTP</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

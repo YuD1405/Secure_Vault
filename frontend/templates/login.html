@@ -5,25 +5,63 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/login_signup.css') }}">
-  <script src="{{ url_for('static', filename='scripts/validation.js') }}" defer></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
 </head>
 
 <body>
   <div class="wrapper">
     <h1>Login</h1>
-    {% if error %}
-    <p id="error-message">{{ error }}</p>
-    {% endif %}
     <form method="POST" action="{{ url_for('auth.login') }}">
-      <div>
-        <label for="email-input">@</label>
-        <input type="email" name="email" id="email-input" placeholder="Email" required>
+      
+      {% if error %}
+      <div class="message-box error-msg">{{ error }}</div>
+      {% endif %}
+
+      {% if locked %}
+      <div class="message-box error-msg">
+        Your account is locked. Try again in <span id="countdown">5:00</span>.
       </div>
-      <div>
-        <label for="password-input">🔒</label>
-        <input type="password" name="passphrase" id="password-input" placeholder="Passphrase" required>
+      
+      <script>
+        // Hàm đếm ngược bắt đầu ngay khi load trang
+        window.onload = function () {
+          let lockTimeLeft = 300; // 5 phút = 300 giây
+
+          const countdownEl = document.getElementById("countdown");
+          const loginBtn = document.querySelector("button[type='submit']");
+          if (loginBtn) loginBtn.disabled = true;
+
+          const lockTimer = setInterval(() => {
+            // Tính phút và giây
+            const mins = Math.floor(lockTimeLeft / 60);
+            const secs = lockTimeLeft % 60;
+            countdownEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+            lockTimeLeft--;
+
+            // Nếu hết thời gian thì bật lại nút & ẩn cảnh báo
+            if (lockTimeLeft < 0) {
+              clearInterval(lockTimer);
+              if (loginBtn) loginBtn.disabled = false;
+              const msgBox = document.querySelector(".message-box");
+              if (msgBox) msgBox.style.display = "none";
+            }
+          }, 1000);
+        };
+      </script>
+      {% endif %}
+
+
+      <div class="input-group">
+        <label for="email">@</label>
+        <input type="email" name="email" id="email" placeholder="Email" required />
       </div>
+
+      <div class="input-group">
+        <label for="passphrase">🔒</label>
+        <input type="password" name="passphrase" id="passphrase" placeholder="Passphrase" required />
+      </div>
+    
       <button type="submit">Login</button>
     </form>
     <p>New here? <a href="{{ url_for('auth.signup') }}">Create an Account</a></p>
