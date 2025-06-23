@@ -97,6 +97,9 @@ def process_login(email, passphrase):
             user['failed_attempts'] = 0
 
     if user['is_locked']:
+        if user['last_failed_login'] is None:
+            return {"success": False, "locked_by_admin": True}
+        
         delta = now - user['last_failed_login']
         if delta < timedelta(minutes=5):
             return {"success": False, "locked": True}

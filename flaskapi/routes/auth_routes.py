@@ -3,6 +3,7 @@ from modules.auth.logic import register_user, process_login
 from modules.auth.mfa import (verify_otp_code, verify_totp_code,
                               generate_and_send_otp, generate_qr_code, expire_otp_code)
 from modules.utils.logger import read_security_logs
+from modules.utils.manage_account import fetch_all_users, toggle_user_lock
 auth_bp = Blueprint('auth', __name__)
 
 
@@ -20,6 +21,8 @@ def login():
             session['role'] = result.get("role")
             session.pop('otp_sent', None)
             return redirect(url_for('auth.verify'))
+        elif result.get("locked_by_admin"):
+            return render_template("login.html", locked_by_admin=True)
         elif result.get("locked"):
             return render_template("login.html", locked=True)
         else:
@@ -110,21 +113,19 @@ def admin_dashboard():
     return render_template("admin_dashboard.html", email=session.get("email"), logs=logs)
 
 
-@auth_bp.route("/admin_lock_account")
-def admin_lock_account():
-    if not session.get("user_id") and session.get("role") != "admin":
-        flash("Access denied.", "error")
-        return redirect(url_for("auth.login"))
-    return render_template("admin_lock_account.html", email=session.get("email"))
-
-@auth_bp.route("/admin_manage_account")
+@auth_bp.route("/admin_manage_account", methods=['GET', 'POST'])
 def admin_manage_account():
     if not session.get("user_id") and session.get("role") != "admin":
         flash("Access denied.", "error")
         return redirect(url_for("auth.login"))
     
-    
-    return render_template("admin_manage_account.html", email=session.get("email"))
+    if request.method == "POST":
+        email = request.form.get("email")
+        action = request.form.get("action")  # "lock" hoặc "unlock"
+        toggle_user_lock(email, lock=(action == "lock"))
+
+    users = fetch_all_users()
+    return render_template("admin_manage_account.html", email=session.get("email"), users=users)
 
 
 @auth_bp.route("/logout")

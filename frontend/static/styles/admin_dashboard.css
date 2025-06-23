@@ -979,3 +979,95 @@ tbody td.active {
     transform: scale(1.25);
     transition: all 0.3s;
 }
+
+/* popup */
+.popup {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 480px;
+    background: white;
+    border: 2px solid #ccc;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    z-index: 1000;
+    border-radius: 12px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+.popup h3 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #3c3c3c;
+    margin-bottom: 20px;
+}
+
+.popup-content p {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.popup-content span {
+    font-weight: 500;
+    color: #555;
+}
+
+.popup-content form {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.popup-content button {
+    padding: 8px 16px;
+    margin: 0 8px;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.lock-btn {
+    background-color: #d9534f;
+    color: white;
+}
+
+.lock-btn:hover {
+    background-color: #c9302c;
+}
+
+.unlock-btn {
+    background-color: #5cb85c;
+    color: white;
+}
+
+.unlock-btn:hover {
+    background-color: #4cae4c;
+}
+
+.close-btn {
+    background-color: #999;
+    color: white;
+}
+
+.close-btn:hover {
+    background-color: #777;
+}
+
+/* Cột STT (#) */
+table th:nth-child(1),
+table td:nth-child(1) {
+    width: 50px;
+    text-align: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* Cột Fullname – thêm margin trái */
+table th:nth-child(2),
+table td:nth-child(2) {
+    padding-left: 1.5rem;
+    /* 👉 tạo khoảng cách thoáng hơn với cột STT */
+}
