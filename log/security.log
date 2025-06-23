@@ -4,3 +4,6 @@
 [2025-06-21 22:09:58] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
 [2025-06-21 22:12:09] [INFO]: [anonymous] Action: Sign file | Status: Success | File: sec_bg.png
 [2025-06-21 22:12:47] [INFO]: [anonymous] Action: Verify signature | Status: Success | File: sec_bg.png
+[2025-06-22 11:30:56] [INFO]: [nhdduy22@clc.fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-23 15:56:08] [INFO]: [admin@fitus.edu.vn] Action: Login success | Status: Pending MFA
+[2025-06-23 16:56:47] [INFO]: [admin@fitus.edu.vn] Action: Login success | Status: Pending MFA

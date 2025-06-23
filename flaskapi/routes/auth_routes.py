@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from modules.auth.logic import register_user, process_login
 from modules.auth.mfa import (verify_otp_code, verify_totp_code,
                               generate_and_send_otp, generate_qr_code, expire_otp_code)
-
+from modules.utils.logger import read_security_logs
 auth_bp = Blueprint('auth', __name__)
 
 
@@ -17,6 +17,7 @@ def login():
         result = process_login(email, passphrase)
         if result.get("success"):
             session['email'] = email
+            session['role'] = result.get("role")
             session.pop('otp_sent', None)
             return redirect(url_for('auth.verify'))
         elif result.get("locked"):
@@ -68,6 +69,8 @@ def verify():
             if verify_otp_code(email, otp_input):
                 session.pop('otp_sent', None)
                 session['user_id'] = email
+                if session.get("role") == "admin":
+                    return redirect(url_for("auth.admin_dashboard"))
                 return redirect(url_for('auth.dashboard'))
             else:
                 flash("Invalid or expired OTP", "email_error")
@@ -77,6 +80,8 @@ def verify():
             if verify_totp_code(email, otp_input):
                 session.pop('otp_sent', None)
                 session['user_id'] = email
+                if session.get("role") == "admin":
+                    return redirect(url_for("auth.admin_dashboard"))
                 return redirect(url_for('auth.dashboard'))
             else:
                 flash("Invalid TOTP code", "totp_error")
@@ -93,6 +98,33 @@ def dashboard():
     if not session.get("user_id"):
         return redirect(url_for("auth.login"))
     return render_template("user_dashboard.html", email=session.get("email"))
+
+
+@auth_bp.route("/admin_dashboard")
+def admin_dashboard():
+    if not session.get("user_id") and session.get("role") != "admin":
+        flash("Access denied.", "error")
+        return redirect(url_for("auth.login"))
+    
+    logs = read_security_logs()
+    return render_template("admin_dashboard.html", email=session.get("email"), logs=logs)
+
+
+@auth_bp.route("/admin_lock_account")
+def admin_lock_account():
+    if not session.get("user_id") and session.get("role") != "admin":
+        flash("Access denied.", "error")
+        return redirect(url_for("auth.login"))
+    return render_template("admin_lock_account.html", email=session.get("email"))
+
+@auth_bp.route("/admin_manage_account")
+def admin_manage_account():
+    if not session.get("user_id") and session.get("role") != "admin":
+        flash("Access denied.", "error")
+        return redirect(url_for("auth.login"))
+    
+    
+    return render_template("admin_manage_account.html", email=session.get("email"))
 
 
 @auth_bp.route("/logout")

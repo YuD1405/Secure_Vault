@@ -126,4 +126,4 @@ def process_login(email, passphrase):
     mysql.connection.commit()
     log_user_action(email, "Login success", "Pending MFA")
 
-    return {"success": True}
+    return {"success": True, "role": user['role']}
