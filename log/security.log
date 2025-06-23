@@ -4,3 +4,21 @@
 [2025-06-21 22:09:58] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
 [2025-06-21 22:12:09] [INFO]: [anonymous] Action: Sign file | Status: Success | File: sec_bg.png
 [2025-06-21 22:12:47] [INFO]: [anonymous] Action: Verify signature | Status: Success | File: sec_bg.png
+[2025-06-23 07:51:36] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-23 08:22:43] [WARNING]: [anonymous] Action: Sign file | Status: Failure | Missing file
+[2025-06-23 08:28:01] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 08:30:53] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 08:40:19] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 08:44:07] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 08:44:12] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 08:45:34] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 08:45:55] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 08:45:57] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 08:50:06] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 08:51:05] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 08:51:23] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 08:55:47] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 09:07:14] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 09:17:37] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 09:17:46] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
+[2025-06-23 09:49:51] [WARNING]: [anonymous] Action: Verify signature | Status: Failure | Missing file or signature
