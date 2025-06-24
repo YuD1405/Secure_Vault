@@ -33,14 +33,14 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('crypto.encrypt_file') }}">
+                    <a href="{{ url_for('crypto.render_encrypt') }}">
                         <span class="material-icons" style="font-size: 28px">
                             lock
                         </span> Encrypt File
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('crypto.decrypt_file') }}">
+                    <a href="{{ url_for('crypto.render_decrypt') }}">
                         <span class="material-icons" style="font-size: 28px">
                             lock_open
                         </span> Decrypt File
@@ -61,21 +61,14 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('utils.generate_qr') }}">
+                    <a href="{{ url_for('utils.render_generate_qr') }}">
                         <span class="material-icons" style="font-size: 28px">
                             qr_code
                         </span> QR Code
                     </a>
                 </li>
-                <!-- <li>
-                    <a href="{{ url_for('crypto.decrypt_file') }}">
-                        <span class="material-icons" style="font-size: 28px">
-                            security
-                        </span> Security Logs
-                    </a>
-                </li> -->
                 <li >
-                    <a href="{{ url_for('auth.update_account') }}">
+                    <a href="{{ url_for('auth.render_update_account') }}">
                         <span class="material-icons" style="font-size: 28px">
                             manage_accounts
                         </span> Update Info

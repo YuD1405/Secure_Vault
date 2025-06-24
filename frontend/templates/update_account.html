@@ -2,10 +2,13 @@
 <html lang="en">
 
 <head>
-    <title>Secure Vault</title>
+    <title>Sign File</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
-    <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/update_account.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/toast.css') }}">
+    <script src="{{ url_for('static', filename='scripts/update_account.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/toast.js') }}"></script>
+
     <!-- Linking Google Font Link for Icon -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet"
@@ -33,49 +36,43 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('crypto.encrypt_file') }}">
+                    <a href="{{ url_for('crypto.render_encrypt') }}">
                         <span class="material-icons" style="font-size: 28px">
                             lock
                         </span> Encrypt File
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('crypto.decrypt_file') }}">
+                    <a href="{{ url_for('crypto.render_decrypt') }}">
                         <span class="material-icons" style="font-size: 28px">
                             lock_open
                         </span> Decrypt File
                     </a>
                 </li>
-                <li>
-                    <a href="{{ url_for('utils.digital_signature') }}">
+                <li data-content="Sign File">
+                    <a href="{{ url_for('utils.render_sign_file') }}">
                         <span class="material-icons" style="font-size: 28px">
                             edit_document
                         </span> Sign File
                     </a>
                 </li>
-                <li>
-                    <a href="{{ url_for('utils.digital_signature') }}">
+                <li >
+                    <a href="{{ url_for('utils.render_verify_signature') }}">
                         <span class="material-icons" style="font-size: 28px">
                             fact_check
                         </span> Verify Signature
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('utils.generate_qr') }}">
+                    <a href="{{ url_for('utils.render_generate_qr') }}">
                         <span class="material-icons" style="font-size: 28px">
                             qr_code
                         </span> QR Code
                     </a>
                 </li>
-                <!-- <li>
-                    <a href="{{ url_for('crypto.decrypt_file') }}">
-                        <span class="material-icons" style="font-size: 28px">
-                            security
-                        </span> Security Logs
-                    </a>
-                </li> -->
-                <li class="active">
-                    <a href="{{ url_for('auth.update_account') }}">
+                
+                <li data-content="Update Info" class="active">
+                    <a href="{{ url_for('auth.render_update_account') }}">
                         <span class="material-icons" style="font-size: 28px">
                             manage_accounts
                         </span> Update Info
@@ -97,29 +94,60 @@
                 <div class="topbar topbar--set-padding">
                     Update Account Information
                 </div>
-                <div class="content__body">
-                    <div class="intro">
-                        <h2>Welcome to Secure Vault</h2>
-                        <p>
-                            Secure Vault is a security platform that enables users to encrypt/decrypt files, digitally sign and verify
-                            documents, manage personal RSA keys, and perform secure multi-factor authentication (MFA).
-                        </p>
-                    
-                        <h3>Quick Navigation Guide</h3>
-                        <ul class="intro-list">
-                            <li><strong>Dashboard:</strong> Overview and welcome screen.</li>
-                            <li><strong>Manage RSA Keys:</strong> Generate and manage your RSA key pairs securely.</li>
-                            <li><strong>Encrypt File:</strong> Encrypt a file for another user using their public key.</li>
-                            <li><strong>Decrypt File:</strong> Decrypt a file using your private key.</li>
-                            <li><strong>Sign File:</strong> Digitally sign any file with your private RSA key.</li>
-                            <li><strong>Verify Signature:</strong> Validate the signature of a file using stored public keys.</li>
-                            <li><strong>Generate & Scan QR Code:</strong> Create or scan QR codes that store public key metadata.</li>
-                            <li><strong>Update Account Info:</strong> Edit your profile details or change your passphrase.</li>
-                            <li><strong>Logout:</strong> Securely exit your session.</li>
-                        </ul>
+                <!-- Content zone -->
+                 <form class="update-form" action="{{ url_for('auth.update_account') }}" method="POST">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" name="name" id="name" placeholder="Full Name">
+                        </div>
                     </div>
-                      
-                    
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="dob">Date of Birth</label>
+                            <input type="date" name="dob" id="dob">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="address">Address</label>
+                            <input type="text" name="address" id="address" placeholder="Address">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="text" name="phone" id="phone" placeholder="Phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="email" style="opacity: 0.5;">Email (read-only)</label>
+                            <input type="text" name="email" id="email" readonly>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h3>Change Passphrase</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="old_pass">Old Passphrase</label>
+                            <input type="password" name="old_pass" id="old_pass" placeholder="Old Passphrase">
+                        </div>
+                        <div class="form-group">
+                            <label for="new_pass">New Passphrase</label>
+                            <input type="password" name="new_pass" id="new_pass" placeholder="New Passphrase">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

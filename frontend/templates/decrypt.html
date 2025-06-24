@@ -2,11 +2,11 @@
 <html lang="en">
 
 <head>
-    <title>Sign File</title>
+    <title>Decrypt</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/sign_file.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/decrypt.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/toast.css') }}">
-    <script src="{{ url_for('static', filename='scripts/sign_file.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/decrypt.js') }}"></script>
     <script src="{{ url_for('static', filename='scripts/toast.js') }}"></script>
 
     <!-- Linking Google Font Link for Icon -->
@@ -35,21 +35,21 @@
                         </span>RSA Keys
                     </a>
                 </li>
-                <li>
+                <li data-content="Encrypt File">
                     <a href="{{ url_for('crypto.render_encrypt') }}">
                         <span class="material-icons" style="font-size: 28px">
                             lock
                         </span> Encrypt File
                     </a>
                 </li>
-                <li>
+                <li data-content="Decrypt File" class="active">
                     <a href="{{ url_for('crypto.render_decrypt') }}">
                         <span class="material-icons" style="font-size: 28px">
                             lock_open
                         </span> Decrypt File
                     </a>
                 </li>
-                <li data-content="Sign File" class="active">
+                <li data-content="Sign File">
                     <a href="{{ url_for('utils.render_sign_file') }}">
                         <span class="material-icons" style="font-size: 28px">
                             edit_document
@@ -90,7 +90,7 @@
 
         <div class="main main--setup">
             <div class="content content--setup">
-                <div class="topbar topbar--set-padding">Sign File</div>
+                <div class="topbar topbar--set-padding">Decrypt File</div>
                     <!-- Left: Upload zone -->
                 <form id="uploadForm" method="POST" enctype="multipart/form-data" class="sign-file-wrapper-v2">
                     <!-- Selected File -->
@@ -108,13 +108,13 @@
                         <img src="{{ url_for('static', filename='images/cloud.png') }}" class="upload-icon" />
                         <p><strong>Drag & drop to upload</strong></p>
                         <p>or <label for="file-upload" class="custom-file-upload">Upload</label></p>
-                        <input type="file" name="file_to_sign" id="file-upload" hidden>
+                        <input type="file" name="file_to_decrypt" id="file-upload" hidden>
                         <p class="upload-hint">Only PDF, DOCX supported</p>
                     </div>
 
                     <!-- Submit Button -->
                     <div class="form-group bottom-submit">
-                        <button type="submit" class="btn-next">Sign File</button>
+                        <button type="submit" class="btn-next">Decrypt File</button>
                         <p id="uploadResult" class="result-message"></p>
                     </div>
                 </form>

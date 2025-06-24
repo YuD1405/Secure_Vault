@@ -31,3 +31,7 @@
 .toast.success {
   background-color: #16a34a;
 }
+
+.toast.info {
+  background-color: #45a6f6;
+}

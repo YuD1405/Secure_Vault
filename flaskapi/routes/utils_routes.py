@@ -69,10 +69,14 @@ def verify_signature_route():
         log_user_action("anonymous", "Verify signature", "Failure", f"File: {file.filename}", level="warning")
         return jsonify({"success": False, "message": "Signature is invalid."}), 400
 
-# Placeholder routes
-@utils_bp.route("/generate_qr")
-def generate_qr():
-    return "Gen Qr"
+# Requirement 4 – QR
+@utils_bp.route('/generate_qr', methods=['GET'])
+def render_generate_qr():
+    return render_template('qr_code.html')
+
+@utils_bp.route('/decode_qr', methods=['POST'])
+def decode_qr():
+    return "decode qr"
 
 # Requirement 11 – Security logging
 @utils_bp.route("/log_security")
