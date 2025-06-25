@@ -127,3 +127,26 @@ def process_login(email, passphrase):
     log_user_action(email, "Login success", "Pending MFA")
 
     return {"success": True}
+
+def get_user_by_email(email):
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT id, email, fullname, dob, phone, address 
+        FROM users 
+        WHERE email = %s
+    """, (email,))
+    
+    row = cur.fetchone()
+    cur.close()
+
+    if row:
+
+        return {
+            "id": row["id"],
+            "email": row["email"],
+            "fullname": row["fullname"],
+            "dob": row["dob"].strftime("%Y-%m-%d") if row["dob"] else "",
+            "phone": row["phone"],
+            "address": row["address"]
+        }
+    return None

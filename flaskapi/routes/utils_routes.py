@@ -6,12 +6,11 @@ import os
 
 utils_bp = Blueprint('utils', __name__)
 
-# Render Page (temp)
-@utils_bp.route('/digital_signature', methods=['GET'])
-def digital_signature():
-    return render_template('digital_signature.html')  
-
 # Requirement 8 – File Signing
+@utils_bp.route('/sign_file', methods=['GET'])
+def render_sign_file():
+    return render_template('sign_file.html')
+
 @utils_bp.route('/sign_file', methods=['POST'])
 def signing_file_route():
     file = request.files.get('file_to_sign')
@@ -36,6 +35,10 @@ def signing_file_route():
     return jsonify({'message': 'Đã ký số thành công!'})
 
 # Requirement 9 – Verify Digital Signature
+@utils_bp.route('/verify_signature', methods=['GET'])
+def render_verify_signature():
+    return render_template('verify_signature.html')
+
 @utils_bp.route('/verify_signature', methods=['POST'])
 def verify_signature_route():
     file = request.files.get('file_to_verify')
@@ -66,10 +69,14 @@ def verify_signature_route():
         log_user_action("anonymous", "Verify signature", "Failure", f"File: {file.filename}", level="warning")
         return jsonify({"success": False, "message": "Signature is invalid."}), 400
 
-# Placeholder routes
-@utils_bp.route("/generate_qr")
-def generate_qr():
-    return "Gen Qr"
+# Requirement 4 – QR
+@utils_bp.route('/generate_qr', methods=['GET'])
+def render_generate_qr():
+    return render_template('qr_code.html')
+
+@utils_bp.route('/decode_qr', methods=['POST'])
+def decode_qr():
+    return "decode qr"
 
 # Requirement 11 – Security logging
 @utils_bp.route("/log_security")

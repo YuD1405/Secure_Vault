@@ -2,10 +2,13 @@
 <html lang="en">
 
 <head>
-    <title>Secure Vault</title>
+    <title>Decrypt</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
-    <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/decrypt.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/toast.css') }}">
+    <script src="{{ url_for('static', filename='scripts/decrypt.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/toast.js') }}"></script>
+
     <!-- Linking Google Font Link for Icon -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet"
@@ -18,7 +21,7 @@
             <!-- <img src="/images/SEBank.png" alt="logo-hover" class="sidebar-img-default" /> -->
             <!-- <img src="/images/Logo.png" alt="logo-hover" class="sidebar-img-hover" /> -->
             <ul class="sidebar-links">
-                <li data-content="Dashboard" class="active">
+                <li data-content="Dashboard">
                     <a href="{{ url_for('auth.dashboard') }}">
                         <span class="material-icons" style="font-size: 28px">
                             home
@@ -32,21 +35,21 @@
                         </span>RSA Keys
                     </a>
                 </li>
-                <li>
+                <li data-content="Encrypt File">
                     <a href="{{ url_for('crypto.render_encrypt') }}">
                         <span class="material-icons" style="font-size: 28px">
                             lock
                         </span> Encrypt File
                     </a>
                 </li>
-                <li>
+                <li data-content="Decrypt File" class="active">
                     <a href="{{ url_for('crypto.render_decrypt') }}">
                         <span class="material-icons" style="font-size: 28px">
                             lock_open
                         </span> Decrypt File
                     </a>
                 </li>
-                <li>
+                <li data-content="Sign File">
                     <a href="{{ url_for('utils.render_sign_file') }}">
                         <span class="material-icons" style="font-size: 28px">
                             edit_document
@@ -86,37 +89,41 @@
         </aside>
 
         <div class="main main--setup">
-            <!-- Dashboard -->
-            <div class="content content--setup" id="Dashboard">
-                <div class="topbar topbar--set-padding">
-                    Dashboard
-                </div>
-                <div class="content__body">
-                    <div class="intro">
-                        <h2>Welcome to Secure Vault</h2>
-                        <p>
-                            Secure Vault is a security platform that enables users to encrypt/decrypt files, digitally sign and verify
-                            documents, manage personal RSA keys, and perform secure multi-factor authentication (MFA).
-                        </p>
-                    
-                        <h3>Quick Navigation Guide</h3>
-                        <ul class="intro-list">
-                            <li><strong>Dashboard:</strong> Overview and welcome screen.</li>
-                            <li><strong>Manage RSA Keys:</strong> Generate and manage your RSA key pairs securely.</li>
-                            <li><strong>Encrypt File:</strong> Encrypt a file for another user using their public key.</li>
-                            <li><strong>Decrypt File:</strong> Decrypt a file using your private key.</li>
-                            <li><strong>Sign File:</strong> Digitally sign any file with your private RSA key.</li>
-                            <li><strong>Verify Signature:</strong> Validate the signature of a file using stored public keys.</li>
-                            <li><strong>Generate & Scan QR Code:</strong> Create or scan QR codes that store public key metadata.</li>
-                            <li><strong>Update Account Info:</strong> Edit your profile details or change your passphrase.</li>
-                            <li><strong>Logout:</strong> Securely exit your session.</li>
-                        </ul>
+            <div class="content content--setup">
+                <div class="topbar topbar--set-padding">Decrypt File</div>
+                    <!-- Left: Upload zone -->
+                <form id="uploadForm" method="POST" enctype="multipart/form-data" class="sign-file-wrapper-v2">
+                    <!-- Selected File -->
+                    <div class="form-group file-preview-top">
+                        <label for="file-upload-show">Selected File:</label>
+                        <div id="file-info" class="file-info">
+                        <img id="file-icon" src="{{ url_for('static', filename='icons/folder.png') }}" alt="file icon" class="file-icon" />
+                        <input type="text" id="file-upload-show" placeholder="No file selected" readonly />
+                        </div>
+                        <p id="file-details" class="upload-hint" style="margin-top: 5px;"></p>
                     </div>
-                      
-                    
-            </div>
+
+                    <!-- Upload zone -->
+                    <div class="upload-box-center" id="drop-area">
+                        <img src="{{ url_for('static', filename='images/cloud.png') }}" class="upload-icon" />
+                        <p><strong>Drag & drop to upload</strong></p>
+                        <p>or <label for="file-upload" class="custom-file-upload">Upload</label></p>
+                        <input type="file" name="file_to_decrypt" id="file-upload" hidden>
+                        <p class="upload-hint">Only PDF, DOCX supported</p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-group bottom-submit">
+                        <button type="submit" class="btn-next">Decrypt File</button>
+                        <p id="uploadResult" class="result-message"></p>
+                    </div>
+                </form>
+            </div>  
         </div>
+
     </div>
+    <div id="toast-container" class="toast-container"></div>
+
 </body>
 
 </html>
