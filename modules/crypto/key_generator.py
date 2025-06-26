@@ -6,7 +6,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from modules.crypto.key_extensions import get_user_dir, get_latest_key_path, write_json_file, read_json_file
+from .key_extensions import get_user_dir, get_latest_key_path, write_json_file, read_json_file
 
 KEY_EXPIRATION_DAYS = 90
 
@@ -48,7 +48,7 @@ def create_new_key(email: str, aes_key: bytes):
 
     # 4. Mã hoá private key
     nonce = os.urandom(12)
-    aesgcm = AESGCM(aes_key)
+    aesgcm = AESGCM(bytes.fromhex(aes_key))
     encrypted_private_key = aesgcm.encrypt(nonce, private_pem, None)
     encrypted_private_key_b64 = base64.b64encode(nonce + encrypted_private_key).decode('utf-8')
 

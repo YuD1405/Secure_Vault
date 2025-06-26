@@ -6,8 +6,8 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from modules.crypto.key_extensions import get_user_dir, get_latest_key_path, read_json_file, get_key_files
-from modules.crypto.key_generator import get_latest_key_path, create_new_key
+from .key_extensions import get_user_dir, get_latest_key_path, read_json_file, get_key_files, hashlib
+from .key_generator import get_latest_key_path, create_new_key
 
 # Kiểm tra tình trạng cặp khóa RSA
 def check_and_manage_own_keys(email: str, aes_key: bytes):
@@ -44,7 +44,7 @@ def get_active_private_key(email: str, aes_key: bytes) -> rsa.RSAPrivateKey | No
     encrypted_data = base64.b64decode(encrypted_b64)
     nonce, ciphertext = encrypted_data[:12], encrypted_data[12:]
     
-    decrypted_pem = AESGCM(aes_key).decrypt(nonce, ciphertext, None)
+    decrypted_pem = AESGCM(bytes.fromhex(aes_key)).decrypt(nonce, ciphertext, None)
     
     print("Đã giải mã thành công khoá riêng tư đang hoạt động.")
     return serialization.load_pem_private_key(decrypted_pem, password=None)
@@ -53,6 +53,7 @@ def get_active_private_key(email: str, aes_key: bytes) -> rsa.RSAPrivateKey | No
 def get_active_public_info(email: str) -> dict | None:
     """Lấy thông tin công khai của cặp khoá đang hoạt động."""
     user_dir = get_user_dir(email)
+    print(email)
     latest_key_path = get_latest_key_path(user_dir)
     if not latest_key_path: return None
     
@@ -97,3 +98,4 @@ def get_all_key_strings(email: str) -> List[dict]:
             continue
 
     return all_keys
+

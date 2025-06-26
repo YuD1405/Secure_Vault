@@ -4,8 +4,11 @@ import cv2
 from pathlib import Path
  
 from pyzbar.pyzbar import decode as qr_decode
-from modules.crypto.key_extensions import get_user_dir, write_json_file, read_json_file
-from modules.crypto.key_management import get_active_public_info
+from ..crypto.key_extensions import get_user_dir, write_json_file, read_json_file
+from ..crypto.key_management import get_active_public_info
+
+
+QR_DIR = Path("publickey.png")
 
 def generate_public_info_qr(email: str, output_path: str | Path):
     """Tạo mã QR chứa thông tin công khai của khoá đang hoạt động."""
@@ -106,3 +109,51 @@ def add_contact_public_key(user_dir: Path, contact_email: str, public_info: dict
 
 
     
+def get_all_contacts(current_user_email: str) -> list:
+    """
+    Lấy toàn bộ danh bạ public key đã lưu của người dùng hiện tại.
+
+    Hàm này đọc file 'contact_public_key.json' trong thư mục của người dùng,
+    sau đó chuyển đổi dictionary các contact thành một danh sách (list).
+
+    Args:
+        current_user_email (str): Email của người dùng đang đăng nhập.
+
+    Returns:
+        Một danh sách các contact, mỗi contact là một dictionary chứa thông tin
+        công khai của họ. Trả về một danh sách rỗng nếu không có danh bạ
+        hoặc có lỗi xảy ra.
+    """
+    try:
+        # 1. Lấy đường dẫn đến thư mục của người dùng hiện tại
+        user_dir = get_user_dir(current_user_email)
+        contacts_path = user_dir / "contact_public_key.json"
+
+        # 2. Kiểm tra xem file danh bạ có tồn tại không
+        if not contacts_path.exists():
+            print(f"Không tìm thấy file danh bạ cho {current_user_email}.")
+            return []
+
+        # 3. Đọc và parse file JSON
+        # Giả sử bạn có hàm read_json_file, nếu không, dùng code bên dưới
+        contacts_data = read_json_file(contacts_path)
+        # Hoặc:
+        # with open(contacts_path, 'r', encoding='utf-8') as f:
+        #     contacts_data = json.load(f)
+
+        # 4. Kiểm tra nếu danh bạ rỗng
+        if not contacts_data:
+            return []
+
+        # 5. Chuyển đổi từ dictionary sang list
+        # contacts_data.values() sẽ lấy tất cả các đối tượng public_info
+        # và list() sẽ chuyển chúng thành một danh sách.
+        contact_list = list(contacts_data.values())
+        
+        return contact_list
+
+    except Exception as e:
+        # Bắt các lỗi có thể xảy ra (ví dụ: file JSON bị hỏng, lỗi phân quyền,...)
+        # và trả về danh sách rỗng để tránh làm sập ứng dụng.
+        print(f"Lỗi khi đọc danh bạ của {current_user_email}: {e}")
+        return []
