@@ -65,6 +65,6 @@ def create_new_key(email: str, aes_key: bytes):
     new_key_path = user_dir / f"key_{new_key_number}.json"
     write_json_file(new_key_path, new_key_data)
     print(f"Đã tạo và lưu khoá mới thành công tại: {new_key_path.name}")
-
+    return True
 
 

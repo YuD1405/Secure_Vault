@@ -1,4 +1,5 @@
 from modules.crypto.key_generator import Path, get_user_dir, read_json_file,datetime, serialization, os, AESGCM, base64, write_json_file, json
+from modules.crypto.key_management import get_active_private_key
 from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.primitives.asymmetric import padding as asym_padding
 from cryptography.hazmat.primitives import hashes
@@ -106,3 +107,93 @@ def encrypt_file_for_recipient(
 
     except Exception as e:
         return False, f"Đã xảy ra lỗi trong quá trình mã hoá: {e}"
+    
+
+def decrypt_file_from_sender(
+    recipient_email: str,
+    recipient_aes_key: bytes, # Khoá AES đã suy diễn từ hashed_passphrase
+    enc_file_stream,
+    key_file_stream=None
+) -> tuple[bool, str, dict, bytes]:
+    """
+    Giải mã một file được mã hoá bằng mã hoá lai.
+
+    Args:
+        recipient_email (str): Email của người nhận (chính là người dùng hiện tại).
+        recipient_aes_key (bytes): Khoá AES dùng để giải mã private key của người nhận.
+        enc_file_stream: Stream của file .enc.
+        key_file_stream (optional): Stream của file .key nếu chúng được tách riêng.
+
+    Returns:
+        Một tuple (success: bool, message: str, metadata: dict, decrypted_content: bytes).
+        Nếu thất bại, metadata và decrypted_content sẽ là None.
+    """
+    print(f"\n--- [GIẢI MÃ FILE CHO {recipient_email}] ---")
+    try:
+        # --- BƯỚC 1: Lấy metadata và nội dung file đã mã hoá ---
+        metadata = {}
+        encrypted_file_content = b''
+
+        if key_file_stream: # Trường hợp file .key và .enc tách riêng
+            print("Phát hiện chế độ file tách rời (.key và .enc).")
+            metadata = json.load(key_file_stream)
+            encrypted_file_content = enc_file_stream.read()
+        else: # Trường hợp file gộp
+            print("Phát hiện chế độ file gộp. Đang đọc metadata...")
+            # Đọc 4 bytes đầu để biết độ dài metadata
+            metadata_len_bytes = enc_file_stream.read(4)
+            if len(metadata_len_bytes) < 4:
+                return False, "File mã hoá không hợp lệ hoặc bị hỏng (thiếu header).", None, None
+            
+            metadata_len = int.from_bytes(metadata_len_bytes, 'big')
+            
+            # Đọc metadata JSON
+            metadata_json_bytes = enc_file_stream.read(metadata_len)
+            metadata = json.loads(metadata_json_bytes.decode('utf-8'))
+            
+            # Phần còn lại của stream là nội dung file đã mã hoá
+            encrypted_file_content = enc_file_stream.read()
+        
+        # --- BƯỚC 2: Giải mã Private Key của người nhận ---
+        # Hàm này đã có sẵn, ta gọi lại nó
+        private_key = get_active_private_key(recipient_email, recipient_aes_key)
+        if not private_key:
+            return False, "Không thể giải mã khoá riêng tư của bạn. Vui lòng kiểm tra lại.", None, None
+
+        # --- BƯỚC 3: Giải mã Ksession (khoá AES phiên) ---
+        encrypted_session_key_b64 = metadata.get('encrypted_session_key_b64')
+        if not encrypted_session_key_b64:
+            return False, "Metadata không chứa khoá phiên.", None, None
+            
+        encrypted_session_key = base64.b64decode(encrypted_session_key_b64)
+        
+        # Dùng private key để giải mã khoá phiên
+        session_key = private_key.decrypt(
+            encrypted_session_key,
+            asym_padding.OAEP(
+                mgf=asym_padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+
+        # --- BƯỚC 4: Giải mã nội dung file bằng Ksession ---
+        aes_nonce_b64 = metadata.get('aes_nonce_b64')
+        if not aes_nonce_b64:
+            return False, "Metadata không chứa nonce cho AES.", None, None
+
+        aes_nonce = base64.b64decode(aes_nonce_b64)
+        aesgcm = AESGCM(session_key)
+        
+        # Dùng Ksession và nonce để giải mã nội dung file
+        decrypted_content = aesgcm.decrypt(aes_nonce, encrypted_file_content, None)
+
+        print("Giải mã file thành công!")
+        return True, "Giải mã file thành công!", metadata, decrypted_content
+
+    except Exception as e:
+        # Bắt các lỗi có thể xảy ra trong quá trình giải mã (sai khoá, file hỏng,...)
+        return False, f"Giải mã thất bại: {e}", None, None
+    
+
+encrypt_file_for_recipient
