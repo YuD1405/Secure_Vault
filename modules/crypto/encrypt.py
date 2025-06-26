@@ -1,5 +1,6 @@
-from modules.crypto.key_generator import Path, get_user_dir, read_json_file,datetime, serialization, os, AESGCM, base64, write_json_file, json
-from modules.crypto.key_management import get_active_private_key
+from modules.crypto.key_generator import get_user_dir, read_json_file,datetime, serialization, os, AESGCM, base64
+from modules.crypto.key_extensions import Path, write_json_file, json
+from modules.crypto.key_management import get_active_private_key, hashlib
 from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.primitives.asymmetric import padding as asym_padding
 from cryptography.hazmat.primitives import hashes
@@ -37,13 +38,11 @@ def encrypt_file_for_recipient(
 
         if not recipient_public_info:
             return False, f"Không tìm thấy public key cho người nhận '{recipient_email}' trong danh bạ của bạn."
-
         # 2. Kiểm tra hạn dùng của public key
         expiry_date_str = recipient_public_info.get("expiry_date")
         if expiry_date_str:
             if datetime.now() > datetime.fromisoformat(expiry_date_str):
                 return False, f"Public key của người nhận '{recipient_email}' đã hết hạn. Vui lòng yêu cầu họ cung cấp khoá mới."
-
         # 3. Tải public key của người nhận thành đối tượng
         public_key_pem = recipient_public_info["public_key_pem"]
         recipient_public_key = serialization.load_pem_public_key(public_key_pem.encode('utf-8'))
@@ -79,7 +78,7 @@ def encrypt_file_for_recipient(
             "encrypted_session_key_b64": base64.b64encode(encrypted_session_key).decode('utf-8'),
             "aes_nonce_b64": base64.b64encode(aes_nonce).decode('utf-8')
         }
-
+        print("Hello")
         # 8. Tùy chọn lưu: gộp hoặc tách file
         if merge_output:
             # Gộp thành 1 file .enc
@@ -95,9 +94,15 @@ def encrypt_file_for_recipient(
             
             return True, f"Mã hoá thành công! File đã được lưu tại: {output_path}"
         else:
+            print("Hello")
+
             # Tách thành file .key và .enc
+            output_dir.mkdir(exist_ok=True)
             key_file_path = output_dir / f"{original_filename}.key"
+            
             write_json_file(key_file_path, metadata)
+            print("hello")            
+
 
             enc_file_path = output_dir / f"{original_filename}.enc"
             with open(enc_file_path, 'wb') as f:
@@ -111,22 +116,21 @@ def encrypt_file_for_recipient(
 
 def decrypt_file_from_sender(
     recipient_email: str,
-    recipient_aes_key: bytes, # Khoá AES đã suy diễn từ hashed_passphrase
+    recipient_aes_key: bytes,
     enc_file_stream,
+    output_dir: Path, # <-- THAM SỐ MỚI
     key_file_stream=None
 ) -> tuple[bool, str, dict, bytes]:
     """
-    Giải mã một file được mã hoá bằng mã hoá lai.
+    Giải mã một file và tự động lưu kết quả vào một thư mục.
 
     Args:
-        recipient_email (str): Email của người nhận (chính là người dùng hiện tại).
-        recipient_aes_key (bytes): Khoá AES dùng để giải mã private key của người nhận.
-        enc_file_stream: Stream của file .enc.
-        key_file_stream (optional): Stream của file .key nếu chúng được tách riêng.
+        ... (các tham số cũ) ...
+        output_dir (Path): Thư mục để lưu file đã giải mã.
 
     Returns:
         Một tuple (success: bool, message: str, metadata: dict, decrypted_content: bytes).
-        Nếu thất bại, metadata và decrypted_content sẽ là None.
+        decrypted_content vẫn được trả về để có thể gửi ngay cho người dùng.
     """
     print(f"\n--- [GIẢI MÃ FILE CHO {recipient_email}] ---")
     try:
@@ -134,40 +138,28 @@ def decrypt_file_from_sender(
         metadata = {}
         encrypted_file_content = b''
 
-        if key_file_stream: # Trường hợp file .key và .enc tách riêng
-            print("Phát hiện chế độ file tách rời (.key và .enc).")
+        if key_file_stream:
             metadata = json.load(key_file_stream)
             encrypted_file_content = enc_file_stream.read()
-        else: # Trường hợp file gộp
-            print("Phát hiện chế độ file gộp. Đang đọc metadata...")
-            # Đọc 4 bytes đầu để biết độ dài metadata
+        else:
             metadata_len_bytes = enc_file_stream.read(4)
             if len(metadata_len_bytes) < 4:
                 return False, "File mã hoá không hợp lệ hoặc bị hỏng (thiếu header).", None, None
-            
             metadata_len = int.from_bytes(metadata_len_bytes, 'big')
-            
-            # Đọc metadata JSON
             metadata_json_bytes = enc_file_stream.read(metadata_len)
             metadata = json.loads(metadata_json_bytes.decode('utf-8'))
-            
-            # Phần còn lại của stream là nội dung file đã mã hoá
             encrypted_file_content = enc_file_stream.read()
         
-        # --- BƯỚC 2: Giải mã Private Key của người nhận ---
-        # Hàm này đã có sẵn, ta gọi lại nó
+        # --- BƯỚC 2 & 3: Giải mã Private Key và Ksession ---
         private_key = get_active_private_key(recipient_email, recipient_aes_key)
         if not private_key:
-            return False, "Không thể giải mã khoá riêng tư của bạn. Vui lòng kiểm tra lại.", None, None
+            return False, "Không thể giải mã khoá riêng tư của bạn.", None, None
 
-        # --- BƯỚC 3: Giải mã Ksession (khoá AES phiên) ---
         encrypted_session_key_b64 = metadata.get('encrypted_session_key_b64')
         if not encrypted_session_key_b64:
             return False, "Metadata không chứa khoá phiên.", None, None
-            
-        encrypted_session_key = base64.b64decode(encrypted_session_key_b64)
         
-        # Dùng private key để giải mã khoá phiên
+        encrypted_session_key = base64.b64decode(encrypted_session_key_b64)
         session_key = private_key.decrypt(
             encrypted_session_key,
             asym_padding.OAEP(
@@ -181,19 +173,30 @@ def decrypt_file_from_sender(
         aes_nonce_b64 = metadata.get('aes_nonce_b64')
         if not aes_nonce_b64:
             return False, "Metadata không chứa nonce cho AES.", None, None
-
+        
         aes_nonce = base64.b64decode(aes_nonce_b64)
         aesgcm = AESGCM(session_key)
-        
-        # Dùng Ksession và nonce để giải mã nội dung file
         decrypted_content = aesgcm.decrypt(aes_nonce, encrypted_file_content, None)
-
-        print("Giải mã file thành công!")
-        return True, "Giải mã file thành công!", metadata, decrypted_content
+        
+        # --- BƯỚC 5: LƯU FILE ĐÃ GIẢI MÃ (THAY ĐỔI Ở ĐÂY) ---
+        original_filename = metadata.get("original_filename", "decrypted_file.dat")
+        
+        # Đảm bảo thư mục output tồn tại
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Tạo đường dẫn file output
+        output_dir.mkdir(exist_ok=True)
+        output_file_path = output_dir / original_filename
+        
+        # Ghi nội dung đã giải mã vào file
+        with open(output_file_path, "wb") as f:
+            f.write(decrypted_content)
+        
+        print(f"Giải mã và lưu file thành công tại: {output_file_path}")
+        
+        # Trả về thông báo thành công cùng với các dữ liệu khác
+        message = f"Giải mã thành công và đã lưu file '{original_filename}'."
+        return True, message, metadata, decrypted_content
 
     except Exception as e:
-        # Bắt các lỗi có thể xảy ra trong quá trình giải mã (sai khoá, file hỏng,...)
         return False, f"Giải mã thất bại: {e}", None, None
-    
-
-encrypt_file_for_recipient
