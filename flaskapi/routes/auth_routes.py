@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
-from modules.auth.logic import register_user, process_login, get_user_by_email
+from modules.auth.logic import register_user, process_login, get_user_by_email, update_user_info_in_db
 from modules.auth.mfa import (verify_otp_code, verify_totp_code,
                               generate_and_send_otp, generate_qr_code, expire_otp_code)
 
@@ -89,7 +89,6 @@ def dashboard():
         return redirect(url_for("auth.login"))
     return render_template("user_dashboard.html", email=session.get("email"))
 
-
 @auth_bp.route("/logout")
 def logout():
     session.clear()
@@ -116,6 +115,19 @@ def api_user_info():
 def render_update_account():
     return render_template('update_account.html')
 
-@auth_bp.route("/update_account", methods=['POST'])
+@auth_bp.route("/update_account", methods=["POST"])
 def update_account():
-    return "update"
+    if 'email' not in session:
+        return redirect(url_for('auth.login'))
+
+    email = session['email']
+    full_name = request.form.get('name')
+    phone = request.form.get('phone')
+    address = request.form.get('address')
+    dob = request.form.get('dob')
+    pass1 = request.form.get('old_pass')
+    pass2 = request.form.get('new_pass')
+
+    success, message = update_user_info_in_db(email, full_name, phone, address, dob, pass1, pass2)
+
+    return jsonify({"success": success, "message": message})

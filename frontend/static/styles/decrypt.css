@@ -374,27 +374,6 @@ content {
     -webkit-text-fill-color: transparent;
 }
 
-.sign_file_form {
-    margin-top: 30px;
-    padding: 40px 50px;
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin-left: 80px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    border: 1px solid #d6d6f5;
-}
-
-/* Style nhãn */
-.sign_file_form label {
-    font-weight: bold;
-    font-size: 18px;
-    color: #333;
-}
-
 /* Style input file */
 .sign-file-wrapper {
     margin-top: 30px;

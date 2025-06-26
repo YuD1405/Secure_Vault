@@ -395,6 +395,7 @@ content {
     color: #333;
 }
 
+
 /* Style input file */
 .sign-file-wrapper {
     margin-top: 30px;
@@ -452,7 +453,6 @@ content {
     gap: 25px;
     padding: 10px;
 }
-
 
 .form-group label {
     font-weight: 600;
@@ -566,13 +566,6 @@ content {
     margin: 20px 0;
     display: flex;
     flex-direction: column;
-}
-
-.form-group label {
-    font-weight: 600;
-    margin-bottom: 6px;
-    font-size: 14px;
-    color: #333;
 }
 
 .form-group select {
