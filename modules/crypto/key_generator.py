@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from .key_extensions import get_user_dir, get_latest_key_path, write_json_file, read_json_file, Path
 
-from .key_extensions import get_user_dir, get_latest_key_path, write_json_file, read_json_file
 
 KEY_EXPIRATION_DAYS = 90
 
