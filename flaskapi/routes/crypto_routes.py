@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, send_file, make_response
-from modules.crypto.key_management import get_all_key_strings
+from modules.crypto.key_management import get_all_key_strings,check_and_manage_own_keys
 from modules.crypto.key_generator import create_new_key
 from modules.crypto.encrypt import encrypt_file_for_recipient, decrypt_file_from_sender
 from modules.crypto.key_extensions import get_user_dir, Path
@@ -23,7 +23,7 @@ def manage_keys():
     # --- Kết thúc khối kiểm tra session ---
     
     email = session["email"] # Lấy email trực tiếp từ session
-
+    check_and_manage_own_keys(email)
     all_keys = get_all_key_strings(email)
 
     return render_template("manage_keys.html", all_keys=all_keys)
@@ -34,35 +34,39 @@ def regenerate_key():
     if 'user_id' not in session:
         flash("Phiên làm việc đã hết hạn.", "error")
         return redirect(url_for('auth.login'))
+    if request.method == 'POST':
+        email = session["email"]
+        passphrase = session.get("passphrase")
+        if not passphrase:
+            flash("Lỗi phiên làm việc, không tìm thấy thông tin xác thực.", "error")
+            session.clear()
+            return redirect(url_for('auth.login'))
         
-    email = session["email"]
-    passphrase = session.get("passphrase")
-    if not passphrase:
-        flash("Lỗi phiên làm việc, không tìm thấy thông tin xác thực.", "error")
-        session.clear()
-        return redirect(url_for('auth.login'))
-    
-    try:
-        aes_key = passphrase
-    except ValueError:
-        flash("Lỗi phiên làm việc.", "error")
-        session.clear()
-        return redirect(url_for('auth.login'))
-    # --- Kết thúc khối kiểm tra và chuẩn bị dữ liệu ---
+        try:
+            aes_key = passphrase
+        except ValueError:
+            flash("Lỗi phiên làm việc.", "error")
+            session.clear()
+            return redirect(url_for('auth.login'))
+        # --- Kết thúc khối kiểm tra và chuẩn bị dữ liệu ---
 
-    success = create_new_key(email, aes_key)
-    
-    if success:
-        flash( "success")
-    else:
-        flash( "error")
+        success = create_new_key(email, aes_key)
         
+        if success:
+            flash("success")
+        else:
+            flash("error")
+            
     return redirect(url_for('crypto.manage_keys'))
 
 # Requirement 6 – Encrypt
 @crypto_bp.route('/render_encrypt', methods=['GET'])
 def render_encrypt():
     return render_template('encrypt.html')
+
+
+
+
 
 # Hàm gọi module encrypt , js sẽ truyền xuống 1 file và pubkey của người nhận => trả về 1 file đã mã để fe xử lí download
 @crypto_bp.route('/encrypt-server-file', methods=['POST'])
