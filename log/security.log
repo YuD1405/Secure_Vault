@@ -4,3 +4,12 @@
 [2025-06-21 22:09:58] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
 [2025-06-21 22:12:09] [INFO]: [anonymous] Action: Sign file | Status: Success | File: sec_bg.png
 [2025-06-21 22:12:47] [INFO]: [anonymous] Action: Verify signature | Status: Success | File: sec_bg.png
+[2025-06-25 09:32:31] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
+[2025-06-25 09:32:43] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-25 09:34:47] [INFO]: [testmail@gmail.com] Action: Register | Status: Success
+[2025-06-25 09:34:56] [INFO]: [testmail@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-26 08:06:41] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-26 09:11:56] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-26 09:12:17] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
+[2025-06-26 09:12:25] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
+[2025-06-26 09:12:32] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA

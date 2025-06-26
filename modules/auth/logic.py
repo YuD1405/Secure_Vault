@@ -127,3 +127,89 @@ def process_login(email, passphrase):
     log_user_action(email, "Login success", "Pending MFA")
 
     return {"success": True}
+
+def get_user_by_email(email):
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT id, email, fullname, dob, phone, address 
+        FROM users 
+        WHERE email = %s
+    """, (email,))
+    
+    row = cur.fetchone()
+    cur.close()
+
+    if row:
+
+        return {
+            "id": row["id"],
+            "email": row["email"],
+            "fullname": row["fullname"],
+            "dob": row["dob"].strftime("%Y-%m-%d") if row["dob"] else "",
+            "phone": row["phone"],
+            "address": row["address"]
+        }
+    return None
+
+def update_user_info_in_db(email: str, full_name: str, phone: str, address: str, dob: str, pass1: str, pass2: str) -> tuple[bool, str]:
+    try:
+        cur = mysql.connection.cursor()
+
+        # --- Kiểm tra bắt buộc ---
+        if not all([email, full_name, dob, phone, address]):
+            return False, "Vui lòng điền đầy đủ thông tin."
+
+        if not is_valid_email(email):
+            return False, "Email không hợp lệ."
+
+        if not is_valid_date(dob):
+            return False, "Ngày sinh không đúng định dạng (yyyy-mm-dd)."
+
+        if not is_valid_phone(phone):
+            return False, "Số điện thoại phải có đúng 10 chữ số."
+
+        # --- Cập nhật thông tin cá nhân ---
+        cur.execute("""
+            UPDATE users
+            SET fullname = %s, phone = %s, address = %s, dob = %s
+            WHERE email = %s
+        """, (full_name, phone, address, dob, email))
+
+        # --- Nếu có yêu cầu đổi passphrase ---
+        if pass1 and pass2:
+            if pass1 == pass2:
+                return False, "Passphrase mới phải khác passphrase cũ."
+
+            if not is_strong_passphrase(pass2):
+                return False, "Passphrase mới quá yếu. Cần ≥8 ký tự, chữ hoa, số, ký hiệu."
+            
+            # Lấy passphrase hash cũ từ DB
+            cur.execute("SELECT hashed_passphrase, salt FROM users WHERE email = %s", (email,))
+            row = cur.fetchone()
+            
+            if not row:
+                return False, "Không tìm thấy tài khoản người dùng."
+
+            stored_hash = row["hashed_passphrase"]
+            stored_salt = row["salt"]
+            
+            input_hash = hash_with_salt(pass1, stored_salt)
+            print(input_hash)
+            print(stored_hash)
+            print(stored_salt)
+            if input_hash != stored_hash:
+                return False, "Passphrase hiện tại không đúng."
+            
+            # Hash passphrase mới
+            new_hash = hash_with_salt(pass2, stored_salt)
+
+            cur.execute("""
+                UPDATE users SET hashed_passphrase = %s WHERE email = %s
+            """, (new_hash, email))
+
+        mysql.connection.commit()
+        cur.close()
+        return True, "Thông tin đã được cập nhật thành công."
+
+    except Exception as e:
+        return False, "Đã xảy ra lỗi khi cập nhật thông tin."
