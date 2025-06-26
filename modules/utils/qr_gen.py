@@ -23,13 +23,6 @@ def generate_public_info_qr(email: str, output_path: str | Path):
     print(f"Đã tạo và lưu QR code thành công tại: {output_path}")
 
 
-# file: modules/utils/qr_gen.py (hoặc nơi bạn đặt hàm này)
-
-# ... các import ...
-import cv2 # Hoặc from PIL import Image nếu bạn dùng Pillow
-import numpy as np
-
-# ... các hàm khác ...
 
 def process_qr_code_and_add_contact(current_user_email: str, qr_image_path: str | Path) -> tuple[bool, str]:
     """
