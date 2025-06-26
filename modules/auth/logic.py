@@ -206,7 +206,9 @@ def update_user_info_in_db(email: str, full_name: str, phone: str, address: str,
             cur.execute("""
                 UPDATE users SET hashed_passphrase = %s WHERE email = %s
             """, (new_hash, email))
-
+        else:
+            return False, "Please enter both passphrase input for changing passphrase"
+        
         mysql.connection.commit()
         cur.close()
         return True, "Thông tin đã được cập nhật thành công."

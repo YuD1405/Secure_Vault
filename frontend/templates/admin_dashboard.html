@@ -6,6 +6,8 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
     <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/toast.css') }}">
+    <script src="{{ url_for('static', filename='scripts/toast.js') }}"></script>
     <!-- Linking Google Font Link for Icon -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet"
@@ -67,6 +69,8 @@
                 </div>
             </div>
         </div>
+            <div id="toast-container" class="toast-container"></div>
+
 </body>
 
 </html>

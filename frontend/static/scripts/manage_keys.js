@@ -41,17 +41,25 @@ const sidebar = document.querySelector(".sidebar");
       <td>${key.public_key_pem.slice(0, 20)}...</td>
       <td>${key.expiry_date}</td>
       <td>${statusLabel}</td>
-      <td>
-        ${key.status === "active"
-          ? `<button class="deactivate-btn" onclick="deactivateKey(${key.index})">Deactivate</button>`
-          : `<em>--</em>`}
-      </td>
     `;
     tableBody.appendChild(row);
   });
+
+  document.getElementById("create-key-btn").addEventListener("click", () => {
+  fetch("/crypto/regenerate_key", { method: "POST" })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showToast("Tạo khóa RSA mới thành công!", "success");
+        loadKeyList(); // tự reload bảng nếu bạn có hàm loadKeyList()
+      } else {
+        showToast(data.message || "Tạo khóa thất bại", "error");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      showToast("Lỗi khi tạo khóa mới", "error");
+    });
 });
 
-function deactivateKey(index) {
-  alert("Bạn vừa nhấn Deactivate key #" + index);
-  // Gọi API hoặc cập nhật UI tại đây
-}
+});

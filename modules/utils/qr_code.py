@@ -104,5 +104,31 @@ def add_contact_public_key(user_dir: Path, contact_email: str, public_info: dict
     write_json_file(contacts_path, contacts_data)
     print(f"Đã thêm/cập nhật public key của '{contact_email}' vào danh bạ.")
 
+def get_added_contacts(user_email: str) -> list[dict]:
+    """
+    Lấy danh sách các contact đã lưu từ QR code (từ file contact_public_key.json).
 
-    
+    Args:
+        user_email (str): Email người dùng hiện tại (để lấy đúng thư mục).
+
+    Returns:
+        list[dict]: Danh sách contact, mỗi phần tử gồm email, public_key_pem, creation_date.
+    """
+    user_dir = get_user_dir(user_email)
+    contacts_path = user_dir / "contact_public_key.json"
+
+    if not contacts_path.exists():
+        return []
+
+    contacts_data = read_json_file(contacts_path)
+
+    # Mỗi contact là 1 dict chứa thông tin của người khác
+    result = []
+    for email, info in contacts_data.items():
+        result.append({
+            "email": email,
+            "public_key": info.get("public_key_pem", ""),
+            "date_added": info.get("creation_date", "unknown")
+        })
+
+    return result

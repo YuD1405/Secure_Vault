@@ -1,8 +1,11 @@
-from flask import Blueprint, request, render_template, jsonify
+from flask import Blueprint, request, render_template, jsonify, session, url_for, redirect, current_app, send_file
 from modules.utils.digital_signing import digital_sign_file
 from modules.utils.verify_digital_signature import verify_signature
 from modules.utils.logger import log_user_action
+from modules.utils.qr_code import generate_public_info_qr, process_qr_code_and_add_contact, get_added_contacts
+import hashlib
 import os
+from pathlib import Path
 
 utils_bp = Blueprint('utils', __name__)
 
@@ -70,13 +73,69 @@ def verify_signature_route():
         return jsonify({"success": False, "message": "Signature is invalid."}), 400
 
 # Requirement 4 – QR
-@utils_bp.route('/generate_qr', methods=['GET'])
+@utils_bp.route("/generate_qr", methods=["GET"])
 def render_generate_qr():
-    return render_template('qr_code.html')
+    if 'email' not in session:
+        return redirect(url_for("auth.login"))
+    
+    email = session['email']
+    email_hash = hashlib.sha256(email.encode()).hexdigest()
+    qr_path = Path(f"data/qr/{email_hash}/my_qr.png")
+    generate_public_info_qr(email, qr_path)
+
+    return render_template("qr_code.html")
+
+@utils_bp.route("/qr_image/<email_hash>")
+def serve_qr_image(email_hash):
+    # Lấy đường dẫn tuyệt đối dựa trên thư mục gốc của app
+    base_path = current_app.root_path  # VD: /Secure_Vault/flaskapi
+    qr_path = os.path.join(base_path, "..", "data", "qr", email_hash, "my_qr.png")
+    qr_path = os.path.abspath(qr_path)
+
+    if not os.path.exists(qr_path):
+        return "QR code not found", 404
+
+    return send_file(qr_path, mimetype="image/png")
+
+@utils_bp.route("/my_qr_url")
+def get_qr_url():
+    if 'email' not in session:
+        return jsonify({"error": True, "message": "Not logged in"}), 401
+
+    email = session['email']
+    email_hash = hashlib.sha256(email.encode()).hexdigest()
+
+    # Tạo URL từ route có thể truy cập được
+    qr_url = url_for("utils.serve_qr_image", email_hash=email_hash)
+    return jsonify({"qr_url": qr_url})
 
 @utils_bp.route('/decode_qr', methods=['POST'])
 def decode_qr():
-    return "decode qr"
+    if 'email' not in session:
+        return jsonify({"success": False, "message": "Bạn chưa đăng nhập."}), 401
+
+    current_user_email = session['email']
+
+    if 'qr_file' not in request.files:
+        return jsonify({"success": False, "message": "Không tìm thấy ảnh QR."}), 400
+
+    qr_image = request.files['qr_file']
+    qr_image.seek(0)
+
+    success, message = process_qr_code_and_add_contact(current_user_email, qr_image)
+    return jsonify({"success": success, "message": message})
+
+@utils_bp.route("/owned_keys", methods=["GET"])
+def api_get_owned_keys():
+    if 'email' not in session:
+        return jsonify({"error": True, "message": "Not logged in"}), 401
+
+    email = session['email']
+    contacts = get_added_contacts(email)
+
+    if contacts: 
+        return jsonify({"success": True, "data": contacts})
+    return jsonify({"success": False, "data": contacts})
 
 # Requirement 11 – Security logging
 @utils_bp.route("/log_security")

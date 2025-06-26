@@ -5,6 +5,8 @@
     <meta charset="UTF-8" />
     <title>Multi-Factor Authentication</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/verify.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/toast.css') }}">
+    <script src="{{ url_for('static', filename='scripts/toast.js') }}"></script>
     <script defer>
         function showOption(option) {
             document.getElementById('otp-form').style.display = option === 'otp' ? 'block' : 'none';
@@ -98,6 +100,8 @@
             </div>
         </div>
     </div>
+        <div id="toast-container" class="toast-container"></div>
+
 </body>
 
 </html>

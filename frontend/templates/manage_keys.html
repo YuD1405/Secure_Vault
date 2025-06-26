@@ -97,15 +97,17 @@
                 <!-- Keys table -->
                 <div class="card-wrapper">
                     <div class="card-box">
+                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <button id="create-key-btn" class="primary-btn">+ Tạo Khóa Mới</button>
+                        </div>
                         <table class="styled-table" id="rsa-key-table">
                         <thead>
                             <tr>
                             <th>#</th>
                             <th>Encrypted Private Key</th>
-                            <th>Public Key</th>
+                            <th>Public Ke   y</th>
                             <th>Expiration</th>
                             <th>Status</th>
-                            <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="rsa-key-table-body">
@@ -117,6 +119,7 @@
             </div>
         </div>
     </div>
+    <div id="toast-container" class="toast-container"></div>
 </body>
 
 </html>
