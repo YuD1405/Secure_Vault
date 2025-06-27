@@ -1,4 +1,5 @@
-from flask import Blueprint, request, render_template, jsonify
+from flask import Blueprint, request, render_template, jsonify, session, send_file, flash, redirect, url_for
+from modules.utils.qr_code import get_user_dir, generate_public_info_qr, process_qr_code_and_add_contact
 from modules.utils.digital_signing import digital_sign_file
 from modules.utils.verify_digital_signature import verify_signature
 from modules.utils.logger import log_user_action
@@ -72,11 +73,95 @@ def verify_signature_route():
 # Requirement 4 – QR
 @utils_bp.route('/generate_qr', methods=['GET'])
 def render_generate_qr():
-    return render_template('qr_code.html')
+    """
+    Tạo một mã QR từ email được cung cấp qua query parameter.
+    Ví dụ: /utils/generate_qr?email=user@example.com
+    """
+    # 1. Lấy email từ query parameter của URL
+    email = session['email']
+
+    # 2. Kiểm tra xem email có được cung cấp không
+    if not email:
+        # Nếu bạn có trang lỗi, có thể render nó.
+        # Hoặc trả về lỗi JSON.
+        return "Lỗi: Vui lòng cung cấp một địa chỉ email trong URL (ví dụ: ?email=user@example.com)", 400
+
+    try:
+        # 3. Xác định đường dẫn output cho file QR
+        # Lưu vào một thư mục tạm thời hoặc thư mục của người dùng
+        user_dir = get_user_dir(email)
+        qr_output_path = user_dir / f"{email.replace('@', '_at_')}_qr.png"
+        print(qr_output_path)
+        # 4. Gọi hàm logic để tạo file ảnh QR
+        # Giả sử hàm generate_qr_image_file trả về True/False
+        success, message = generate_public_info_qr(email=email, output_path=qr_output_path)
+
+        if not success:
+            # Nếu hàm tạo QR thất bại (ví dụ không tìm thấy public key)
+            print(f"Lỗi khi tạo QR", message)
+            # Có thể trả về một ảnh placeholder "lỗi"
+            return f"Không thể tạo QR code", 500
+        print(qr_output_path)
+        print("Hello")
+        # 5. Gửi file ảnh vừa tạo về cho trình duyệt
+        return send_file(
+            ".." / qr_output_path,
+            mimetype='image/png'
+        )
+
+    except Exception as e:
+        print(f"Lỗi nghiêm trọng khi tạo QR code cho {email}: {e}")
+        return "Đã xảy ra lỗi không xác định trên server.", 500
 
 @utils_bp.route('/decode_qr', methods=['POST'])
 def decode_qr():
-    return "decode qr"
+    """
+    Nhận một file ảnh QR, giải mã và thêm thông tin vào danh bạ
+    của người dùng đang đăng nhập (lấy từ session).
+    """
+    # 1. Bắt đầu khối kiểm tra session
+    # Kiểm tra xem người dùng đã đăng nhập hoàn toàn chưa
+    if 'user_id' not in session:
+        flash("Bạn cần phải đăng nhập để thực hiện hành động này.", "error")
+        # Nếu đây là một request từ JS (AJAX), bạn có thể muốn trả về JSON
+        # return jsonify({"error": "Unauthorized"}), 401
+        return redirect(url_for('auth.login'))
+
+    # Lấy email trực tiếp từ session
+    current_user_email = session.get("email")
+
+    if not current_user_email:
+        # Trường hợp hi hữu session có user_id nhưng không có email
+        flash("Lỗi phiên làm việc, vui lòng đăng nhập lại.", "error")
+        session.clear()
+        return redirect(url_for('auth.login'))
+    # --- Kết thúc khối kiểm tra session ---
+
+    # 2. Kiểm tra file upload
+    if 'qr_code_file' not in request.files:
+        flash("Không có file nào được chọn.", "error")
+        return redirect(url_for('crypto.manage_keys'))
+
+    file = request.files['qr_code_file']
+    if file.filename == '':
+        flash("Chưa chọn file nào.", "error")
+        return redirect(url_for('crypto.manage_keys'))
+
+    # 3. Gọi hàm xử lý logic
+    if file:
+        success, message = process_qr_code_and_add_contact(
+            current_user_email=current_user_email, # <-- Sử dụng biến lấy từ session
+            qr_image_stream=file.stream
+        )
+        
+        # 4. Flash thông báo kết quả
+        if success:
+            flash(message, "success")
+        else:
+            flash(message, "error")
+
+    # 5. Chuyển hướng người dùng trở lại
+    return redirect(url_for('crypto.manage_keys'))
 
 # Requirement 11 – Security logging
 @utils_bp.route("/log_security")
