@@ -213,3 +213,16 @@ def update_user_info_in_db(email: str, full_name: str, phone: str, address: str,
 
     except Exception as e:
         return False, "Đã xảy ra lỗi khi cập nhật thông tin."
+    
+def check_correct_pw(email: str, passphrase:str):
+    email = sanitize_input(email)
+    passphrase = sanitize_input(passphrase)
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+    user = cur.fetchone()
+    
+    hashed = hash_with_salt(passphrase, user['salt'])
+    if hashed != user['hashed_passphrase']:
+        return False
+    return True

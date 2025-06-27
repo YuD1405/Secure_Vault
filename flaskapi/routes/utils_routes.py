@@ -72,13 +72,13 @@ def verify_signature_route():
 
 # Requirement 4 – QR
 @utils_bp.route('/generate_qr', methods=['GET'])
-def generate_qr():
+def render_generate_qr():
     """
     Tạo một mã QR từ email được cung cấp qua query parameter.
     Ví dụ: /utils/generate_qr?email=user@example.com
     """
     # 1. Lấy email từ query parameter của URL
-    email = request.args.get('email')
+    email = session['email']
 
     # 2. Kiểm tra xem email có được cung cấp không
     if not email:
@@ -91,7 +91,7 @@ def generate_qr():
         # Lưu vào một thư mục tạm thời hoặc thư mục của người dùng
         user_dir = get_user_dir(email)
         qr_output_path = user_dir / f"{email.replace('@', '_at_')}_qr.png"
-
+        print(qr_output_path)
         # 4. Gọi hàm logic để tạo file ảnh QR
         # Giả sử hàm generate_qr_image_file trả về True/False
         success, message = generate_public_info_qr(email=email, output_path=qr_output_path)
@@ -101,10 +101,11 @@ def generate_qr():
             print(f"Lỗi khi tạo QR", message)
             # Có thể trả về một ảnh placeholder "lỗi"
             return f"Không thể tạo QR code", 500
-
+        print(qr_output_path)
+        print("Hello")
         # 5. Gửi file ảnh vừa tạo về cho trình duyệt
         return send_file(
-            qr_output_path,
+            ".." / qr_output_path,
             mimetype='image/png'
         )
 

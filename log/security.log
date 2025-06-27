@@ -13,3 +13,11 @@
 [2025-06-26 09:12:17] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
 [2025-06-26 09:12:25] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
 [2025-06-26 09:12:32] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-26 17:13:03] [INFO]: [hoangdat220404@gmail.com] Action: Register | Status: Success
+[2025-06-26 17:13:49] [INFO]: [hoangdat220404@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-26 17:13:52] [INFO]: [hoangdat220404@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-26 21:42:58] [INFO]: [hoangdat220404@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-26 21:43:00] [INFO]: [hoangdat220404@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-26 21:43:05] [INFO]: [hoangdat220404@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-26 23:28:40] [INFO]: [hoangdat220404@gmail.com] Action: Login success | Status: Pending MFA
+[2025-06-27 09:35:06] [INFO]: [hoangdat220404@gmail.com] Action: Login success | Status: Pending MFA

@@ -1,9 +1,1 @@
-from modules.utils.mail import send_email
-import hashlib
-passphrase = "YourPassword123!"
-salt = "a1b2c3d4e5f6g7h8"
-hashed = hashlib.sha256((passphrase + salt).encode()).hexdigest()
-print(hashed)
-import pyotp
-
-print(pyotp.random_base32())
+print("c:\\Users\\user\'\\Documents\\HCMUS\\ComputerSec\\Proj1\\Secure_Vault\\flaskapi\\data\\key_manage\\213ce980ed52a9687c9fc282d2197bc9f7ae376c34ac3ed2ff2ee7892e02b7a7\\hoangdat220404_at_gmail.com_qr.png")

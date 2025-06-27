@@ -4,6 +4,7 @@ from modules.crypto.key_generator import create_new_key
 from modules.crypto.encrypt import encrypt_file_for_recipient, decrypt_file_from_sender
 from modules.crypto.key_extensions import get_user_dir, Path
 from modules.utils.qr_code import get_all_contacts
+from modules.auth.logic import check_correct_pw
 import io
 import zipfile
 crypto_bp = Blueprint('crypto', __name__)
@@ -43,7 +44,7 @@ def regenerate_key():
             return redirect(url_for('auth.login'))
         
         try:
-            aes_key = passphrase
+            aes_key = passphrase #
         except ValueError:
             flash("Lỗi phiên làm việc.", "error")
             session.clear()
@@ -70,83 +71,75 @@ def render_encrypt():
 
 # Hàm gọi module encrypt , js sẽ truyền xuống 1 file và pubkey của người nhận => trả về 1 file đã mã để fe xử lí download
 @crypto_bp.route('/encrypt-server-file', methods=['POST'])
-def encrypt_server_file():
+def encrypt_file():
+    """
+    Nhận một file được upload, mã hoá cho người nhận, và trả về file
+    kết quả (.enc hoặc .zip) để người dùng tải xuống.
+    """
     # --- Bắt đầu khối kiểm tra session ---
     if 'user_id' not in session:
+        # Trả về lỗi JSON nếu request này được gọi bằng AJAX/JS
         return {"error": "Phiên làm việc đã hết hạn"}, 401
     # --- Kết thúc khối kiểm tra session ---
 
-    # 1. Lấy thông tin từ request POST
+    # 1. Lấy thông tin từ request POST và file upload
     sender_email = session["email"]
     recipient_email = request.form.get('recipient_email')
-    file_path_to_encrypt = request.form.get('file_path') # <-- Input là đường dẫn file
+    file_to_encrypt = request.files.get('file_to_encrypt') # <-- Lấy file upload
     output_option = request.form.get('output_option', 'merge')
 
     # 2. Kiểm tra đầu vào
-    if not file_path_to_encrypt or not recipient_email:
-        flash("Vui lòng cung cấp đường dẫn file và email người nhận.", "error")
-        return redirect(url_for('crypto.manage_keys')) # Hoặc trang tương ứng
+    if not file_to_encrypt or not recipient_email or file_to_encrypt.filename == '':
+        flash("Vui lòng chọn file và nhập email người nhận.", "error")
+        return redirect(url_for('crypto.manage_keys')) # Hoặc trang mã hoá
 
-    file_path_obj = Path(file_path_to_encrypt)
-    if not file_path_obj.is_file():
-        flash(f"Không tìm thấy file tại đường dẫn đã cung cấp.", "error")
-        return redirect(url_for('crypto.manage_keys'))
+    # 3. Chuẩn bị thư mục output và các tham số
+    output_dir = get_user_dir(sender_email) / "encrypted_outputs"
+    output_dir.mkdir(exist_ok=True)
+    merge_output = (output_option == 'merge')
 
-    # 3. Mở file từ đường dẫn để lấy stream và thực hiện mã hoá
-    try:
-        with open(file_path_obj, 'rb') as file_stream:
-            # Chuẩn bị thư mục output
-            output_dir = get_user_dir(sender_email) / "encrypted_outputs"
-            output_dir.mkdir(exist_ok=True)
-            
-            # Gọi hàm mã hoá
-            success, message = encrypt_file_for_recipient(
-                sender_email=sender_email,
-                recipient_email=recipient_email,
-                file_stream=file_stream,
-                original_filename=file_path_obj.name, # Lấy tên file từ đường dẫn
-                output_dir=output_dir,
-                merge_output=(output_option == 'merge')
-            )
-    except IOError as e:
-        flash(f"Không thể đọc file: {e}", "error")
-        return redirect(url_for('crypto.manage_keys'))
+    # 4. Gọi hàm mã hoá
+    success, message = encrypt_file_for_recipient(
+        sender_email=sender_email,
+        recipient_email=recipient_email,
+        file_stream=file_to_encrypt.stream, # <-- Dùng stream từ file upload
+        original_filename=file_to_encrypt.filename,
+        output_dir=output_dir,
+        merge_output=merge_output
+    )
 
-    # 4. Xử lý kết quả và gửi file về cho người dùng
     if not success:
         flash(f"Mã hoá thất bại: {message}", "error")
         return redirect(url_for('crypto.manage_keys'))
 
-    # --- Logic gửi file về trình duyệt ---
+    # 5. Xử lý kết quả và gửi file về cho người dùng
     try:
-        original_filename_base = file_path_obj.stem # Tên file không có đuôi
+        original_filename = file_to_encrypt.filename
+        original_filename_base = Path(original_filename).stem
 
-        if output_option == 'merge':
+        if merge_output:
             # Trường hợp gộp file: Gửi trực tiếp file .enc
-            encrypted_file_path = output_dir / f"{file_path_obj.name}.enc"
+            encrypted_file_path = output_dir / f"{original_filename}.enc"
             return send_file(
                 encrypted_file_path,
-                as_attachment=True,
-                download_name=f"{file_path_obj.name}.enc"
+                as_attachment=True
             )
         else:
-            # Trường hợp tách file: Nén thành ZIP trực tiếp và gửi về
-            enc_file_path = output_dir / f"{file_path_obj.name}.enc"
-            key_file_path = output_dir / f"{file_path_obj.name}.key"
+            # Trường hợp tách file: Nén thành ZIP và gửi về
+            enc_file_path = output_dir / f"{original_filename}.enc"
+            key_file_path = output_dir / f"{original_filename}.key"
 
-            # Tạo một đối tượng file ảo trong bộ nhớ RAM để lưu file ZIP
+            if not (enc_file_path.exists() and key_file_path.exists()):
+                 raise FileNotFoundError("Không thể tạo đầy đủ các file mã hoá.")
+
+            # Nén 2 file vào một file ZIP trong bộ nhớ
             memory_file = io.BytesIO()
-
-            # Tạo file ZIP và ghi vào file trong bộ nhớ
             with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
-                # Ghi file .enc và .key vào file ZIP
                 zf.write(enc_file_path, arcname=enc_file_path.name)
                 zf.write(key_file_path, arcname=key_file_path.name)
-            
-            # Đưa con trỏ về đầu stream để send_file có thể đọc được
             memory_file.seek(0)
 
-            # Gửi file ZIP trong bộ nhớ về cho người dùng
+            # Gửi file ZIP về
             return send_file(
                 memory_file,
                 mimetype='application/zip',
@@ -154,7 +147,7 @@ def encrypt_server_file():
                 download_name=f"{original_filename_base}_encrypted.zip"
             )
     except Exception as e:
-        flash(f"Đã xảy ra lỗi khi gửi file về trình duyệt: {e}", "error")
+        flash(f"Đã xảy ra lỗi khi chuẩn bị file để tải xuống: {e}", "error")
         return redirect(url_for('crypto.manage_keys'))
 
 
@@ -179,7 +172,7 @@ def decrypt_file():
         flash("Lỗi phiên làm việc.", "error")
         return redirect(url_for('auth.login'))
         
-    try:
+    try:  
         aes_key = passphrase
     except ValueError:
         flash("Lỗi phiên làm việc.", "error")
@@ -250,3 +243,4 @@ def decrypt_file():
     except Exception as e:
         flash(f"Đã xảy ra lỗi không xác định trong quá trình giải mã: {e}", "error")
         return redirect(url_for('crypto.manage_keys'))
+    
