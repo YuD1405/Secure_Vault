@@ -19,7 +19,7 @@ def generate_public_info_qr(email: str, output_path: str | Path):
 
 
     public_key_b64 = base64.b64encode(public_info["public_key_pem"].encode()).decode()
-    qr_data = {"email": public_info["owner_email"], "creation_date": public_info["creation_date"],
+    qr_data = {"email": public_info["owner_email"], "creation_date": public_info["creation_date"], "expired_date": public_info["expiry_date"],
                "public_key_b64": public_key_b64}
     
     json_string = json.dumps(qr_data, separators=(',', ':'))
@@ -62,6 +62,7 @@ def process_qr_code_and_add_contact(current_user_email: str, qr_image_stream) ->
         # 4. Xác thực dữ liệu cơ bản
         contact_email = qr_data.get('email')
         creation_date = qr_data.get('creation_date')
+        expiry_date = qr_data.get('expired_date')
         public_key_b64 = qr_data.get('public_key_b64')
 
         if not all([contact_email, creation_date, public_key_b64]):
@@ -83,7 +84,7 @@ def process_qr_code_and_add_contact(current_user_email: str, qr_image_stream) ->
             "owner_email": contact_email,
             "public_key_pem": public_key_pem,
             "creation_date": creation_date,
-            "expiry_date": None  # Không có thông tin này từ QR
+            "expiry_date": expiry_date  # Không có thông tin này từ QR
         }
 
         # 7. Lấy thư mục của người dùng hiện tại và lưu contact

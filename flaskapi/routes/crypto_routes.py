@@ -24,7 +24,7 @@ def manage_keys():
         return {"success": False, "message": "Bạn cần phải đăng nhập để truy cập trang này."}, 401
 
     email = session["email"]
-    passphrase = session.get("passphrase")
+    passphrase = session.get("passphrase")  
     if not passphrase:
         return {"success": False, "message": "Không tìm thấy passphrase."}, 401
 
