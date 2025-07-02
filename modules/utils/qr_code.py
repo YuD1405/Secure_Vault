@@ -30,32 +30,72 @@ def generate_public_info_qr(email: str, output_path: str | Path):
 
 def process_qr_code_and_add_contact(current_user_email: str, qr_image_stream) -> tuple[bool, str]:
     """
-    Đọc một file ảnh QR từ stream, giải mã và lưu vào danh bạ.
+    Đọc một file ảnh QR, giải mã nội dung, xác thực và lưu vào danh bạ.
+
+    Args:
+        current_user_email (str): Email của người dùng đang đăng nhập (để biết lưu vào thư mục nào).
+        qr_image_stream: Một đối tượng file-like stream của ảnh được upload.
+
+    Returns:
+        Một tuple (success: bool, message: str).
     """
     try:
-        img = Image.open(qr_image_stream)
+        # 1. Đọc ảnh từ stream sử dụng OpenCV
+        # Đọc stream vào một numpy array
+        import numpy as np
+        image_array = np.frombuffer(qr_image_stream.read(), np.uint8)
+        # Decode array thành ảnh mà OpenCV có thể đọc
+        img = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+
+        if img is None:
+            return False, "Không thể đọc file ảnh. Vui lòng thử lại với định dạng khác (PNG, JPG)."
+
+        # 2. Giải mã QR code từ ảnh
         decoded_objects = qr_decode(img)
-        
         if not decoded_objects:
             return False, "Không tìm thấy mã QR nào trong ảnh."
 
-        qr_data = json.loads(decoded_objects[0].data.decode('utf-8'))
-        
+        # 3. Lấy dữ liệu và phân tích cú pháp JSON
+        qr_data_string = decoded_objects[0].data.decode('utf-8')
+        qr_data = json.loads(qr_data_string)
+
+        # 4. Xác thực dữ liệu cơ bản
         contact_email = qr_data.get('email')
-        # ... (phần còn lại của hàm như đã viết trước đó) ...
-        
+        creation_date = qr_data.get('creation_date')
+        public_key_b64 = qr_data.get('public_key_b64')
+
+        if not all([contact_email, creation_date, public_key_b64]):
+            return False, "Dữ liệu từ QR code không đầy đủ hoặc không hợp lệ."
+            
         if contact_email == current_user_email:
             return False, "Bạn không thể thêm chính mình vào danh bạ."
 
-        # ... (xử lý, tạo public_info_to_save) ...
-        
+        # 5. Giải mã Base64 để lấy public key PEM
+        try:
+            public_key_pem = base64.b64decode(public_key_b64).decode('utf-8')
+        except Exception:
+            return False, "Định dạng public key trong QR code không hợp lệ."
+            
+        # 6. Tạo đối tượng public_info để lưu trữ
+        # Ở đây chúng ta không có expiry_date từ QR, có thể để trống hoặc tính toán
+        # nếu có quy tắc nào đó. Tạm thời để trống.
+        public_info_to_save = {
+            "owner_email": contact_email,
+            "public_key_pem": public_key_pem,
+            "creation_date": creation_date,
+            "expiry_date": None  # Không có thông tin này từ QR
+        }
+
+        # 7. Lấy thư mục của người dùng hiện tại và lưu contact
         user_dir = get_user_dir(current_user_email)
         add_contact_public_key(user_dir, contact_email, public_info_to_save)
         
-        return True, f"Đã thêm thành công {contact_email} vào danh bạ!"
+        return True, f"Đã thêm thành công {contact_email} vào danh bạ của bạn!"
 
+    except json.JSONDecodeError:
+        return False, "Nội dung QR code không phải là định dạng JSON hợp lệ."
     except Exception as e:
-        return False, f"Đã xảy ra lỗi: {e}"
+        return False, f"Đã xảy ra lỗi không xác định: {e}"
     
 def add_contact_public_key(user_dir: Path, contact_email: str, public_info: dict):
     """Tiện ích để lưu trữ public_info của một người dùng khác vào danh bạ."""

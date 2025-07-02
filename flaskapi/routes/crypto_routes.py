@@ -42,7 +42,8 @@ def regenerate_key():
             flash("Lỗi phiên làm việc, không tìm thấy thông tin xác thực.", "error")
             session.clear()
             return redirect(url_for('auth.login'))
-        
+        if not check_correct_pw(email, passphrase):
+            flash("Mật khẩu không đúng")
         try:
             aes_key = passphrase #
         except ValueError:
@@ -171,7 +172,8 @@ def decrypt_file():
     if not passphrase:
         flash("Lỗi phiên làm việc.", "error")
         return redirect(url_for('auth.login'))
-        
+    if not check_correct_pw(recipient_email, passphrase):
+            flash("Mật khẩu không đúng")
     try:  
         aes_key = passphrase
     except ValueError:

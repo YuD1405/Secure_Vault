@@ -128,7 +128,7 @@ def decode_qr():
         return redirect(url_for('auth.login'))
 
     # Lấy email trực tiếp từ session
-    current_user_email = session.get("email")
+    current_user_email = session["email"]
 
     if not current_user_email:
         # Trường hợp hi hữu session có user_id nhưng không có email

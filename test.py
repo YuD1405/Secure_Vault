@@ -1,1 +1,1 @@
-print("c:\\Users\\user\'\\Documents\\HCMUS\\ComputerSec\\Proj1\\Secure_Vault\\flaskapi\\data\\key_manage\\213ce980ed52a9687c9fc282d2197bc9f7ae376c34ac3ed2ff2ee7892e02b7a7\\hoangdat220404_at_gmail.com_qr.png")
+print("c:\\Users\\user'\\Documents\\HCMUS\\ComputerSec\\Proj1\\Secure_Vault\\flaskapi\\data\\key_manage\\213ce980ed52a9687c9fc282d2197bc9f7ae376c34ac3ed2ff2ee7892e02b7a7\\hoangdat220404_at_gmail.com_qr.png")
