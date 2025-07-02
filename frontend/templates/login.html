@@ -19,6 +19,12 @@
       <div class="message-box error-msg">{{ error }}</div>
       {% endif %}
 
+      {% if locked_by_admin %}
+      <div class="message-box error-msg">
+        Your account is locked by admin.
+      </div>
+      {% endif %}
+      
       {% if locked %}
       <div class="message-box error-msg">
         Your account is locked. Try again in <span id="countdown">5:00</span>.
@@ -67,6 +73,7 @@
       <button type="submit">Login</button>
     </form>
     <p>New here? <a href="{{ url_for('auth.signup') }}">Create an Account</a></p>
+    <p><a href="{{ url_for('auth.render_recover_account') }}">Forgot password?</a></p>
   </div>
   <div id="toast-container" class="toast-container"></div>
 

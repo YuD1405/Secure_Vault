@@ -2,7 +2,7 @@ from flask import Blueprint, request, render_template, jsonify, session, url_for
 from modules.utils.digital_signing import digital_sign_file
 from modules.utils.verify_digital_signature import verify_signature
 from modules.utils.logger import log_user_action
-from modules.utils.qr_code import generate_public_info_qr, process_qr_code_and_add_contact, get_added_contacts
+from modules.utils.qr_code import generate_public_info_qr, process_qr_code_and_add_contact, get_all_contacts, get_user_dir
 import hashlib
 import os
 from pathlib import Path
@@ -36,6 +36,7 @@ def signing_file_route():
 
     log_user_action("anonymous", "Sign file", "Success", f"File: {file.filename}", level="info")
     return jsonify({'message': 'Đã ký số thành công!'})
+
 
 # Requirement 9 – Verify Digital Signature
 @utils_bp.route('/verify_signature', methods=['GET'])
@@ -72,6 +73,7 @@ def verify_signature_route():
         log_user_action("anonymous", "Verify signature", "Failure", f"File: {file.filename}", level="warning")
         return jsonify({"success": False, "message": "Signature is invalid."}), 400
 
+
 # Requirement 4 – QR
 @utils_bp.route("/generate_qr", methods=["GET"])
 def render_generate_qr():
@@ -84,6 +86,52 @@ def render_generate_qr():
     generate_public_info_qr(email, qr_path)
 
     return render_template("qr_code.html")
+
+@utils_bp.route("/upload_qr", methods=["GET"])
+def upload_qr():
+    """
+    Tạo một mã QR từ email được cung cấp qua query parameter.
+    Ví dụ: /utils/generate_qr?email=user@example.com
+    """
+
+    # 1. Lấy email từ query parameter của URL
+    email = session['email']
+
+    # 2. Kiểm tra xem email có được cung cấp không
+    if not email:
+        # Nếu bạn có trang lỗi, có thể render nó.
+        # Hoặc trả về lỗi JSON.
+        return "Lỗi: Vui lòng cung cấp một địa chỉ email trong URL (ví dụ: ?email=user@example.com)", 400
+
+    try:
+        # 3. Xác định đường dẫn output cho file QR
+        # Lưu vào một thư mục tạm thời hoặc thư mục của người dùng
+        user_dir = get_user_dir(email)
+        qr_output_path = user_dir / f"{email.replace('@', '_at_')}_qr.png"
+        print(qr_output_path)
+
+        # 4. Gọi hàm logic để tạo file ảnh QR
+        # Giả sử hàm generate_qr_image_file trả về True/False
+        success, message = generate_public_info_qr(email=email, output_path=qr_output_path)
+
+        if not success:
+            # Nếu hàm tạo QR thất bại (ví dụ không tìm thấy public key)
+            print(f"Lỗi khi tạo QR", message)
+            # Có thể trả về một ảnh placeholder "lỗi"
+            return f"Không thể tạo QR code", 500
+        
+        print(qr_output_path)
+        print("Hello")
+
+        # 5. Gửi file ảnh vừa tạo về cho trình duyệt
+        return send_file(
+            ".." / qr_output_path,
+            mimetype='image/png'
+        )
+
+    except Exception as e:
+        print(f"Lỗi nghiêm trọng khi tạo QR code cho {email}: {e}")
+        return "Đã xảy ra lỗi không xác định trên server.", 500
 
 @utils_bp.route("/qr_image/<email_hash>")
 def serve_qr_image(email_hash):
@@ -111,19 +159,45 @@ def get_qr_url():
 
 @utils_bp.route('/decode_qr', methods=['POST'])
 def decode_qr():
+    """
+    Nhận một file ảnh QR, giải mã và thêm thông tin vào danh bạ
+    của người dùng đang đăng nhập (lấy từ session).
+    """
+
+    # 1. Bắt đầu khối kiểm tra session
+    # Kiểm tra xem người dùng đã đăng nhập hoàn toàn chưa
     if 'email' not in session:
         return jsonify({"success": False, "message": "Bạn chưa đăng nhập."}), 401
 
-    current_user_email = session['email']
+    # Lấy email trực tiếp từ session
+    current_user_email = session.get("email")
 
-    if 'qr_file' not in request.files:
+    if not current_user_email:
+        # Trường hợp hi hữu session có user_id nhưng không có email
+        return jsonify({"success": False, "message": "Lỗi phiên làm việc."}), 401
+
+    # --- Kết thúc khối kiểm tra session ---
+
+    # 2. Kiểm tra file upload
+    if 'qr_code_file' not in request.files:
         return jsonify({"success": False, "message": "Không tìm thấy ảnh QR."}), 400
 
-    qr_image = request.files['qr_file']
-    qr_image.seek(0)
+    file = request.files['qr_code_file']
+    if file.filename == '':
+        return jsonify({"success": False, "message": "Chưa chọn file nào."}), 400
 
-    success, message = process_qr_code_and_add_contact(current_user_email, qr_image)
-    return jsonify({"success": success, "message": message})
+    # 3. Gọi hàm xử lý logic
+    if file:
+        success, message = process_qr_code_and_add_contact(
+            current_user_email=current_user_email, # <-- Sử dụng biến lấy từ session
+            qr_image_stream=file.stream
+        )
+
+        # 4. Flash thông báo kết quả
+        if success:
+            return jsonify({"success": True, "message": message}), 200
+        else:
+            return jsonify({"success": False, "message": message}), 400
 
 @utils_bp.route("/owned_keys", methods=["GET"])
 def api_get_owned_keys():
@@ -131,7 +205,7 @@ def api_get_owned_keys():
         return jsonify({"error": True, "message": "Not logged in"}), 401
 
     email = session['email']
-    contacts = get_added_contacts(email)
+    contacts = get_all_contacts(email)
 
     if contacts: 
         return jsonify({"success": True, "data": contacts})

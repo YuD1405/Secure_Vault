@@ -5,17 +5,47 @@ from datetime import datetime, timedelta
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
 
-from modules.crypto.key_extensions import get_user_dir, get_latest_key_path, write_json_file, read_json_file
+from modules.crypto.key_extensions import get_user_dir, get_latest_key_path, write_json_file, read_json_file, Path
 
 KEY_EXPIRATION_DAYS = 90
 
-# Tọa khóa AES từ hash pw (sửa lại)
-def derive_aes_key_from_hash(hashed_passphrase_hex: str) -> bytes:
-    """Tạo khoá AES 256-bit trực tiếp từ chuỗi hex của hash SHA-256."""
-    if len(hashed_passphrase_hex) != 64:
-        raise ValueError("Hashed passphrase phải là một chuỗi hex 64 ký tự (SHA-256).")
-    return bytes.fromhex(hashed_passphrase_hex)
+# Tọa khóa AES từ pw
+def derive_aes_key(passphrase: str, salt: str, iterations: int = 100_000) -> bytes:
+    """
+    Tạo khóa AES 256-bit từ passphrase thô (dạng string), dùng thuật toán PBKDF2-HMAC-SHA256.
+    
+    Args:
+        passphrase (str): Passphrase dạng thô người dùng nhập.
+        salt (bytes): Salt ngẫu nhiên hoặc cố định (16–32 byte).
+        iterations (int): Số vòng lặp để tăng độ mạnh (mặc định: 100_000).
+        
+    Returns:
+        bytes: Khóa AES 32 byte.
+    """
+    if isinstance(salt, memoryview):
+        salt = salt.tobytes()
+    elif isinstance(salt, str):
+        salt = salt.encode('utf-8')
+    elif isinstance(salt, bytearray):
+        salt = bytes(salt)
+        
+    if not isinstance(passphrase, str):
+        raise TypeError("Passphrase phải là chuỗi string.")
+    if not isinstance(salt, bytes):
+        raise TypeError("Salt phải là bytes.")
+
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,  # AES-256
+        salt=salt,
+        iterations=iterations,
+        backend=default_backend()
+    )
+    return kdf.derive(passphrase.encode('utf-8'))
 
 # Tạo cặp khóa RSA, mã hóa pri key bằng AES Key
 def create_new_key(email: str, aes_key: bytes):
@@ -65,6 +95,4 @@ def create_new_key(email: str, aes_key: bytes):
     new_key_path = user_dir / f"key_{new_key_number}.json"
     write_json_file(new_key_path, new_key_data)
     print(f"Đã tạo và lưu khoá mới thành công tại: {new_key_path.name}")
-
-
-
+    return True

@@ -7,14 +7,16 @@ from pyzbar.pyzbar import decode as qr_decode
 from modules.crypto.key_extensions import get_user_dir, write_json_file, read_json_file
 from modules.crypto.key_management import get_active_public_info
 
+QR_DIR = Path("publickey.png")
+
 def generate_public_info_qr(email: str, output_path: str | Path):
     """Tạo mã QR chứa thông tin công khai của khoá đang hoạt động."""
     import qrcode # import tại đây để không bắt buộc phải cài nếu không dùng đến
     print("\n--- [TẠO QR CODE CHO PUBLIC KEY] ---")
     public_info = get_active_public_info(email)
     if not public_info:
-        print("Lỗi: Không thể tạo QR code vì không có khoá nào đang hoạt động.")
-        return
+        return False, "Lỗi: Không thể tạo QR code vì không có khoá nào đang hoạt động."
+
 
     public_key_b64 = base64.b64encode(public_info["public_key_pem"].encode()).decode()
     qr_data = {"email": public_info["owner_email"], "creation_date": public_info["creation_date"],
@@ -22,8 +24,13 @@ def generate_public_info_qr(email: str, output_path: str | Path):
     
     json_string = json.dumps(qr_data, separators=(',', ':'))
     img = qrcode.make(json_string)
+    
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    
     img.save(output_path)
-    print(f"Đã tạo và lưu QR code thành công tại: {output_path}")
+    
+    return True, f"Đã tạo và lưu QR code thành công tại: {output_path}"
 
 def process_qr_code_and_add_contact(current_user_email: str, qr_image_stream) -> tuple[bool, str]:
     """
@@ -37,17 +44,13 @@ def process_qr_code_and_add_contact(current_user_email: str, qr_image_stream) ->
         Một tuple (success: bool, message: str).
     """
     try:
-        # 1. Đọc ảnh từ stream sử dụng OpenCV
-        # Đọc stream vào một numpy array
         import numpy as np
-        image_array = np.frombuffer(qr_image_stream.read(), np.uint8)
-        # Decode array thành ảnh mà OpenCV có thể đọc
-        img = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
+        image_array = np.frombuffer(qr_image_stream.read(), np.uint8)
+        img = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
         if img is None:
             return False, "Không thể đọc file ảnh. Vui lòng thử lại với định dạng khác (PNG, JPG)."
-
-        # 2. Giải mã QR code từ ảnh
+        
         decoded_objects = qr_decode(img)
         if not decoded_objects:
             return False, "Không tìm thấy mã QR nào trong ảnh."
@@ -87,12 +90,12 @@ def process_qr_code_and_add_contact(current_user_email: str, qr_image_stream) ->
         user_dir = get_user_dir(current_user_email)
         add_contact_public_key(user_dir, contact_email, public_info_to_save)
         
-        return True, f"Đã thêm thành công {contact_email} vào danh bạ của bạn!"
+        return True, f"Đã thêm thành công {contact_email} vào danh bạ!"
 
     except json.JSONDecodeError:
         return False, "Nội dung QR code không phải là định dạng JSON hợp lệ."
     except Exception as e:
-        return False, f"Đã xảy ra lỗi không xác định: {e}"
+        return False, f"Đã xảy ra lỗi: {e}"
     
 def add_contact_public_key(user_dir: Path, contact_email: str, public_info: dict):
     """Tiện ích để lưu trữ public_info của một người dùng khác vào danh bạ."""
@@ -104,31 +107,24 @@ def add_contact_public_key(user_dir: Path, contact_email: str, public_info: dict
     write_json_file(contacts_path, contacts_data)
     print(f"Đã thêm/cập nhật public key của '{contact_email}' vào danh bạ.")
 
-def get_added_contacts(user_email: str) -> list[dict]:
-    """
-    Lấy danh sách các contact đã lưu từ QR code (từ file contact_public_key.json).
+def get_all_contacts(current_user_email: str) -> list:
+    try:
+        user_dir = get_user_dir(current_user_email)
 
-    Args:
-        user_email (str): Email người dùng hiện tại (để lấy đúng thư mục).
+        contacts_path = user_dir / "contact_public_key.json"
+        if not contacts_path.exists():
+            print(f"Không tìm thấy file danh bạ cho {current_user_email}.")
+            return []
 
-    Returns:
-        list[dict]: Danh sách contact, mỗi phần tử gồm email, public_key_pem, creation_date.
-    """
-    user_dir = get_user_dir(user_email)
-    contacts_path = user_dir / "contact_public_key.json"
+        contacts_data = read_json_file(contacts_path)
+        
+        if not contacts_data:
 
-    if not contacts_path.exists():
+            return []
+
+        contact_list = list(contacts_data.values())
+        return contact_list
+
+    except Exception as e:
+        print(f"Lỗi khi đọc danh bạ của {current_user_email}: {e}")
         return []
-
-    contacts_data = read_json_file(contacts_path)
-
-    # Mỗi contact là 1 dict chứa thông tin của người khác
-    result = []
-    for email, info in contacts_data.items():
-        result.append({
-            "email": email,
-            "public_key": info.get("public_key_pem", ""),
-            "date_added": info.get("creation_date", "unknown")
-        })
-
-    return result

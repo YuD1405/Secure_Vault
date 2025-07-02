@@ -93,6 +93,20 @@
                 <div class="topbar topbar--set-padding">Encrypt File</div>
 
                 <form id="uploadForm" method="POST" enctype="multipart/form-data" class="sign-file-wrapper-v2">
+                    <!-- Tùy chọn lưu định dạng -->
+                    <div class="form-group file-preview-top">
+                        <label>Chọn định dạng lưu file:</label>
+                        <label style="display: flex; align-items: center; gap: 10px;">
+                            <input type="radio" name="save_format" value="combined" checked />
+                                Gộp chung thành 1 file
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px;">
+                            <input type="radio" name="save_format" value="split" />
+                            Lưu riêng file mã hoá và khoá
+                        </label>
+                        <p class="upload-hint">Định dạng ảnh hưởng đến cách giải mã sau này</p>
+                    </div>
+
                     <!-- Select Receipt -->
                     <div class="form-group file-preview-top">
                         <label for="recipient-email">Select Recipient:</label>

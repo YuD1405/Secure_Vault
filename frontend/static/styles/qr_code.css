@@ -699,3 +699,26 @@ content {
     text-overflow: ellipsis;
     max-width: 400px;
 }
+
+.search-box {
+  margin: 15px 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.search-box input {
+  padding: 10px 16px;
+  width: 320px;
+  font-size: 1rem;
+  border: 2px solid #aaa; /* viền rõ hơn khi không focus */
+  border-radius: 12px;
+  background-color: var(--input-color);
+  color: var(--text-color);
+  
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); /* nhẹ nhàng */
+}
+
+.search-box input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(95, 119, 241, 0.25); /* đổ bóng sáng hơn */
+}

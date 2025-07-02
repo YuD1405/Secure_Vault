@@ -141,19 +141,28 @@
                             <h2>Owned Public Keys</h2>
                             <p>Below is the list of public keys you have scanned and saved.</p>
 
+                            <!-- ✅ Search Bar -->
+                            <div class="search-box">
+                                <input
+                                    type="text"
+                                    id="search-publickey"
+                                    placeholder="🔍 Search by email or public key..."
+                                    oninput="filterPublicKeys()" />
+                            </div>
+
                             <div class="key-table">
                                 <table>
-                                    <thead>
+                                <thead>
                                     <tr>
-                                        <th>#</th>
-                                        <th>Email</th>
-                                        <th>Date Added</th>
-                                        <th>Public Key</th>
+                                    <th>#</th>
+                                    <th>Email</th>
+                                    <th>Creation date</th>
+                                    <th>Public Key</th>
                                     </tr>
-                                    </thead>
-                                    <tbody id="owned-keys-tbody">
+                                </thead>
+                                <tbody id="owned-keys-tbody">
                                     <!-- JavaScript sẽ render vào đây -->
-                                    </tbody>
+                                </tbody>
                                 </table>
                             </div>
                         </div>

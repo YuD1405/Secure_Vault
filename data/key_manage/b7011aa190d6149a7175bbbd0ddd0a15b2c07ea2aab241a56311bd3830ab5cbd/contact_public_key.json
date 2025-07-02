@@ -1,0 +1,8 @@
+{
+  "testmail@gmail.com": {
+    "owner_email": "testmail@gmail.com",
+    "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyy6EoKyHyEuimIMBfZVu\ndGDICggeo0riog2XcdDUsCeqMKICXTyhutmKjzMT0v9b0xyLHYoNMmomCxuGlDf6\nWpPngSZRnJkTJ+uW/bsHTFlgonLB8mTLdXXdqRzo4YUkUKQsdDFItGElAPzGTJ3u\nDh3qKV/lVXMuicx5j7qjy2LQf7ISGZYAUdgbXuZo75wiBPgcGObUiPhO3sWol4vq\ndTD4RSlJcFzRozL32z8qfheJupScUdqXYH919WrWyDP8yqemDtDT5FdJRf2k4KJQ\nPRyUf+fBFZXCh6krZm2I5frzOLn7zKatKkKHGRfhE8FHa0ToTPdYNKoimeDXDy4b\ngwIDAQAB\n-----END PUBLIC KEY-----\n",
+    "creation_date": "2025-07-02T09:28:40.219704",
+    "expiry_date": null
+  }
+}

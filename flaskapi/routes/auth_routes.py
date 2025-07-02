@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
-from modules.auth.logic import register_user, process_login, get_user_by_email, update_user_info_in_db
+from modules.auth.logic import register_user, process_login, get_user_by_email, update_user_info_in_db, verify_recovery_code_from_db, reset_password_in_db
 from modules.auth.mfa import (verify_otp_code, verify_totp_code,
                               generate_and_send_otp, generate_qr_code, expire_otp_code)
+from modules.utils.logger import read_security_logs
+from modules.utils.manage_account import fetch_all_users, toggle_user_lock
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -15,9 +17,13 @@ def login():
         passphrase = request.form['passphrase']
         result = process_login(email, passphrase)
         if result.get("success"):
+            session['passphrase'] = passphrase
             session['email'] = email
+            session['role'] = result.get("role")
             session.pop('otp_sent', None)
             return redirect(url_for('auth.verify'))
+        elif result.get("locked_by_admin"):
+            return render_template("login.html", locked_by_admin=True)
         elif result.get("locked"):
             return render_template("login.html", locked=True)
         else:
@@ -65,6 +71,8 @@ def verify():
             if verify_otp_code(email, otp_input):
                 session.pop('otp_sent', None)
                 session['user_id'] = email
+                if session.get("role") == "admin":
+                    return redirect(url_for("auth.admin_dashboard"))
                 return redirect(url_for('auth.dashboard'))
             else:
                 flash("Invalid or expired OTP", "email_error")
@@ -74,6 +82,8 @@ def verify():
             if verify_totp_code(email, otp_input):
                 session.pop('otp_sent', None)
                 session['user_id'] = email
+                if session.get("role") == "admin":
+                    return redirect(url_for("auth.admin_dashboard"))
                 return redirect(url_for('auth.dashboard'))
             else:
                 flash("Invalid TOTP code", "totp_error")
@@ -89,15 +99,65 @@ def dashboard():
         return redirect(url_for("auth.login"))
     return render_template("user_dashboard.html", email=session.get("email"))
 
+@auth_bp.route("/admin_dashboard")
+def admin_dashboard():
+    if not session.get("user_id") and session.get("role") != "admin":
+        flash("Access denied.", "error")
+        return redirect(url_for("auth.login"))
+    
+    logs = read_security_logs()
+    return render_template("admin_dashboard.html", email=session.get("email"), logs=logs)
+
+@auth_bp.route("/admin_manage_account", methods=['GET', 'POST'])
+def admin_manage_account():
+    if not session.get("user_id") and session.get("role") != "admin":
+        flash("Access denied.", "error")
+        return redirect(url_for("auth.login"))
+    
+    if request.method == "POST":
+        email = request.form.get("email")
+        action = request.form.get("action")  # "lock" hoặc "unlock"
+        toggle_user_lock(email, lock=(action == "lock"))
+
+    users = fetch_all_users()
+    return render_template("admin_manage_account.html", email=session.get("email"), users=users)
+
 @auth_bp.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("auth.login"))
 
+# Requirement 17 – update info
 @auth_bp.route("/recover_account")
-def recover_account():
-    return "Khôi phục account"
+def render_recover_account():
+    return render_template("recover_account.html")
 
+@auth_bp.route('/verify_recovery', methods=['POST'])
+def verify_recovery_code():
+    data = request.get_json()
+    email = data.get('email')
+    recovery_code = data.get('recovery_code')
+
+    success, error = verify_recovery_code_from_db(email, recovery_code)
+
+    if success:
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'message': error}), 400
+    
+@auth_bp.route('/reset_password', methods=['POST'])
+def reset_password():
+    data = request.get_json()
+    email = data.get('email')
+    new_password = data.get('new_password')
+
+    success, error = reset_password_in_db(email, new_password)
+
+    if success:
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'message': error or 'Failed to reset password'}), 400
+    
 # Requirement 5 – update info
 @auth_bp.route("/user_info")
 def api_user_info():

@@ -35,45 +35,58 @@ document.addEventListener("DOMContentLoaded", () => {
   // 📤 5. Gửi form qua fetch
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const file = fileInput.files[0];
 
+    const file = fileInput.files[0];
+    const recipientEmail = document.getElementById("recipient-email")?.value || "hihihi@gmail.com";
+    const encryptMode = document.querySelector('input[name="save_format"]:checked')?.value || "combined";
+
+    // ✅ Kiểm tra đủ thông tin
     if (!file) {
-      // resultDisplay.innerText = "Please select a file first!";
-      // resultDisplay.classList.remove("success");
-      // resultDisplay.classList.add("error");
-      showToast("Please select a file first!", "error");
+      showToast("Please select a file to encrypt!", "error");
       return;
     }
 
+    if (!recipientEmail) {
+      showToast("Please select a recipient!", "error");
+      return;
+    }
+
+    // ✅ Tạo formData
     const formData = new FormData();
     formData.append("file_to_encrypt", file);
+    formData.append("encrypt_mode", encryptMode);
+    formData.append("recipient_email", recipientEmail);
 
     try {
-      const res = await fetch("/crypto/encrypt", {
+      const res = await fetch("/crypto/encrypt_file", {
         method: "POST",
         body: formData
       });
-      const result = await res.json();
-      resultDisplay.classList.remove("error", "success");
 
-      if (result.error) {
-        // resultDisplay.innerText = result.error;
-        // resultDisplay.classList.add("error");
-        showToast(result.error, "error");
-      } else if (result.message) {
-        // resultDisplay.innerText = result.message;
-        // resultDisplay.classList.add("success");
-        showToast(result.message, "success");
-      } else {
-        // resultDisplay.innerText = "Đã gửi!";
-        showToast("Đã gửi!", "success");
+      if (!res.ok) {
+        const errorText = await res.text();
+        showToast("Lỗi mã hóa: " + errorText, "error");
+        return;
       }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "encrypted_file.enc"; 
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      showToast("Đã mã hóa và tải file thành công!", "success");
+      
     } catch (err) {
-      // resultDisplay.innerText = "Lỗi khi gửi file.";
       console.error(err);
       showToast("Lỗi khi gửi file", "error");
     }
   });
+
 
   // 🎯 6. Drag & drop vào drop-area
   ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {

@@ -16,14 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
     decodeBtn.addEventListener("click", () => {
       const fileInput = document.getElementById("qr_file");
       const file = fileInput.files[0];
-      console.log(fileInput);
+
       if (!file) {
         showToast("Vui lòng chọn ảnh QR để giải mã", "error");
         return;
       }
 
       const formData = new FormData();
-      formData.append("qr_file", file);
+      formData.append("qr_code_file", file);
 
       fetch("/utils/decode_qr", {
         method: "POST",
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(res => res.json())
         .then(data => {
           if (data.success) {
-            showToast("Đã thêm người dùng!", "success");
+            showToast(data.message, "success");
             fileInput.value = "";
             loadOwnedKeys();
           } else {
@@ -84,38 +84,66 @@ function downloadQR() {
   document.body.removeChild(link);
 }
 
+// Hàm fetch chuẩn
 function loadOwnedKeys() {
-    const tbody = document.getElementById("owned-keys-tbody");
-    if (!tbody) {
-      console.warn("Không tìm thấy tbody để render owned keys.");
-      return;
-    }
+  const tbody = document.getElementById("owned-keys-tbody");
+  if (!tbody) {
+    console.warn("Không tìm thấy tbody để render owned keys.");
+    return;
+  }
 
-    fetch("/utils/owned_keys")
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            tbody.innerHTML = "";  
+  fetch("/utils/owned_keys")
+    .then(res => res.json())
+    .then(data => {
+      tbody.innerHTML = "";
+      const container = document.getElementById("active-key-info");
 
-            if (!data.success ) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;font-style:italic;">No public keys found.</td></tr>`;
-                showToast("Bạn chưa có public key nào được lưu.", "info");
-                return;
-            }
+      if (!data.success || !data.data || data.data.length === 0) {
+        container.innerHTML = `<tr><td colspan="4" style="text-align:center;font-style:italic;">Không có public key nào được lưu.</td></tr>`;
+        showToast("Bạn chưa có public key nào được lưu.", "info");
+        return;
+      }
 
-            data.data.forEach((key, index) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${key.email}</td>
-                    <td>${key.date_added}</td>
-                    <td><pre>${key.public_key.slice(0, 40)}...</pre></td>
-                `;
-                tbody.appendChild(row);
-            });
-        })
-        .catch(err => {
-            showToast("Failed to fetch owned keys", "error");
-            console.error("Failed to fetch owned keys:", err);
-        });
+      data.data.forEach((key, index) => {
+        const email = key.owner_email || "-";
+        const created = key.creation_date?.split("T")[0] || "-";
+        //const expiry = key.expiry_date?.split("T")[0] || "Chưa có";
+       const trimmedKey = trimPublicKey(key.public_key_pem || key.public_key || "");
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${email}</td>
+          <td>${created}</td>
+          <td><pre title="${trimmedKey}">${trimmedKey.slice(0, 40)}...</pre></td>
+        `;
+        tbody.appendChild(row);
+      });
+    })
+    .catch(error => {
+      console.error("❌ Lỗi khi load owned keys:", error);
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:red;">Lỗi khi tải danh sách public keys.</td></tr>`;
+      showToast("Không thể kết nối máy chủ", "error");
+    });
+}
+
+
+function filterPublicKeys() {
+  const keyword = document.getElementById('search-publickey').value.toLowerCase();
+  const rows = document.querySelectorAll('#owned-keys-tbody tr');
+
+  rows.forEach(row => {
+    const email = row.children[1].textContent.toLowerCase();
+    const pubkey = row.children[3].textContent.toLowerCase();
+    const match = email.includes(keyword) || pubkey.includes(keyword);
+    row.style.display = match ? '' : 'none';
+  });
+}
+
+function trimPublicKey(pem) {
+  if (!pem) return "";
+  return pem
+    .split('\n')
+    .filter(line => !line.includes("-----"))
+    .join('');
 }

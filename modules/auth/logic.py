@@ -15,14 +15,11 @@ from datetime import datetime, timedelta
 def generate_salt(length=16):
     return os.urandom(length).hex()
 
-
 def hash_with_salt(passphrase, salt):
     return hashlib.sha256((passphrase + salt).encode()).hexdigest()
 
-
 def generate_recovery_code(length=12):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
-
 
 def register_user(data: dict) -> tuple:
     email = sanitize_input(data.get("email", ""))
@@ -73,7 +70,6 @@ def register_user(data: dict) -> tuple:
     finally:
         cur.close()
 
-
 def process_login(email, passphrase):
     email = sanitize_input(email)
     passphrase = sanitize_input(passphrase)
@@ -97,6 +93,9 @@ def process_login(email, passphrase):
             user['failed_attempts'] = 0
 
     if user['is_locked']:
+        if user['last_failed_login'] is None:
+            return {"success": False, "locked_by_admin": True}
+        
         delta = now - user['last_failed_login']
         if delta < timedelta(minutes=5):
             return {"success": False, "locked": True}
@@ -126,7 +125,7 @@ def process_login(email, passphrase):
     mysql.connection.commit()
     log_user_action(email, "Login success", "Pending MFA")
 
-    return {"success": True}
+    return {"success": True, "role": user['role']}
 
 def get_user_by_email(email):
     cur = mysql.connection.cursor()
@@ -215,3 +214,76 @@ def update_user_info_in_db(email: str, full_name: str, phone: str, address: str,
 
     except Exception as e:
         return False, "Đã xảy ra lỗi khi cập nhật thông tin."
+    
+def check_correct_pw(email: str, passphrase:str):
+    email = sanitize_input(email)
+    passphrase = sanitize_input(passphrase)
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+    user = cur.fetchone()
+    
+    hashed = hash_with_salt(passphrase, user['salt'])
+    if hashed != user['hashed_passphrase']:
+        return False
+    return True
+
+def verify_recovery_code_from_db(email, recovery_code_input):
+    cursor = mysql.connection.cursor()
+
+    query = "SELECT recovery_code FROM users WHERE email = %s"
+    cursor.execute(query, (email,))
+    result = cursor.fetchone()
+    cursor.close()
+
+    if not result:
+        return False, "User not found"
+
+    db_recovery_code = result["recovery_code"]
+
+    if recovery_code_input == db_recovery_code:
+        return True, None
+    else:
+        return False, "Invalid recovery code"
+    
+def reset_password_in_db(email, new_password):
+    try:
+        cursor = mysql.connection.cursor()
+
+        # Tạo salt ngẫu nhiên
+        salt = os.urandom(16).hex()
+        hash_input = new_password + salt
+        hashed_pass = hashlib.sha256(hash_input.encode()).hexdigest()
+
+        # Cập nhật mật khẩu mới + xóa recovery_code
+        query = """
+            UPDATE users 
+            SET hashed_passphrase = %s, salt = %s, recovery_code = NULL 
+            WHERE email = %s
+        """
+        cursor.execute(query, (hashed_pass, salt, email))
+        mysql.connection.commit()
+        cursor.close()
+
+        return True, None
+    except Exception as e:
+        print("Password reset error:", e)
+        return False, "Database error"
+    
+def get_salt_from_db(email: str) -> bytes:
+    """
+    Lấy salt từ bảng `rsa_keys` trong MySQL thông qua email.
+    Trả về salt dạng bytes hoặc None nếu không tìm thấy.
+    """
+    try:
+        cur = mysql.connection.cursor()
+        query = "SELECT salt FROM users WHERE email = %s"
+        cur.execute(query, (email,))
+        result = cur.fetchone()
+        cur.close()
+        if result:
+            return result["salt"]
+        return None
+    except Exception as e:
+        print("Lỗi khi truy vấn salt:", e)
+        return None

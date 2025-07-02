@@ -12,6 +12,9 @@ def create_app():
     static_path = os.path.join(os.path.dirname(__file__), "..", "frontend", "static")
     app = Flask(__name__, template_folder=template_path, static_folder=static_path)
     app.secret_key = os.getenv("FLASK_SECRET_KEY")
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SECURE'] = True  # Chỉ hoạt động qua HTTPS
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
     CORS(app)
 
     # Load biến môi trường nếu có

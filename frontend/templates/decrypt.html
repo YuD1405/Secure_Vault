@@ -92,29 +92,52 @@
             <div class="content content--setup">
                 <div class="topbar topbar--set-padding">Decrypt File</div>
                     <!-- Left: Upload zone -->
-                <form id="uploadForm" method="POST" enctype="multipart/form-data" class="sign-file-wrapper-v2">
-                    <!-- Selected File -->
-                    <div class="form-group file-preview-top">
-                        <label for="file-upload-show">Selected File:</label>
-                        <div id="file-info" class="file-info">
-                        <img id="file-icon" src="{{ url_for('static', filename='icons/folder.png') }}" alt="file icon" class="file-icon" />
-                        <input type="text" id="file-upload-show" placeholder="No file selected" readonly />
+                <form id="uploadForm" method="POST" enctype="multipart/form-data" class="decrypt-wrapper">
+                    <!-- 🧾 Section chọn file -->
+                    <div class="decrypt-grid">
+                        <!-- File cần giải mã -->
+                        <div class="decrypt-box">
+                            <label class="decrypt-label">File to Decrypt</label>
+                            <div class="upload-box-center" id="drop-file">
+                                <img src="{{ url_for('static', filename='images/cloud.png') }}" class="upload-icon" />
+                                <p><strong>Drag & drop file</strong></p>
+                                <p>or <label for="file-upload" class="custom-file-upload">Upload</label></p>
+                                <input type="file" name="file-to-decrypt" id="file-upload" hidden>
+                                <p class="upload-hint">Only .enc supported</p>
+                            </div>
+                            <div class="form-group file-preview-top">
+                                <div id="file-info" class="file-info">
+                                <img id="file-icon" src="{{ url_for('static', filename='icons/folder.png') }}" alt="file icon" class="file-icon" />
+                                <input type="text" id="file-upload-show" placeholder="No file selected" readonly />
+                                </div>
+                                <p id="file-details-decrypt" class="upload-hint" style="margin-top: 5px;"></p>
+                            </div>
                         </div>
-                        <p id="file-details" class="upload-hint" style="margin-top: 5px;"></p>
+
+                        <!-- Khóa -->
+                        <div class="decrypt-box">
+                            <label class="decrypt-label">Key (optional)</label>
+                            <div class="upload-box-center" id="drop-key">
+                                <img src="{{ url_for('static', filename='images/cloud.png') }}" class="upload-icon" />
+                                <p><strong>Drag & drop file</strong></p>
+                                <p>or <label for="key-upload" class="custom-file-upload">Upload</label></p>
+                                <input type="file" name="key" id="key-upload" hidden>
+                                <p class="upload-hint">Only .key files</p>
+                            </div>
+                            
+                            <div class="form-group file-preview-top">
+                                <div id="file-info" class="file-info">
+                                <img id="file-icon" src="{{ url_for('static', filename='icons/folder.png') }}" alt="file icon" class="file-icon" />
+                                <input type="text" id="key-upload-show" placeholder="No file selected" readonly />
+                                </div>
+                                <p id="file-details-key" class="upload-hint" style="margin-top: 5px;"></p>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Upload zone -->
-                    <div class="upload-box-center" id="drop-area">
-                        <img src="{{ url_for('static', filename='images/cloud.png') }}" class="upload-icon" />
-                        <p><strong>Drag & drop to upload</strong></p>
-                        <p>or <label for="file-upload" class="custom-file-upload">Upload</label></p>
-                        <input type="file" name="file_to_decrypt" id="file-upload" hidden>
-                        <p class="upload-hint">Only PDF, DOCX supported</p>
-                    </div>
-
-                    <!-- Submit Button -->
+                    <!-- ✅ Submit -->
                     <div class="form-group bottom-submit">
-                        <button type="submit" class="btn-next">Decrypt File</button>
+                        <button type="submit" class="btn-next">Decrypt</button>
                         <p id="uploadResult" class="result-message"></p>
                     </div>
                 </form>

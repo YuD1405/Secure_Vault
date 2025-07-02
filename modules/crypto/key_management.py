@@ -6,7 +6,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from modules.crypto.key_extensions import get_user_dir, get_latest_key_path, read_json_file, get_key_files
+from modules.crypto.key_extensions import get_user_dir, get_latest_key_path, read_json_file, get_key_files, hashlib
 from modules.crypto.key_generator import get_latest_key_path, create_new_key
 
 # Kiểm tra tình trạng cặp khóa RSA
@@ -44,7 +44,7 @@ def get_active_private_key(email: str, aes_key: bytes) -> rsa.RSAPrivateKey | No
     encrypted_data = base64.b64decode(encrypted_b64)
     nonce, ciphertext = encrypted_data[:12], encrypted_data[12:]
     
-    decrypted_pem = AESGCM(aes_key).decrypt(nonce, ciphertext, None)
+    decrypted_pem = AESGCM(bytes.fromhex(aes_key)).decrypt(nonce, ciphertext, None)
     
     print("Đã giải mã thành công khoá riêng tư đang hoạt động.")
     return serialization.load_pem_private_key(decrypted_pem, password=None)
@@ -60,6 +60,15 @@ def get_active_public_info(email: str) -> dict | None:
     return key_data.get('public_info') if key_data.get('status') == 'active' else None
 
 # Lấy toàn bộ khóa pri và pub của user
+def trim_public_key(pem_str: str) -> str:
+    """
+    Xoá phần BEGIN/END và nối chuỗi public key PEM thành 1 dòng base64.
+    """
+    lines = pem_str.strip().splitlines()
+    # Bỏ BEGIN/END dòng đầu/cuối
+    core_lines = [line for line in lines if "-----" not in line]
+    return ''.join(core_lines)
+
 def get_all_key_strings(email: str) -> List[dict]:
     """
     Trả về danh sách tất cả các key của người dùng gồm:
@@ -82,13 +91,14 @@ def get_all_key_strings(email: str) -> List[dict]:
 
             encrypted_private_key = key_data["private_info"]["encrypted_private_key_b64"]
             public_key = key_data["public_info"]["public_key_pem"]
+            public_key_trimmed = trim_public_key(public_key)
             expiry = key_data["public_info"]["expiry_date"]
             status = key_data.get("status", "unknown")
 
             all_keys.append({
                 "file": key_path.name,
                 "private_key_b64": encrypted_private_key,
-                "public_key_pem": public_key,
+                "public_key_pem": public_key_trimmed,
                 "expiry_date": expiry,
                 "status": status
             })
