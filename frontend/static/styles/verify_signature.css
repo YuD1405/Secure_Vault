@@ -578,3 +578,26 @@ content {
   font-size: 13px;
   color: #6b7280; /* text-gray-500 */
 }
+
+.verify-result {
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-top: 5px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  border-left: 5px solid transparent;
+}
+
+/* Khi chữ ký hợp lệ */
+.verify-result.success {
+  background-color: #e6f4ea;
+  color: #2e7d32;
+  border-left-color: #2e7d32;
+}
+
+/* Khi chữ ký không hợp lệ hoặc chưa xác minh */
+.verify-result.error {
+  background-color: #fbe9e7;
+  color: #d32f2f;
+  border-left-color: #d32f2f;
+}

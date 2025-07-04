@@ -7,8 +7,7 @@ from modules.crypto.key_management import get_all_key_strings, check_and_manage_
 from modules.crypto.key_generator import create_new_key, derive_aes_key
 from modules.crypto.encrypt import encrypt_file_for_recipient, decrypt_file_from_sender
 from modules.crypto.key_extensions import get_user_dir, Path
-from modules.utils.qr_code import get_all_contacts
-from modules.auth.logic import check_correct_pw, get_salt_from_db
+from modules.auth.logic import get_salt_from_db
 
 crypto_bp = Blueprint('crypto', __name__)
 
@@ -82,14 +81,14 @@ def encrypt_file():
     sender_email = session["email"]
     recipient_email = request.form.get('recipient_email')
     file_to_encrypt = request.files.get('file_to_encrypt')
-    output_option = request.form.get('output_option', 'merge')
+    output_option = request.form.get('output_option')
 
     if not file_to_encrypt or not recipient_email or file_to_encrypt.filename == '':
         return {"success": False, "message": "Vui lòng chọn file và nhập email người nhận."}, 400
 
     output_dir = get_user_dir(sender_email) / "encrypted_outputs"
     output_dir.mkdir(exist_ok=True)
-    merge_output = (output_option == 'merge')
+    merge_output = (output_option == 'combined')
 
     success, message = encrypt_file_for_recipient(
         sender_email=sender_email,
@@ -109,13 +108,12 @@ def encrypt_file():
 
         if merge_output:
             encrypted_file_path = output_dir / f"{original_filename}.enc"
+
             if not encrypted_file_path.exists():
                 return {"success": False, "message": "Không tìm thấy file .enc đã mã hoá."}, 500
 
-            return send_file(
-                encrypted_file_path,
-                as_attachment=True
-            )
+            return send_file(encrypted_file_path.resolve(strict=True), as_attachment=True)
+
         else:
             enc_file_path = output_dir / f"{original_filename}.enc"
             key_file_path = output_dir / f"{original_filename}.key"
@@ -156,9 +154,10 @@ def decrypt_file():
         return {"success": False, "message": "Lỗi phiên làm việc"}, 401
 
     try:
-        aes_key = passphrase  # đã derive sẵn từ trước
-    except ValueError:
-        return {"success": False, "message": "Lỗi phiên làm việc"}, 400
+        salt = get_salt_from_db(recipient_email)
+        aes_key = derive_aes_key(passphrase, salt)
+    except Exception as e:
+        return {"success": False, "message": f"Lỗi tạo AES key: {e}"}, 400
 
     uploaded_file = request.files.get('file_to_decrypt')
     if not uploaded_file or uploaded_file.filename == '':
@@ -168,6 +167,8 @@ def decrypt_file():
     enc_file_stream = None
     key_file_stream = None
 
+    output_dir = get_user_dir(recipient_email) / "decrypted_outputs"
+    
     try:
         if filename.lower().endswith('.zip'):
             with zipfile.ZipFile(uploaded_file.stream, 'r') as zf:
@@ -188,6 +189,7 @@ def decrypt_file():
             recipient_email=recipient_email,
             recipient_aes_key=aes_key,
             enc_file_stream=enc_file_stream,
+            output_dir = output_dir,
             key_file_stream=key_file_stream
         )
 

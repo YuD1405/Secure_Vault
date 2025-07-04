@@ -5,7 +5,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from modules.utils.logger import log_internal_event
 import os
 
-def digital_sign_file(file, private_key_path):
+def digital_sign_file(file, private_key):
     """
     Function: digital_sign_file(file, private_key_path)
 
@@ -33,13 +33,6 @@ def digital_sign_file(file, private_key_path):
 
     # Tính SHA-256 hash của file
     sha256 = hashlib.sha256(file_bytes).digest()
-
-    # Đọc private key từ file
-    with open(private_key_path, 'rb') as key_file:
-        private_key = serialization.load_pem_private_key(
-            key_file.read(),
-            password=None,
-        )
 
     # Ký hash của file với private key RSA
     signature = private_key.sign(

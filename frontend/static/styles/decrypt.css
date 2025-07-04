@@ -657,3 +657,22 @@ content {
     border-radius: 8px;
     background-color: #f9fafb;
 }
+
+#decryption-mode-display {
+  font-weight: bold;
+  margin-top: 5px;
+  transition: color 0.3s ease;
+}
+
+#decryption-mode-display.combined {
+  color: #007bff;  /* xanh */
+}
+
+#decryption-mode-display.split {
+  color: #d32f2f;  /* đỏ */
+}
+
+#decryption-mode-display.unknown {
+  color: #999;     /* xám */
+  font-style: italic;
+}

@@ -44,7 +44,7 @@ def get_active_private_key(email: str, aes_key: bytes) -> rsa.RSAPrivateKey | No
     encrypted_data = base64.b64decode(encrypted_b64)
     nonce, ciphertext = encrypted_data[:12], encrypted_data[12:]
     
-    decrypted_pem = AESGCM(bytes.fromhex(aes_key)).decrypt(nonce, ciphertext, None)
+    decrypted_pem = AESGCM(aes_key).decrypt(nonce, ciphertext, None)
     
     print("Đã giải mã thành công khoá riêng tư đang hoạt động.")
     return serialization.load_pem_private_key(decrypted_pem, password=None)

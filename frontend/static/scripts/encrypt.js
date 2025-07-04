@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  loadRecipientEmails();
   // 🔒 1. Chặn mặc định hành vi kéo file vào toàn trang (mở PDF)
   window.addEventListener("dragover", e => e.preventDefault());
   window.addEventListener("drop", e => e.preventDefault());
@@ -54,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ✅ Tạo formData
     const formData = new FormData();
     formData.append("file_to_encrypt", file);
-    formData.append("encrypt_mode", encryptMode);
+    formData.append("output_option", encryptMode);
     formData.append("recipient_email", recipientEmail);
 
     try {
@@ -68,23 +69,46 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("Lỗi mã hóa: " + errorText, "error");
         return;
       }
+
+      // 📥 Lấy tên file từ header (nếu có)
+      const disposition = res.headers.get("Content-Disposition");
+      let filename = "encrypted_file";
+
+      if (disposition && disposition.includes("filename=")) {
+        const match = disposition.match(/filename="?([^"]+)"?/);
+        if (match) {
+          filename = match[1];
+        }
+      }
+
+      // 📦 Lấy phần mở rộng
+      const fileExt = filename.split('.').pop().toLowerCase();
+
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = "encrypted_file.enc"; 
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
-      showToast("Đã mã hóa và tải file thành công!", "success");
-      
+      // ✅ Tuỳ theo định dạng file → hiển thị Toast tương ứng
+      if (fileExt === "zip") {
+        showToast(`🔐 File đã được mã hoá và tách khóa. Đã tải: ${filename}`, "success");
+      } else if (fileExt === "enc") {
+        showToast(`🔐 File đã được mã hoá và gộp thành 1 file. Đã tải: ${filename}`, "success");
+      } else {
+        showToast(`📁 File mã hoá đã được tải về: ${filename}`, "success");
+      }
+
     } catch (err) {
       console.error(err);
       showToast("Lỗi khi gửi file", "error");
     }
+
   });
 
 
@@ -137,4 +161,40 @@ function getFileIcon(fileName) {
     default:
       return '/static/icons/file.png';
   }
+}
+
+function loadRecipientEmails() {
+  const select = document.getElementById("recipient-email");
+  if (!select) {
+    console.warn("Không tìm thấy #recipient-email để render contact.");
+    return;
+  }
+
+  fetch("/utils/owned_keys")
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success || !data.data || data.data.length === 0) {
+        showToast("Không có người dùng nào trong danh bạ.", "info");
+        return;
+      }
+
+      // Xoá hết options cũ, giữ lại option đầu tiên
+      const placeholder = select.querySelector("option[value='']");
+      select.innerHTML = "";
+      if (placeholder) select.appendChild(placeholder);
+
+      data.data.forEach((key) => {
+        const email = key.owner_email || key.email;
+        if (!email) return;
+
+        const option = document.createElement("option");
+        option.value = email;
+        option.textContent = email;
+        select.appendChild(option);
+      });
+    })
+    .catch(error => {
+      console.error("❌ Lỗi khi load recipient emails:", error);
+      showToast("Không thể tải danh bạ.", "error");
+    });
 }

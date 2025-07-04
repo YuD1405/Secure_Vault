@@ -38,9 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const file = fileInput.files[0];
 
     if (!file) {
-      // resultDisplay.innerText = "Please select a file first!";
-      // resultDisplay.classList.remove("success");
-      // resultDisplay.classList.add("error");
       showToast("Please select a file first!", "error");
       return;
     }
@@ -53,23 +50,30 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         body: formData
       });
-      const result = await res.json();
-      resultDisplay.classList.remove("error", "success");
+      console.log(res);
+      const contentType = res.headers.get("Content-Type");
 
-      if (result.error) {
-        // resultDisplay.innerText = result.error;
-        // resultDisplay.classList.add("error");
-        showToast(result.error, "error");
-      } else if (result.message) {
-        // resultDisplay.innerText = result.message;
-        // resultDisplay.classList.add("success");
-        showToast(result.message, "success");
+      if (res.ok && contentType === "application/octet-stream") {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name + ".sig";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+
+        showToast("Ký số thành công! File đang được tải xuống.", "success");
       } else {
-        // resultDisplay.innerText = "Đã gửi!";
-        showToast("Đã gửi!", "success");
+        // ❌ Trường hợp lỗi - trả về JSON
+        const result = await res.json();
+        const message = result.message || result.error || "Đã xảy ra lỗi.";
+        showToast(message, "error");
       }
     } catch (err) {
-      // resultDisplay.innerText = "Lỗi khi gửi file.";
       console.error(err);
       showToast("Lỗi khi gửi file", "error");
     }

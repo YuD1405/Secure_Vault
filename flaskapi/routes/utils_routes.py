@@ -3,8 +3,13 @@ from modules.utils.digital_signing import digital_sign_file
 from modules.utils.verify_digital_signature import verify_signature
 from modules.utils.logger import log_user_action
 from modules.utils.qr_code import generate_public_info_qr, process_qr_code_and_add_contact, get_all_contacts, get_user_dir
+from modules.auth.logic import get_salt_from_db
+from modules.crypto.key_generator import derive_aes_key
+from modules.crypto.key_management import get_active_private_key
+
 import hashlib
 import os
+import io
 from pathlib import Path
 
 utils_bp = Blueprint('utils', __name__)
@@ -16,26 +21,41 @@ def render_sign_file():
 
 @utils_bp.route('/sign_file', methods=['POST'])
 def signing_file_route():
+    if 'user_id' not in session:
+        return {"success": False, "message": "Bạn cần phải đăng nhập để truy cập trang này."}, 401
+    
     file = request.files.get('file_to_sign')
 
-    if not file:
+    if not file or file.filename == '':
         log_user_action("anonymous", "Sign file", "Failure", "Missing file", level="warning")
         return jsonify({'error': 'Không có file nào'}), 400
 
-    if file.filename == '':
-        log_user_action("anonymous", "Sign file", "Failure", "Empty filename", level="warning")
-        return jsonify({'error': 'Tên file trống'}), 400
+    email = session["email"]
+    passphrase = session.get("passphrase")  
+    if not passphrase:
+        return {"success": False, "message": "Không tìm thấy passphrase."}, 401
+    try:
+        salt = get_salt_from_db(email)
+        aes_key = derive_aes_key(passphrase, salt)
+        private_key = get_active_private_key(email, aes_key)
 
-    private_key_path = 'data/keys/private.pem'
-    if not os.path.exists(private_key_path):
-        log_user_action("anonymous", "Sign file", "Failure", "Private key not found", level="error")
-        return jsonify({'error': 'Không tìm thấy private key!'}), 500
+        # Ký file và tạo file chữ ký
+        signature_bytes = digital_sign_file(file, private_key)
 
-    # Thực hiện ký số và lưu
-    signature = digital_sign_file(file, private_key_path)
-
-    log_user_action("anonymous", "Sign file", "Success", f"File: {file.filename}", level="info")
-    return jsonify({'message': 'Đã ký số thành công!'})
+        # Tạo file signature dạng memory stream
+        signature_stream = io.BytesIO(signature_bytes)
+        signature_stream.seek(0)
+        
+        log_user_action(email, "Sign file", "Success", f"File: {file.filename}", level="info")
+        return send_file(
+            signature_stream,
+            as_attachment=True,
+            download_name=f"{file.filename}.sig",
+            mimetype="application/octet-stream"
+        )
+    except Exception as e:
+        log_user_action(email, "Sign file", "Failure", f"Lỗi: {e}", level="error")
+        return jsonify({"success": False, "message": f"Lỗi khi ký số: {e}"}), 500
 
 
 # Requirement 9 – Verify Digital Signature
@@ -45,6 +65,9 @@ def render_verify_signature():
 
 @utils_bp.route('/verify_signature', methods=['POST'])
 def verify_signature_route():
+    if 'user_id' not in session:
+        return {"success": False, "message": "Bạn cần phải đăng nhập để truy cập trang này."}, 401
+    
     file = request.files.get('file_to_verify')
     signature_file = request.files.get('signature')
 
@@ -57,18 +80,20 @@ def verify_signature_route():
         return jsonify({'error': 'Tên file trống'}), 400
 
     signature = signature_file.read()
-    public_key_path = request.form.get('public_key_path', 'data/keys/public.pem')
+    
+    email = session["email"]
+    contacts_public_key_path = get_user_dir(email) / "contact_public_key.json"
 
-    if not os.path.exists(public_key_path):
+    if not os.path.exists(contacts_public_key_path):
         log_user_action("anonymous", "Verify signature", "Failure", "Public key not found", level="error")
         return jsonify({"success": False, "message": "Public key không tồn tại"}), 400
 
     # Thực hiện xác minh
-    is_valid = verify_signature(file, signature, public_key_path)
+    signer = verify_signature(file, signature, contacts_public_key_path)
 
-    if is_valid:
+    if signer:
         log_user_action("anonymous", "Verify signature", "Success", f"File: {file.filename}", level="info")
-        return jsonify({"success": True, "message": "Signature is valid."}), 200
+        return jsonify({"success": True, "message": "Signature is valid.", "signer_email": signer}), 200
     else:
         log_user_action("anonymous", "Verify signature", "Failure", f"File: {file.filename}", level="warning")
         return jsonify({"success": False, "message": "Signature is invalid."}), 400

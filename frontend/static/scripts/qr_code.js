@@ -99,7 +99,7 @@ function loadOwnedKeys() {
       const container = document.getElementById("active-key-info");
 
       if (!data.success || !data.data || data.data.length === 0) {
-        container.innerHTML = `<tr><td colspan="4" style="text-align:center;font-style:italic;">Không có public key nào được lưu.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;font-style:italic;">Không có public key nào được lưu.</td></tr>`;
         showToast("Bạn chưa có public key nào được lưu.", "info");
         return;
       }

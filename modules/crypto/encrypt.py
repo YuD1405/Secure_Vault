@@ -38,6 +38,7 @@ def encrypt_file_for_recipient(
 
         if not recipient_public_info:
             return False, f"Không tìm thấy public key cho người nhận '{recipient_email}' trong danh bạ của bạn."
+        
         # 2. Kiểm tra hạn dùng của public key
         expiry_date_str = recipient_public_info.get("expiry_date")
         if expiry_date_str:
@@ -78,7 +79,7 @@ def encrypt_file_for_recipient(
             "encrypted_session_key_b64": base64.b64encode(encrypted_session_key).decode('utf-8'),
             "aes_nonce_b64": base64.b64encode(aes_nonce).decode('utf-8')
         }
-        print("Hello")
+        
         # 8. Tùy chọn lưu: gộp hoặc tách file
         if merge_output:
             # Gộp thành 1 file .enc
@@ -87,6 +88,7 @@ def encrypt_file_for_recipient(
             metadata_len_bytes = len(metadata_json_bytes).to_bytes(4, 'big')
             
             output_path = output_dir / f"{original_filename}.enc"
+
             with open(output_path, 'wb') as f:
                 f.write(metadata_len_bytes)
                 f.write(metadata_json_bytes)
@@ -94,17 +96,14 @@ def encrypt_file_for_recipient(
             
             return True, f"Mã hoá thành công! File đã được lưu tại: {output_path}"
         else:
-            print("Hello")
-
             # Tách thành file .key và .enc
             output_dir.mkdir(exist_ok=True)
             key_file_path = output_dir / f"{original_filename}.key"
             
             write_json_file(key_file_path, metadata)
-            print("hello")            
-
 
             enc_file_path = output_dir / f"{original_filename}.enc"
+            
             with open(enc_file_path, 'wb') as f:
                 f.write(encrypted_file_content)
 
@@ -118,7 +117,7 @@ def decrypt_file_from_sender(
     recipient_email: str,
     recipient_aes_key: bytes,
     enc_file_stream,
-    output_dir: Path, # <-- THAM SỐ MỚI
+    output_dir: Path, 
     key_file_stream=None
 ) -> tuple[bool, str, dict, bytes]:
     """

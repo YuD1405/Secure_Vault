@@ -134,15 +134,9 @@
                         </div>
                     </div>
 
-                    <!-- 🔑 Chọn người xác minh -->
                     <div class="form-group" style="margin-top: 30px; width: 100%;">
-                        <label for="public_key_selector" class="verify-label">Select public key to verify</label>
-                        <select id="public_key_selector" name="public_key_path" class="verify-select">
-                        <option value="">-- Select Public Key --</option>
-                        {% for user in users %}
-                        <option value="{{ user.public_key_path }}">{{ user.email }}</option>
-                        {% endfor %}
-                        </select>
+                        <label class="verify-label">Người ký</label>
+                        <p id="signerInfo" class="verify-result error">Chưa xác định</p>
                     </div>
 
                     <!-- ✅ Submit -->

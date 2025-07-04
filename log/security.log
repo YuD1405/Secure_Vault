@@ -63,3 +63,17 @@
 [2025-07-02 09:29:02] [INFO]: [testmail@gmail.com] Action: Login success | Status: Pending MFA
 [2025-07-02 09:37:33] [INFO]: [testmail@gmail.com] Action: Login success | Status: Pending MFA
 [2025-07-02 09:58:53] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
+[2025-07-02 10:51:20] [INFO]: [hihihi@gmail.com] Action: Register | Status: Success
+[2025-07-02 10:51:28] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
+[2025-07-04 08:10:17] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
+[2025-07-04 09:04:44] [INFO]: [yuddydoo1405@gmail.com] Action: Sign file | Status: Success | File: Duy_Resume_official.pdf
+[2025-07-04 09:30:03] [INFO]: [yuddydoo1405@gmail.com] Action: Login failed - wrong pass | Status: Failed
+[2025-07-04 09:30:09] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
+[2025-07-04 09:30:49] [INFO]: [yuddydoo1405@gmail.com] Action: Sign file | Status: Success | File: Duy_Resume_official.pdf
+[2025-07-04 09:31:51] [WARNING]: [anonymous] Action: Verify signature | Status: Failure | File: Duy_Resume_official.pdf
+[2025-07-04 09:32:23] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
+[2025-07-04 09:33:22] [INFO]: [testmail@gmail.com] Action: Login success | Status: Pending MFA
+[2025-07-04 09:33:49] [INFO]: [anonymous] Action: Verify signature | Status: Success | File: Duy_Resume_official.pdf
+[2025-07-04 09:35:17] [INFO]: [anonymous] Action: Verify signature | Status: Success | File: Duy_Resume_official.pdf
+[2025-07-04 15:48:36] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
+[2025-07-04 16:27:55] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA

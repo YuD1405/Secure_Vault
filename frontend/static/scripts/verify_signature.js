@@ -56,34 +56,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const file = fileInput.files[0];
     const sig = sigInput.files[0];
-    const pubKey = document.getElementById("public_key_selector").value;
+    const signerElem = document.getElementById("signerInfo");
 
-    if (!file || !sig || !pubKey) {
-      showToast("Vui lòng chọn đầy đủ file, chữ ký và public key!", "error");
+    // Xoá class cũ
+    signerElem.classList.remove("success", "error");
+
+    if (!file || !sig) {
+      showToast("Vui lòng chọn đầy đủ file và chữ ký!", "error");
+      signerElem.innerText = "Không xác định";
+      signerElem.classList.add("error");
       return;
     }
 
     const formData = new FormData();
     formData.append("file_to_verify", file);
     formData.append("signature", sig);
-    formData.append("public_key_path", pubKey);
 
     try {
       const res = await fetch("/utils/verify_signature", {
         method: "POST",
         body: formData,
       });
+
       const result = await res.json();
-      if (result.error) {
-        showToast(result.error, "error");
-      } else {
+
+      if (result.success) {
         showToast(result.message || "Xác minh thành công!", "success");
+        signerElem.innerText = `Người ký: ${result.signer_email || "Không xác định"}`;
+        signerElem.classList.add("success");
+      } else {
+        showToast(result.message || "Chữ ký không hợp lệ!", "error");
+        signerElem.innerText = "Không xác định";
+        signerElem.classList.add("error");
       }
     } catch (err) {
       console.error(err);
       showToast("Lỗi khi gửi xác minh", "error");
+      signerElem.innerText = "Không xác định";
+      signerElem.classList.add("error");
     }
   });
+
 
   // 🖱️ Drag & Drop cho cả 2 khung
   function setupDropEvents(area, inputEl, displayEl, iconEl, detailEl) {

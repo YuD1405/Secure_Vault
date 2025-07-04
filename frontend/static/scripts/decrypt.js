@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // 🔒 1. Chặn hành vi mặc định khi kéo file vào toàn trang
+  // 🔒 Ngăn kéo file toàn trang
   window.addEventListener("dragover", e => e.preventDefault());
   window.addEventListener("drop", e => e.preventDefault());
 
-  // 🧭 2. Sidebar hover mở rộng main
+  // 🧭 Sidebar hover mở rộng
   const sidebar = document.querySelector(".sidebar");
   const mainToggle = document.querySelector(".main");
   if (sidebar && mainToggle) {
@@ -11,83 +11,93 @@ document.addEventListener("DOMContentLoaded", () => {
     sidebar.addEventListener("mouseout", () => mainToggle.classList.remove("active"));
   }
 
-  // 📦 3. Gán DOM cho 2 file input: encrypted + key
-  const dropEnc = document.getElementById("drop-file");
-  const dropKey = document.getElementById("drop-key");
-
-  const encInput = document.getElementById("file-upload");
-  const keyInput = document.getElementById("key-upload");
-
-  const encDisplay = document.getElementById("file-upload-show");
-  const encIcon = document.querySelectorAll("#file-icon")[0];
-  const encDetails = document.getElementById("file-details-decrypt");
-
-  const keyDisplay = document.getElementById("key-upload-show");
-  const keyIcon = document.querySelectorAll("#file-icon")[1];
-  const keyDetails = document.getElementById("file-details-key");
-
+  // 📦 Gán DOM cho encrypt form
+  const dropArea = document.getElementById("drop-area");
+  const fileInput = document.getElementById("file-upload");
+  const fileDisplay = document.getElementById("file-upload-show");
+  const fileIcon = document.getElementById("file-icon");
+  const fileDetails = document.getElementById("file-details");
   const form = document.getElementById("uploadForm");
   const resultDisplay = document.getElementById("uploadResult");
 
-  if (!dropEnc || !dropKey || !encInput || !keyInput || !form) return;
+  if (!dropArea || !fileInput || !fileDisplay || !form || !fileIcon || !fileDetails) return;
 
-  // 🖱️ Khi chọn file bằng tay
-  encInput.addEventListener("change", function () {
-    updatePreview(this.files[0], encDisplay, encIcon, encDetails);
+  // 🖱️ Khi chọn file thủ công
+  fileInput.addEventListener("change", function () {
+    const file = this.files[0];
+    updatePreview(file, fileDisplay, fileIcon, fileDetails);
+    updateDecryptionModeDisplay();
   });
 
-  keyInput.addEventListener("change", function () {
-    updatePreview(this.files[0], keyDisplay, keyIcon, keyDetails);
-  });
-
-  // 🚀 Submit giải mã
+  // 🚀 Submit form Encrypt
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const encFile = encInput.files[0];
-    const keyFile = keyInput.files[0];
-    const mode = keyFile ? "splitted" : "combined";
-
-    if (!encFile) {
-      showToast("Vui lòng chọn file cần giải mã (.enc)!", "error");
+    const file = fileInput.files[0];
+    if (!file) {
+      showToast("Vui lòng chọn file để giải mã!", "error");
       return;
     }
 
     const formData = new FormData();
-    formData.append("file_to_decrypt", encFile);
-    if (keyFile) formData.append("key_file", keyFile);
-    formData.append("mode", mode);
-
-    console.log("🚀 Sending decrypt:", {
-      mode,
-      enc: encFile.name,
-      key: keyFile ? keyFile.name : "none"
-    });
+    formData.append("file_to_decrypt", file);
 
     try {
       const res = await fetch("/crypto/decrypt", {
         method: "POST",
-        body: formData,
+        body: formData
       });
 
-      const result = await res.json();
-      if (result.error) {
-        showToast(result.error, "error");
-      } else {
-        showToast(result.message || "Giải mã thành công!", "success");
+      const contentType = res.headers.get("Content-Type");
+
+      if (!res.ok) {
+        // Nếu server trả về lỗi dưới dạng JSON
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await res.json();
+          showToast(errorData.message || "Giải mã thất bại", "error");
+        } else {
+          const errorText = await res.text();
+          showToast("Lỗi không xác định: " + errorText, "error");
+        }
+        return;
       }
+
+      // Nếu thành công → file trả về → tải xuống
+      const blob = await res.blob();
+      const disposition = res.headers.get("Content-Disposition");
+      let filename = "decrypted_file.dat";
+
+      // Tìm tên file từ header
+      if (disposition && disposition.includes("filename=")) {
+        const match = disposition.match(/filename="?(.+)"?/);
+        if (match && match[1]) {
+          filename = match[1];
+        }
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      showToast("Giải mã và tải xuống thành công!", "success");
+
     } catch (err) {
       console.error(err);
       showToast("Lỗi khi gửi yêu cầu giải mã", "error");
     }
   });
 
-  // ☁️ Kích hoạt drag & drop
-  setupDropEvents(dropEnc, encInput, encDisplay, encIcon, encDetails);
-  setupDropEvents(dropKey, keyInput, keyDisplay, keyIcon, keyDetails);
+
+  // ☁️ Drag & Drop
+  setupDropEvents(dropArea, fileInput, fileDisplay, fileIcon, fileDetails);
 });
 
-// ✅ Hiển thị preview thông tin file
+// ✅ Preview file
 function updatePreview(file, displayEl, iconEl, detailEl) {
   if (!file) return;
   displayEl.value = file.name;
@@ -96,7 +106,7 @@ function updatePreview(file, displayEl, iconEl, detailEl) {
   detailEl.innerText = `${file.type || "Unknown type"} • ${formatFileSize(file.size)}`;
 }
 
-// ✅ Xử lý Drag & Drop
+// ✅ Drag & Drop setup
 function setupDropEvents(area, inputEl, displayEl, iconEl, detailEl) {
   ["dragenter", "dragover", "dragleave", "drop"].forEach(event =>
     area.addEventListener(event, e => {
@@ -122,14 +132,13 @@ function setupDropEvents(area, inputEl, displayEl, iconEl, detailEl) {
   });
 }
 
-// 🧠 Icon file theo đuôi
+// 🧠 Icon theo loại file
 function getFileIcon(fileName) {
   const ext = fileName.split('.').pop().toLowerCase();
   switch (ext) {
-    case 'enc': return '/static/icons/lock.png';
-    case 'key': return '/static/icons/key.png';
-    case 'txt': return '/static/icons/txt.png';
     case 'pdf': return '/static/icons/pdf.png';
+    case 'docx': return '/static/icons/doc.png';
+    case 'txt': return '/static/icons/txt.png';
     default: return '/static/icons/file.png';
   }
 }
@@ -139,4 +148,30 @@ function formatFileSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+}
+
+function updateDecryptionModeDisplay() {
+  const encFile = document.getElementById("file-upload").files[0];
+  const modeDisplay = document.getElementById("decryption-mode-display");
+
+  modeDisplay.classList.remove("split", "combined", "unknown");
+
+  if (!encFile) {
+    modeDisplay.innerText = "Unknown";
+    modeDisplay.classList.add("unknown");
+    return;
+  }
+
+  const fileName = encFile.name.toLowerCase();
+
+  if (fileName.endsWith(".zip")) {
+    modeDisplay.innerText = "Split (.enc + .key in zip)";
+    modeDisplay.classList.add("split");
+  } else if (fileName.endsWith(".enc")) {
+    modeDisplay.innerText = "Combined (.enc only)";
+    modeDisplay.classList.add("combined");
+  } else {
+    modeDisplay.innerText = "Unknown format";
+    modeDisplay.classList.add("unknown");
+  }
 }
