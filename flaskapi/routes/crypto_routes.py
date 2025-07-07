@@ -184,7 +184,7 @@ def decrypt_file():
             enc_file_stream = uploaded_file.stream
         else:
             return {"success": False, "message": "File không hợp lệ. Chỉ hỗ trợ .enc và .zip"}, 400
-
+        print("Oke")
         success, message, metadata, decrypted_content = decrypt_file_from_sender(
             recipient_email=recipient_email,
             recipient_aes_key=aes_key,
@@ -192,7 +192,6 @@ def decrypt_file():
             output_dir = output_dir,
             key_file_stream=key_file_stream
         )
-
         if success:
             original_filename = metadata.get('original_filename', 'decrypted_file.dat')
             response = make_response(decrypted_content)
