@@ -107,3 +107,7 @@ def get_all_key_strings(email: str) -> List[dict]:
             continue
 
     return all_keys
+
+# Giari mã pri bằng pw cũ sau đó mã lại bằng pw mới và lưu vào json
+def encrypt_pri_key_with_new_pw(old_password, new_password):
+    return True

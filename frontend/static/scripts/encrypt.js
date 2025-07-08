@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!res.ok) {
         const errorText = await res.text();
-        showToast("Lỗi mã hóa: " + errorText, "error");
+        showToast("Encryption error: " + errorText, "error");
         return;
       }
 
@@ -97,16 +97,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // ✅ Tuỳ theo định dạng file → hiển thị Toast tương ứng
       if (fileExt === "zip") {
-        showToast(`🔐 File đã được mã hoá và tách khóa. Đã tải: ${filename}`, "success");
+        showToast(`File has been encrypted and the key has been separated. Downloaded: ${filename}`, "success");
       } else if (fileExt === "enc") {
-        showToast(`🔐 File đã được mã hoá và gộp thành 1 file. Đã tải: ${filename}`, "success");
+        showToast(`File has been encrypted and merged into a single file. Downloaded: ${filename}`, "success");
       } else {
-        showToast(`📁 File mã hoá đã được tải về: ${filename}`, "success");
+        showToast(`Encrypted file has been downloaded: ${filename}`, "success");
       }
 
     } catch (err) {
       console.error(err);
-      showToast("Lỗi khi gửi file", "error");
+      showToast("Error while sending the file.", "error");
     }
 
   });
@@ -153,20 +153,39 @@ function getFileIcon(fileName) {
   switch (ext) {
     case 'pdf':
       return '/static/icons/pdf.png';
-    case 'doc':
     case 'docx':
+    case 'doc':
       return '/static/icons/doc.png';
     case 'txt':
       return '/static/icons/txt.png';
+    case 'key':
+      return '/static/icons/key.png';         
+    case 'enc':
+      return '/static/icons/locked.png';     
+    case 'zip':
+      return '/static/icons/zip.png';  
+    case 'mp4':
+    case 'avi':
+    case 'mov':
+    case 'mkv':
+      return '/static/icons/video.png';       // 🎞️ video file
+    case 'png':
+    case 'jpg':
+    case 'jpeg':
+    case 'gif':
+    case 'webp':
+    case 'bmp':
+      return '/static/icons/gallery.png'; 
     default:
-      return '/static/icons/file.png';
+      return '/static/icons/file.png';        // 📄 mặc định
   }
 }
+
 
 function loadRecipientEmails() {
   const select = document.getElementById("recipient-email");
   if (!select) {
-    console.warn("Không tìm thấy #recipient-email để render contact.");
+    console.log("Không tìm thấy #recipient-email để render contact.");
     return;
   }
 
@@ -174,7 +193,7 @@ function loadRecipientEmails() {
     .then(res => res.json())
     .then(data => {
       if (!data.success || !data.data || data.data.length === 0) {
-        showToast("Không có người dùng nào trong danh bạ.", "info");
+        showToast("No users found in your contact list.", "info");
         return;
       }
 
@@ -194,7 +213,7 @@ function loadRecipientEmails() {
       });
     })
     .catch(error => {
-      console.error("❌ Lỗi khi load recipient emails:", error);
-      showToast("Không thể tải danh bạ.", "error");
+      console.error("Lỗi khi load recipient emails:", error);
+      showToast("Unable to load contact list.", "error");
     });
 }

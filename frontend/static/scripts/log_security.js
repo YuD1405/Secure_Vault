@@ -11,7 +11,7 @@ document.getElementById("refreshBtn").addEventListener("click", async () => {
     // Thay thế bảng cũ
     document.getElementById("logContainer").innerHTML = newTable.innerHTML;
   } catch (err) {
-    alert("Lỗi khi tải lại bảng log!");
+    showToast("Error while reloading the log table!");
     console.error(err);
   }
 });

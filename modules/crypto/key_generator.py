@@ -34,9 +34,9 @@ def derive_aes_key(passphrase: str, salt: str, iterations: int = 100_000) -> byt
         salt = bytes(salt)
         
     if not isinstance(passphrase, str):
-        raise TypeError("Passphrase phải là chuỗi string.")
+        raise TypeError("Passphrase must be a string.")
     if not isinstance(salt, bytes):
-        raise TypeError("Salt phải là bytes.")
+        raise TypeError("Salt must be bytes.")
 
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),

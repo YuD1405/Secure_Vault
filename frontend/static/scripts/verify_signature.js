@@ -62,8 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
     signerElem.classList.remove("success", "error");
 
     if (!file || !sig) {
-      showToast("Vui lòng chọn đầy đủ file và chữ ký!", "error");
-      signerElem.innerText = "Không xác định";
+      showToast("Please select both the file and its signature!", "error");
+      signerElem.innerText = "Undefined";
       signerElem.classList.add("error");
       return;
     }
@@ -81,18 +81,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await res.json();
 
       if (result.success) {
-        showToast(result.message || "Xác minh thành công!", "success");
-        signerElem.innerText = `Người ký: ${result.signer_email || "Không xác định"}`;
+        showToast(result.message || "Verification successful!", "success");
+        signerElem.innerText = `Người ký: ${result.signer_email || "Undefined"}`;
         signerElem.classList.add("success");
       } else {
-        showToast(result.message || "Chữ ký không hợp lệ!", "error");
-        signerElem.innerText = "Không xác định";
+        showToast(result.message || "Invalid signature!", "error");
+        signerElem.innerText = "Undefined";
         signerElem.classList.add("error");
       }
     } catch (err) {
       console.error(err);
-      showToast("Lỗi khi gửi xác minh", "error");
-      signerElem.innerText = "Không xác định";
+      showToast("Error sending verification data", "error");
+      signerElem.innerText = "Undefined";
       signerElem.classList.add("error");
     }
   });
@@ -135,20 +135,36 @@ function formatFileSize(bytes) {
   else return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
 
-// 🧠 Chọn icon file dựa theo phần mở rộng
+// 🧠 Icon theo loại file
 function getFileIcon(fileName) {
   const ext = fileName.split('.').pop().toLowerCase();
   switch (ext) {
-    case 'pdf': 
-        return '/static/icons/pdf.png';
+    case 'pdf':
+      return '/static/icons/pdf.png';
+    case 'docx':
     case 'doc':
-    case 'docx': 
-        return '/static/icons/doc.png';
-    case 'sig': 
-        return '/static/icons/sig.png';
-    case 'txt': 
-        return '/static/icons/txt.png';
-    default: 
-        return '/static/icons/file.png';
+      return '/static/icons/doc.png';
+    case 'txt':
+      return '/static/icons/txt.png';
+    case 'key':
+      return '/static/icons/key.png';         // 🔑 file key AES
+    case 'enc':
+      return '/static/icons/locked.png';        // 🔒 file mã hóa\
+    case 'zip':
+      return '/static/icons/zip.png';
+    case 'mp4':
+    case 'avi':
+    case 'mov':
+    case 'mkv':
+      return '/static/icons/video.png';       // 🎞️ video file
+    case 'png':
+    case 'jpg':
+    case 'jpeg':
+    case 'gif':
+    case 'webp':
+    case 'bmp':
+      return '/static/icons/gallery.png'; 
+    default:
+      return '/static/icons/file.png';        // 📄 mặc định
   }
 }

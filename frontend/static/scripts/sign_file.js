@@ -66,16 +66,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         URL.revokeObjectURL(url);
 
-        showToast("Ký số thành công! File đang được tải xuống.", "success");
+        showToast("Digital signature successful! Your file is being downloaded.", "success");
       } else {
         // ❌ Trường hợp lỗi - trả về JSON
         const result = await res.json();
-        const message = result.message || result.error || "Đã xảy ra lỗi.";
+        const message = result.message || result.error || "Error occured.";
         showToast(message, "error");
       }
     } catch (err) {
       console.error(err);
-      showToast("Lỗi khi gửi file", "error");
+      showToast("Failed to upload file", "error");
     }
   });
 
@@ -115,17 +115,36 @@ function formatFileSize(bytes) {
   else return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
 
+// 🧠 Icon theo loại file
 function getFileIcon(fileName) {
   const ext = fileName.split('.').pop().toLowerCase();
   switch (ext) {
     case 'pdf':
       return '/static/icons/pdf.png';
-    case 'doc':
     case 'docx':
+    case 'doc':
       return '/static/icons/doc.png';
     case 'txt':
       return '/static/icons/txt.png';
+    case 'key':
+      return '/static/icons/key.png';         // 🔑 file key AES
+    case 'enc':
+      return '/static/icons/locked.png';        // 🔒 file mã hóa
+    case 'zip':
+      return '/static/icons/zip.png';
+    case 'mp4':
+    case 'avi':
+    case 'mov':
+    case 'mkv':
+      return '/static/icons/video.png';       // 🎞️ video file
+    case 'png':
+    case 'jpg':
+    case 'jpeg':
+    case 'gif':
+    case 'webp':
+    case 'bmp':
+      return '/static/icons/gallery.png'; 
     default:
-      return '/static/icons/file.png';
+      return '/static/icons/file.png';        // 📄 mặc định
   }
 }

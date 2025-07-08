@@ -25,6 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🖱️ Khi chọn file thủ công
   fileInput.addEventListener("change", function () {
     const file = this.files[0];
+    if (!isValidEncryptedFile(file)) {
+      showToast("Only .enc or .zip files are supported!", "error");
+      this.value = "";  // Reset input
+      return;
+    }
+      
     updatePreview(file, fileDisplay, fileIcon, fileDetails);
     updateDecryptionModeDisplay();
   });
@@ -35,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const file = fileInput.files[0];
     if (!file) {
-      showToast("Vui lòng chọn file để giải mã!", "error");
+      showToast("Please select a file to decrypt!", "error");
       return;
     }
 
@@ -54,10 +60,10 @@ document.addEventListener("DOMContentLoaded", () => {
         // Nếu server trả về lỗi dưới dạng JSON
         if (contentType && contentType.includes("application/json")) {
           const errorData = await res.json();
-          showToast(errorData.message || "Giải mã thất bại", "error");
+          showToast(errorData.message || "Decryption failed.", "error");
         } else {
           const errorText = await res.text();
-          showToast("Lỗi không xác định: " + errorText, "error");
+          showToast("Unknown error: " + errorText, "error");
         }
         return;
       }
@@ -69,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Tìm tên file từ header
       if (disposition && disposition.includes("filename=")) {
-        const match = disposition.match(/filename="?(.+)"?/);
+        const match = disposition.match(/filename="?([^"]+)"?/);
         if (match && match[1]) {
           filename = match[1];
         }
@@ -84,11 +90,11 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
-      showToast("Giải mã và tải xuống thành công!", "success");
+      showToast("Decryption and download completed successfully!", "success");
 
     } catch (err) {
       console.error(err);
-      showToast("Lỗi khi gửi yêu cầu giải mã", "error");
+      showToast("Error while sending decryption request.", "error");
     }
   });
 
@@ -126,8 +132,14 @@ function setupDropEvents(area, inputEl, displayEl, iconEl, detailEl) {
   area.addEventListener("drop", e => {
     const files = e.dataTransfer.files;
     if (files.length > 0) {
+      const file = files[0];
+      if (!isValidEncryptedFile(file)) {
+        showToast("Only .enc or .zip files are supported!", "error");
+        return;
+      }
       inputEl.files = files;
-      updatePreview(files[0], displayEl, iconEl, detailEl);
+      updatePreview(file, displayEl, iconEl, detailEl);
+      updateDecryptionModeDisplay();
     }
   });
 }
@@ -136,10 +148,33 @@ function setupDropEvents(area, inputEl, displayEl, iconEl, detailEl) {
 function getFileIcon(fileName) {
   const ext = fileName.split('.').pop().toLowerCase();
   switch (ext) {
-    case 'pdf': return '/static/icons/pdf.png';
-    case 'docx': return '/static/icons/doc.png';
-    case 'txt': return '/static/icons/txt.png';
-    default: return '/static/icons/file.png';
+    case 'pdf':
+      return '/static/icons/pdf.png';
+    case 'docx':
+    case 'doc':
+      return '/static/icons/doc.png';
+    case 'txt':
+      return '/static/icons/txt.png';
+    case 'key':
+      return '/static/icons/key.png';         // 🔑 file key AES
+    case 'enc':
+      return '/static/icons/locked.png';        // 🔒 file mã hóa
+    case 'zip':
+      return '/static/icons/zip.png';  
+    case 'mp4':
+    case 'avi':
+    case 'mov':
+    case 'mkv':
+      return '/static/icons/video.png';       // 🎞️ video file
+    case 'png':
+    case 'jpg':
+    case 'jpeg':
+    case 'gif':
+    case 'webp':
+    case 'bmp':
+      return '/static/icons/gallery.png'; 
+    default:
+      return '/static/icons/file.png';        // 📄 mặc định
   }
 }
 
@@ -174,4 +209,10 @@ function updateDecryptionModeDisplay() {
     modeDisplay.innerText = "Unknown format";
     modeDisplay.classList.add("unknown");
   }
+}
+
+function isValidEncryptedFile(file) {
+  if (!file || !file.name) return false;
+  const ext = file.name.split('.').pop().toLowerCase();
+  return ext === "enc" || ext === "zip";
 }

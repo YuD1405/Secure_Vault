@@ -26,12 +26,21 @@ def encrypt_file_for_recipient(
         # ... (logic lấy public key và sinh session key không đổi) ...
         sender_user_dir = get_user_dir(sender_email)
         contacts_path = sender_user_dir / "contact_public_key.json"
-        if not contacts_path.exists(): return False, "Không tìm thấy file danh bạ."
+        
+        if not contacts_path.exists(): 
+            return False,  "Contact file not found."
+        
         contacts = read_json_file(contacts_path)
         recipient_public_info = contacts.get(recipient_email)
-        if not recipient_public_info: return False, f"Không tìm thấy public key cho '{recipient_email}'."
+        
+        if not recipient_public_info: 
+            return False, f"Public key not found for '{recipient_email}'."
+        
         expiry_date_str = recipient_public_info.get("expiry_date")
-        if expiry_date_str and datetime.now() > datetime.fromisoformat(expiry_date_str): return False, f"Public key của '{recipient_email}' đã hết hạn."
+        
+        if expiry_date_str and datetime.now() > datetime.fromisoformat(expiry_date_str): 
+            return False, f"The public key for '{recipient_email}' has expired."
+        
         public_key_pem = recipient_public_info["public_key_pem"]
         recipient_public_key = serialization.load_pem_public_key(public_key_pem.encode('utf-8'))
         session_key = os.urandom(32)
@@ -80,14 +89,14 @@ def encrypt_file_for_recipient(
                     f_out.write(len(metadata_json_bytes).to_bytes(4, 'big'))
                     f_out.write(metadata_json_bytes)
                     write_encrypted_chunks(file_stream, f_out)
-                return True, f"Mã hoá thành công! File đã được lưu tại: {output_path}"
+                return True, f"Encryption successful! File has been saved at: {output_path}"
             else:
                 key_file_path = output_dir / f"{original_filename}.key"
                 enc_file_path = output_dir / f"{original_filename}.enc"
                 write_json_file(key_file_path, metadata)
                 with open(enc_file_path, 'wb') as f_enc:
                     write_encrypted_chunks(file_stream, f_enc)
-                return True, f"Mã hoá thành công! File dữ liệu (.enc) và khoá (.key) đã được lưu tại: {output_dir}"
+                return True, f"Encryption successful! Data file (.enc) and key file (.key) have been saved to: {output_dir}"
 
         # --- Trường hợp 2: File nhỏ (<= 5MB), mã hóa toàn bộ ---
         else:
@@ -109,17 +118,17 @@ def encrypt_file_for_recipient(
                     f_out.write(len(metadata_json_bytes).to_bytes(4, 'big'))
                     f_out.write(metadata_json_bytes)
                     f_out.write(encrypted_content)
-                return True, f"Mã hoá thành công! File đã được lưu tại: {output_path}"
+                return True, f"Encryption successful! File has been saved at: {output_path}"
             else:
                 key_file_path = output_dir / f"{original_filename}.key"
                 enc_file_path = output_dir / f"{original_filename}.enc"
                 write_json_file(key_file_path, metadata)
                 with open(enc_file_path, 'wb') as f_enc:
                     f_enc.write(encrypted_content)
-                return True, f"Mã hoá thành công! File dữ liệu (.enc) và khoá (.key) đã được lưu tại: {output_dir}"
+                return True, f"Encryption successful! Data file (.enc) and key file (.key) have been saved to: {output_dir}"
 
     except Exception as e:
-        return False, f"Đã xảy ra lỗi trong quá trình mã hoá: {e}"
+        return False, f"An error occurred during encryption: {e}"
 
 # --- HÀM GIẢI MÃ ĐÃ ĐƯỢC CẬP NHẬT ---
 def decrypt_file_from_sender(
@@ -184,7 +193,7 @@ def decrypt_file_from_sender(
             encrypted_data = enc_file_stream.read()
             decrypted_content = aesgcm.decrypt(nonce, encrypted_data, None)
         else:
-            raise ValueError(f"Chế độ mã hóa '{encryption_mode}' không được hỗ trợ.")
+            raise ValueError(f"Encryption mode '{encryption_mode}' is not supported.")
 
         # === BƯỚC 3: GHI FILE VÀ TRẢ VỀ KẾT QUẢ (Không đổi) ===
         original_filename = metadata.get("original_filename", "decrypted_file.dat")
@@ -193,11 +202,11 @@ def decrypt_file_from_sender(
         print(f"Ghi nội dung đã giải mã vào file '{original_filename}'...")
         with open(output_file_path, "wb") as f_out:
             f_out.write(decrypted_content)
-        message = f"Giải mã thành công! File '{original_filename}' đã được lưu tại: {output_file_path}"
+        message = f"Decryption successful! File '{original_filename}' has been saved at: {output_file_path}"
         print(message)
         return True, message, metadata, decrypted_content
 
     except Exception as e:
         if output_file_path and output_file_path.exists():
             output_file_path.unlink()
-        return False, f"Giải mã thất bại: {e}", locals().get('metadata'), None
+        return False, f"Decryption failed: {e}", locals().get('metadata'), None

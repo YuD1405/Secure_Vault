@@ -123,15 +123,20 @@
 
                             <!-- Scan by Code -->
                             <form action="{{ url_for('utils.decode_qr') }}" method="POST" enctype="multipart/form-data">
-                                <!-- Scan by QR File -->
                                 <div class="scan-box">
-                                    <label for="qr_file">Upload QR Image:</label>
-                                    <div class="scan-input">
-                                        <input type="file" name="qr_file" id="qr_file" accept="image/png, image/jpeg" />
-                                        <button id="scan-btn" type="button" class="scan-btn" title="Upload QR">
-                                            <span class="material-icons">qr_code_scanner</span>
+                                    <label for="qr_file" style="font-weight: 600; margin-bottom: 8px;">Upload QR Image:</label>
+                                    <div class="scan-input" id="scan-input-wrapper">
+                                        <span class="folder-icon material-icons">folder</span>
+                                        <span class="file-name" id="file-name">No file selected</span>
+                                        
                                         </button>
+                                        <input type="file" id="qr_file" name="qr_file" accept="image/png, image/jpeg, image/jpg" style="display:none" />
                                     </div>
+                                </div>
+                                <div style="display: flex; justify-content: center; margin-top: 16px;">
+                                    <button id="scan-btn" type="button" class="scan-btn" title="Scan QR">
+                                    <span class="material-icons">qr_code_scanner</span>
+                                    </button>
                                 </div>
                             </form>
                         </div>

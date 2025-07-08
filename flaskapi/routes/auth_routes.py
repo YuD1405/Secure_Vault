@@ -4,6 +4,7 @@ from modules.auth.mfa import (verify_otp_code, verify_totp_code,
                               generate_and_send_otp, generate_qr_code, expire_otp_code)
 from modules.utils.logger import read_security_logs
 from modules.utils.manage_account import fetch_all_users, toggle_user_lock
+from modules.crypto.key_management import encrypt_pri_key_with_new_pw
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -150,7 +151,11 @@ def reset_password():
     data = request.get_json()
     email = data.get('email')
     new_password = data.get('new_password')
-
+    old_password = session.get["passphrase"]
+    
+    encrypt_pri_key_with_new_pw(old_password, new_password)
+    session["passphrase"] = new_password
+    
     success, error = reset_password_in_db(email, new_password)
 
     if success:
@@ -188,6 +193,9 @@ def update_account():
     pass1 = request.form.get('old_pass')
     pass2 = request.form.get('new_pass')
 
+    encrypt_pri_key_with_new_pw(pass1, pass2)
+    session["passphrase"] = pass2
+    
     success, message = update_user_info_in_db(email, full_name, phone, address, dob, pass1, pass2)
-
+    
     return jsonify({"success": success, "message": message})

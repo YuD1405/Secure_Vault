@@ -1,4 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById('scan-input-wrapper').addEventListener('click', () => {
+    document.getElementById('qr_file').click();
+  });
+
+  document.getElementById('qr_file').addEventListener('change', (e) => {
+    const fileName = e.target.files.length ? e.target.files[0].name : 'No file selected';
+    document.getElementById('file-name').textContent = fileName;
+  });
+
   // Load QR như cũ
   fetch("/utils/my_qr_url")
     .then(res => res.json())
@@ -6,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data.qr_url) {
         document.getElementById("qr-img").src = data.qr_url;
       } else {
-        showToast("QR không tồn tại", "error");
+        showToast("QR code does not exist.", "error");
       }
     });
 
@@ -18,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const file = fileInput.files[0];
 
       if (!file) {
-        showToast("Vui lòng chọn ảnh QR để giải mã", "error");
+        showToast("Please select a QR image to decode", "error");
         return;
       }
 
@@ -36,12 +45,12 @@ document.addEventListener("DOMContentLoaded", () => {
             fileInput.value = "";
             loadOwnedKeys();
           } else {
-            showToast(data.message || "Giải mã QR thất bại", "error");
+            showToast(data.message || "Failed to decode QR code", "error");
           }
         })
         .catch(err => {
           console.error(err);
-          showToast("Lỗi gửi ảnh QR", "error");
+          showToast("Failed to upload QR image", "error");
         });
     });
 
@@ -62,6 +71,10 @@ function switchTab(tabElement, tabId) {
   tabElement.classList.add("active");
   document.getElementById(tabId).classList.add("active");
 
+  if (tabId === "lookup") {
+    document.getElementById('file-name').textContent = "No file selected";
+  }
+
   if (tabId === "owned-keys") {
     loadOwnedKeys();
   }
@@ -72,7 +85,7 @@ function downloadQR() {
   const qrImg = document.getElementById("qr-img");
 
   if (!qrImg.src || qrImg.src.includes("undefined") || qrImg.src.trim() === "") {
-    showToast("QR chưa được tạo hoặc tải xong!", "error");
+    showToast("QR code has not been created or loaded!", "error");
     return;
   }
 
@@ -88,7 +101,7 @@ function downloadQR() {
 function loadOwnedKeys() {
   const tbody = document.getElementById("owned-keys-tbody");
   if (!tbody) {
-    console.warn("Không tìm thấy tbody để render owned keys.");
+    console.log("Không tìm thấy tbody để render owned keys.");
     return;
   }
 
@@ -99,8 +112,8 @@ function loadOwnedKeys() {
       const container = document.getElementById("active-key-info");
 
       if (!data.success || !data.data || data.data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;font-style:italic;">Không có public key nào được lưu.</td></tr>`;
-        showToast("Bạn chưa có public key nào được lưu.", "info");
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;font-style:italic;">No public keys have been saved.</td></tr>`;
+        showToast("You have no saved public keys.", "info");
         return;
       }
 
@@ -121,9 +134,9 @@ function loadOwnedKeys() {
       });
     })
     .catch(error => {
-      console.error("❌ Lỗi khi load owned keys:", error);
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:red;">Lỗi khi tải danh sách public keys.</td></tr>`;
-      showToast("Không thể kết nối máy chủ", "error");
+      console.error("Lỗi khi load owned keys:", error);
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:red;">Failed to load the list of public keys.</td></tr>`;
+      showToast("Cannot connect to the server", "error");
     });
 }
 

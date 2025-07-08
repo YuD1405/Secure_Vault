@@ -36,15 +36,19 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                showToast("Thông tin đã được cập nhật!", "success");
+                showToast("Account information has been updated!", "success");
                 fetchUserInfo(); // 👈 tự fetch lại để hiển thị dữ liệu mới nhất
             } else {
-                showToast(data.message || "Cập nhật thất bại", "error");
+                if (data.message === "No changes were made.") {
+                    showToast(data.message, "info"); 
+                } else {
+                    showToast(data.message || "Update failed", "error");
+                }
             }
         })
         .catch(err => {
             console.error(err);
-            showToast("Lỗi khi gửi dữ liệu", "error");
+            showToast("Error sending data", "error");
         });
     });
 

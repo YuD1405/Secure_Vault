@@ -22,18 +22,18 @@ def render_sign_file():
 @utils_bp.route('/sign_file', methods=['POST'])
 def signing_file_route():
     if 'user_id' not in session:
-        return {"success": False, "message": "Bạn cần phải đăng nhập để truy cập trang này."}, 401
+        return {"success": False, "message": "You must be logged in to access this page."}, 401
     
     file = request.files.get('file_to_sign')
 
     if not file or file.filename == '':
         log_user_action("anonymous", "Sign file", "Failure", "Missing file", level="warning")
-        return jsonify({'error': 'Không có file nào'}), 400
+        return jsonify({'error': "No file provided."}), 400
 
     email = session["email"]
     passphrase = session.get("passphrase")  
     if not passphrase:
-        return {"success": False, "message": "Không tìm thấy passphrase."}, 401
+        return {"success": False, "message": "Passphrase not found."}, 401
     try:
         salt = get_salt_from_db(email)
         aes_key = derive_aes_key(passphrase, salt)
@@ -54,8 +54,8 @@ def signing_file_route():
             mimetype="application/octet-stream"
         )
     except Exception as e:
-        log_user_action(email, "Sign file", "Failure", f"Lỗi: {e}", level="error")
-        return jsonify({"success": False, "message": f"Lỗi khi ký số: {e}"}), 500
+        log_user_action(email, "Sign file", "Failure", f"Error: {e}", level="error")
+        return jsonify({"success": False, "message": f"Error during digital signing: {e}"}), 500
 
 
 # Requirement 9 – Verify Digital Signature
@@ -86,7 +86,7 @@ def verify_signature_route():
 
     if not os.path.exists(contacts_public_key_path):
         log_user_action("anonymous", "Verify signature", "Failure", "Public key not found", level="error")
-        return jsonify({"success": False, "message": "Public key không tồn tại"}), 400
+        return jsonify({"success": False, "message":  "Public key does not exist."}), 400
 
     # Thực hiện xác minh
     signer = verify_signature(file, signature, contacts_public_key_path)
@@ -126,7 +126,7 @@ def upload_qr():
     if not email:
         # Nếu bạn có trang lỗi, có thể render nó.
         # Hoặc trả về lỗi JSON.
-        return "Lỗi: Vui lòng cung cấp một địa chỉ email trong URL (ví dụ: ?email=user@example.com)", 400
+        return "Error: Please provide an email address in the URL (e.g., ?email=user@example.com)", 400
 
     try:
         # 3. Xác định đường dẫn output cho file QR
@@ -143,10 +143,7 @@ def upload_qr():
             # Nếu hàm tạo QR thất bại (ví dụ không tìm thấy public key)
             print(f"Lỗi khi tạo QR", message)
             # Có thể trả về một ảnh placeholder "lỗi"
-            return f"Không thể tạo QR code", 500
-        
-        print(qr_output_path)
-        print("Hello")
+            return f"Unable to generate QR code.", 500
 
         # 5. Gửi file ảnh vừa tạo về cho trình duyệt
         return send_file(
@@ -156,7 +153,7 @@ def upload_qr():
 
     except Exception as e:
         print(f"Lỗi nghiêm trọng khi tạo QR code cho {email}: {e}")
-        return "Đã xảy ra lỗi không xác định trên server.", 500
+        return "An unknown error occurred on the server.", 500
 
 @utils_bp.route("/qr_image/<email_hash>")
 def serve_qr_image(email_hash):
@@ -192,24 +189,24 @@ def decode_qr():
     # 1. Bắt đầu khối kiểm tra session
     # Kiểm tra xem người dùng đã đăng nhập hoàn toàn chưa
     if 'email' not in session:
-        return jsonify({"success": False, "message": "Bạn chưa đăng nhập."}), 401
+        return jsonify({"success": False, "message": "You are not logged in."}), 401
 
     # Lấy email trực tiếp từ session
     current_user_email = session.get("email")
 
     if not current_user_email:
         # Trường hợp hi hữu session có user_id nhưng không có email
-        return jsonify({"success": False, "message": "Lỗi phiên làm việc."}), 401
+        return jsonify({"success": False, "message": "Session error."}), 401
 
     # --- Kết thúc khối kiểm tra session ---
 
     # 2. Kiểm tra file upload
     if 'qr_code_file' not in request.files:
-        return jsonify({"success": False, "message": "Không tìm thấy ảnh QR."}), 400
+        return jsonify({"success": False, "message": "QR image not found."}), 400
 
     file = request.files['qr_code_file']
     if file.filename == '':
-        return jsonify({"success": False, "message": "Chưa chọn file nào."}), 400
+        return jsonify({"success": False, "message": "No file selected."}), 400
 
     # 3. Gọi hàm xử lý logic
     if file:

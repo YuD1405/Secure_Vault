@@ -156,64 +156,79 @@ def update_user_info_in_db(email: str, full_name: str, phone: str, address: str,
 
         # --- Kiểm tra bắt buộc ---
         if not all([email, full_name, dob, phone, address]):
-            return False, "Vui lòng điền đầy đủ thông tin."
+            return False, "Please fill in all required fields."
 
         if not is_valid_email(email):
-            return False, "Email không hợp lệ."
+            return False, "Invalid email format."
 
         if not is_valid_date(dob):
-            return False, "Ngày sinh không đúng định dạng (yyyy-mm-dd)."
+            return False, "Invalid date of birth format (expected yyyy-mm-dd)."
 
         if not is_valid_phone(phone):
-            return False, "Số điện thoại phải có đúng 10 chữ số."
+            return False, "Phone number must be exactly 10 digits."
 
-        # --- Cập nhật thông tin cá nhân ---
-        cur.execute("""
-            UPDATE users
-            SET fullname = %s, phone = %s, address = %s, dob = %s
-            WHERE email = %s
-        """, (full_name, phone, address, dob, email))
+        # --- Truy vấn dữ liệu hiện tại ---
+        cur.execute("SELECT fullname, phone, address, dob, hashed_passphrase, salt FROM users WHERE email = %s", (email,))
+        row = cur.fetchone()
+        if not row:
+            return False, "User account not found."
 
-        # --- Nếu có yêu cầu đổi passphrase ---
-        if pass1 and pass2:
+        no_info_change = (
+            row["fullname"] == full_name and
+            row["phone"] == phone and
+            row["address"] == address and
+            row["dob"].strftime("%Y-%m-%d") == dob
+        )
+
+        # Nếu không có thay đổi gì
+        if no_info_change and not (pass1 or pass2):
+            return False,  "No changes were made."
+
+        # --- Cập nhật thông tin cá nhân nếu có thay đổi ---
+        if not no_info_change:
+            cur.execute("""
+                UPDATE users SET fullname = %s, phone = %s, address = %s, dob = %s
+                WHERE email = %s
+            """, (full_name, phone, address, dob, email))
+
+        # --- Nếu có ý định đổi passphrase ---
+        if pass1 or pass2:
+            if not (pass1 and pass2):
+                return False, "Please enter both your current and new passphrase to change your password."
+
             if pass1 == pass2:
-                return False, "Passphrase mới phải khác passphrase cũ."
+                return False, "The new passphrase must be different from the current one."
 
             if not is_strong_passphrase(pass2):
-                return False, "Passphrase mới quá yếu. Cần ≥8 ký tự, chữ hoa, số, ký hiệu."
-            
-            # Lấy passphrase hash cũ từ DB
+                return False,  "New passphrase is too weak. It must contain at least 8 characters, an uppercase letter, a number, and a special symbol."
+
+            # Kiểm tra passphrase cũ đúng không
             cur.execute("SELECT hashed_passphrase, salt FROM users WHERE email = %s", (email,))
             row = cur.fetchone()
-            
+
             if not row:
-                return False, "Không tìm thấy tài khoản người dùng."
+                return False, "User account not found."
 
             stored_hash = row["hashed_passphrase"]
             stored_salt = row["salt"]
-            
             input_hash = hash_with_salt(pass1, stored_salt)
-            print(input_hash)
-            print(stored_hash)
-            print(stored_salt)
+
             if input_hash != stored_hash:
-                return False, "Passphrase hiện tại không đúng."
-            
+                return False, "Current passphrase is incorrect."
+
             # Hash passphrase mới
             new_hash = hash_with_salt(pass2, stored_salt)
-
             cur.execute("""
                 UPDATE users SET hashed_passphrase = %s WHERE email = %s
             """, (new_hash, email))
-        else:
-            return False, "Please enter both passphrase input for changing passphrase"
-        
+
+        # ✅ Commit tất cả cập nhật (dù chỉ là thông tin cá nhân)
         mysql.connection.commit()
         cur.close()
-        return True, "Thông tin đã được cập nhật thành công."
+        return True, "Information has been successfully updated."
 
     except Exception as e:
-        return False, "Đã xảy ra lỗi khi cập nhật thông tin."
+        return False, "An error occurred while updating the information."
     
 def check_correct_pw(email: str, passphrase:str):
     email = sanitize_input(email)
@@ -285,5 +300,5 @@ def get_salt_from_db(email: str) -> bytes:
             return result["salt"]
         return None
     except Exception as e:
-        print("Lỗi khi truy vấn salt:", e)
+        print("Error while querying salt:", e)
         return None

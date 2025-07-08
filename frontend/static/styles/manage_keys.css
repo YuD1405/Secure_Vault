@@ -494,3 +494,31 @@ content {
 .primary-btn:hover {
   background-color: #303f9f;
 }
+
+.key-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.copy-btn {
+  margin-left: 8px;
+  padding: 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.copy-btn:hover {
+  color: #4a5fe4;
+}
+
+.copy-btn svg {
+  width: 16px;
+  height: 16px;
+}
