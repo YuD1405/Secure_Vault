@@ -1,13 +1,15 @@
 import base64
 from datetime import datetime
 from typing import List, Tuple
+import os
 
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from modules.crypto.key_extensions import get_user_dir, get_latest_key_path, read_json_file, get_key_files, hashlib
-from modules.crypto.key_generator import get_latest_key_path, create_new_key
+from modules.crypto.key_extensions import get_user_dir, get_latest_key_path, read_json_file, get_key_files, hashlib, write_json_file
+from modules.crypto.key_generator import get_latest_key_path, create_new_key, derive_aes_key
+from modules.auth.logic import get_salt_from_db
 
 # Kiểm tra tình trạng cặp khóa RSA
 def check_and_manage_own_keys(email: str, aes_key: bytes):
@@ -109,5 +111,84 @@ def get_all_key_strings(email: str) -> List[dict]:
     return all_keys
 
 # Giari mã pri bằng pw cũ sau đó mã lại bằng pw mới và lưu vào json
-def encrypt_pri_key_with_new_pw(old_password, new_password):
-    return True
+def re_encrypt_private_key_with_new_passphrase(
+    email: str, 
+    old_passphrase: str, 
+    new_passphrase: str
+) -> tuple[bool, str]:
+    """
+    Giải mã private key đang hoạt động bằng passphrase cũ, sau đó mã hoá lại
+    bằng passphrase mới và cập nhật file key.
+
+    Đây là chức năng cốt lõi cho việc "Đổi mật khẩu".
+
+    Args:
+        email (str): Email của người dùng đang thực hiện đổi mật khẩu.
+        old_passphrase (str): Passphrase hiện tại (cũ) của người dùng.
+        new_passphrase (str): Passphrase mới người dùng muốn đặt.
+
+    Returns:
+        Một tuple (success: bool, message: str).
+    """
+    print(f"\n--- [BẮT ĐẦU QUÁ TRÌNH TÁI MÃ HOÁ PRIVATE KEY CHO {email}] ---")
+    try:
+        # --- BƯỚC 1: LẤY THÔNG TIN VÀ KHÓA CŨ ---
+        user_dir = get_user_dir(email)
+        latest_key_path = get_latest_key_path(user_dir)
+
+        if not latest_key_path:
+            return False, "Không tìm thấy khoá nào để thực hiện. Vui lòng tạo khoá trước."
+
+        key_data = read_json_file(latest_key_path)
+        if key_data.get('status') != 'active':
+            return False, "Khoá mới nhất không ở trạng thái hoạt động."
+            
+        # Suy diễn khoá AES từ passphrase CŨ
+        try:
+            salt = get_salt_from_db(email)
+            old_aes_key = derive_aes_key(old_passphrase, salt)
+        except Exception as e:
+            return False, f"Error generating AES key: {e}"
+    
+        # --- BƯỚC 2: GIẢI MÃ PRIVATE KEY BẰNG KHÓA CŨ ---
+        encrypted_b64 = key_data["private_info"]["encrypted_private_key_b64"]
+        encrypted_data = base64.b64decode(encrypted_b64)
+        
+        nonce = encrypted_data[:12]
+        ciphertext = encrypted_data[12:]
+        
+        try:
+            aesgcm_old = AESGCM(old_aes_key)
+            decrypted_private_key_pem_bytes = aesgcm_old.decrypt(nonce, ciphertext, None)
+            print("Giải mã thành công private key bằng passphrase cũ.")
+        except Exception: # Thường là InvalidTag
+            return False, "Mật khẩu cũ không chính xác."
+
+        # --- BƯỚC 3: MÃ HOÁ LẠI PRIVATE KEY BẰNG KHÓA MỚI ---
+        # Suy diễn khoá AES từ passphrase MỚI
+        try:
+            new_aes_key = derive_aes_key(new_passphrase, salt)
+        except Exception as e:
+            return False, f"Error generating AES key: {e}"  
+        
+        # Dùng khoá AES mới để mã hoá lại private key PEM đã giải mã ở trên
+        new_nonce = os.urandom(12)
+        aesgcm_new = AESGCM(new_aes_key)
+        re_encrypted_private_key = aesgcm_new.encrypt(new_nonce, decrypted_private_key_pem_bytes, None)
+        
+        # Encode lại thành Base64
+        re_encrypted_private_key_b64 = base64.b64encode(new_nonce + re_encrypted_private_key).decode('utf-8')
+        print("Mã hoá lại thành công private key bằng passphrase mới.")
+
+        # --- BƯỚC 4: CẬP NHẬT FILE KEY VỚI PRIVATE KEY ĐÃ MÃ HOÁ LẠI ---
+        key_data["private_info"]["encrypted_private_key_b64"] = re_encrypted_private_key_b64
+        
+        # Ghi đè lại file key cũ với dữ liệu đã cập nhật
+        write_json_file(latest_key_path, key_data)
+        
+        print(f"Đã cập nhật thành công file {latest_key_path.name}.")
+        return True, "Đổi mật khẩu và tái mã hoá khoá thành công!"
+
+    except Exception as e:
+        print(f"Lỗi nghiêm trọng trong quá trình tái mã hoá: {e}")
+        return False, f"Đã xảy ra lỗi không xác định: {e}"
