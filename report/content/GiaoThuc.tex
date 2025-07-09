@@ -1,0 +1,283 @@
+\newpage
+\section{Các giao thức và chuẩn hỗ trợ}
+\subsection{Giao thức}
+\subsubsection{OAuth 2.0}
+\begin{itemize}
+    \item OAuth 2.0 là một giao thức ủy quyền tiêu chuẩn mở, cho phép các ứng dụng truy cập vào tài nguyên của người dùng mà không cần chia sẻ thông tin đăng nhập như tên người dùng và mật khẩu.
+    \item Cách hoạt động:
+    \begin{itemize}
+        \item \textbf{Yêu cầu ủy quyền:} Client yêu cầu quyền truy cập từ Resource Owner thông qua Authorization Server.
+        \item \textbf{Cấp phép:} Nếu Resource Owner đồng ý, Authorization Server sẽ cấp một mã ủy quyền (authorization code) cho Client.
+        \item \textbf{Nhận token:} Client sử dụng mã ủy quyền để yêu cầu Access Token từ Authorization Server.
+        \item \textbf{Truy cập tài nguyên:} Client sử dụng Access Token để truy cập tài nguyên trên Resource Server.
+    \end{itemize}
+    \item Lợi ích:
+    \begin{itemize}
+        \item \textbf{Bảo mật cao hơn:} Người dùng không cần chia sẻ mật khẩu với các ứng dụng bên thứ ba.
+        \item \textbf{Dễ dàng tích hợp:} Các ứng dụng có thể dễ dàng tích hợp với nhau thông qua API mà không cần quản lý thông tin đăng nhập phức tạp.
+        \item \textbf{Hỗ trợ đa dạng nền tảng:} OAuth 2.0 có thể được sử dụng trên nhiều loại ứng dụng khác nhau, từ web đến di động.
+    \end{itemize}
+    \item Ứng dụng:
+    \begin{itemize}
+        \item Được sử dụng trong các ứng dụng web, di động.
+        \item Hỗ trợ đa nền tảng, dễ dàng tích hợp với API như Google, Facebook, GitHub.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{OpenID Connect (OIDC)}
+\begin{itemize}
+    \item OpenID Connect (OIDC) là một giao thức xác thực dựa trên OAuth 2.0, cho phép các ứng dụng xác minh danh tính người dùng và lấy thông tin hồ sơ cơ bản của họ. OIDC được thiết kế để đơn giản hóa quy trình xác thực, cung cấp khả năng đăng nhập một lần (Single Sign-On - SSO) và cho phép người dùng sử dụng một bộ thông tin đăng nhập để truy cập nhiều dịch vụ khác nhau.
+    \item Cách hoạt động:
+    \begin{itemize}
+        \item \textbf{Người dùng truy cập} vào ứng dụng (RP) và chọn tùy chọn đăng nhập.
+        \item \textbf{RP gửi yêu cầu} đến OP để xác thực người dùng.
+
+        \item \textbf{OP xác thực người dùng} và nếu thành công, sẽ gửi lại một ID Token (thường là JSON Web Token - JWT) cùng với một Access Token cho RP.
+        \item \textbf{RP sử dụng Access Token} để yêu cầu thông tin bổ sung từ UserInfo Endpoint, nơi chứa các thông tin về người dùng như tên, email, v.v.
+
+    \end{itemize}
+    \item Lợi ích:
+    \begin{itemize}
+        \item \textbf{Xác thực an toàn:} Người dùng không cần chia sẻ mật khẩu với các ứng dụng bên thứ ba.
+        \item \textbf{Đăng nhập một lần (SSO):} Cho phép người dùng đăng nhập vào nhiều dịch vụ mà không cần phải nhập lại thông tin đăng nhập.
+
+        \item \textbf{Thông tin phong phú:} Cung cấp thông tin chi tiết về người dùng thông qua ID Token và UserInfo Endpoint.
+    \end{itemize}
+    \item Ứng dụng:
+    \begin{itemize}
+        \item Phổ biến trong các ứng dụng cần xác minh danh tính người dùng.
+
+        \item Hỗ trợ bảo mật mạnh mẽ nhờ JSON Web Token (JWT).
+
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Kerberos}
+\begin{itemize}
+    \item Kerberos là một giao thức xác thực mạng được phát triển bởi MIT, nhằm cung cấp một phương pháp bảo mật cho việc xác thực các yêu cầu dịch vụ giữa các máy chủ đáng tin cậy trên một mạng không an toàn. Kerberos đã trở thành nền tảng cho nhiều hệ thống bảo mật mạng hiện đại và được sử dụng rộng rãi trong các môi trường yêu cầu xác thực mạnh mẽ.
+    \item Cách hoạt động:
+    \begin{itemize}
+        \item \textbf{Yêu cầu xác thực:} Client gửi yêu cầu đến AS của KDC với thông tin người dùng (User Principal Name - UPN). Yêu cầu này không chứa mật khẩu mà chỉ được mã hóa bằng hash của mật khẩu người dùng.
+        \item \textbf{Cấp phát TGT:} Nếu thông tin hợp lệ, AS sẽ cấp phát một TGT và một session key, cả hai đều được mã hóa và gửi lại cho client.
+        \item \textbf{Yêu cầu ticket dịch vụ:} Client sử dụng TGT để yêu cầu ticket dịch vụ từ TGS. Yêu cầu này bao gồm TGT đã mã hóa và thông tin về dịch vụ mà client muốn truy cập.
+
+        \item \textbf{Truy cập dịch vụ:} TGS kiểm tra tính hợp lệ của TGT và nếu hợp lệ, cấp phát một service ticket cho client. Client sau đó gửi ticket này đến SS để được truy cập.
+
+    \end{itemize}
+    \item Lợi ích:
+    \begin{itemize}
+        \item \textbf{Bảo mật cao:} Kerberos sử dụng mã hóa khóa đối xứng và không bao giờ truyền mật khẩu qua mạng, giúp bảo vệ thông tin đăng nhập khỏi bị đánh cắp.
+        \item \textbf{Xác thực lẫn nhau:} Không chỉ client mà cả server cũng phải xác thực danh tính của nhau, giảm thiểu nguy cơ tấn công man-in-the-middle.
+
+        \item \textbf{Hỗ trợ Single Sign-On (SSO):} Người dùng chỉ cần đăng nhập một lần để có thể truy cập nhiều dịch vụ khác nhau mà không cần phải nhập lại mật khẩu.
+
+    \end{itemize}
+    \item Ứng dụng:
+    \begin{itemize}
+        \item Được sử dụng trong hệ thống nội bộ như Active Directory.
+        \item Hỗ trợ xác thực mạnh mẽ với mã hóa symmetric (DES, AES).
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{RADIUS (Remote Authentication Dial-In User Service)}
+\begin{itemize}
+    \item RADIUS là một giao thức xác thực, ủy quyền và kế toán (AAA) được thiết kế để cung cấp dịch vụ xác thực cho người dùng truy cập vào mạng. Giao thức này sử dụng mô hình client-server, cho phép quản lý tập trung các thông tin xác thực và quyền truy cập của người dùng.
+
+    \item Cách hoạt động:
+    \begin{itemize}
+        \item \textbf{Yêu cầu truy cập:} Người dùng gửi thông tin đăng nhập (username và password) đến RADIUS Client.
+
+        \item \textbf{Gửi yêu cầu đến RADIUS Server:} RADIUS Client gửi một gói tin Access-Request đến RADIUS Server chứa thông tin đăng nhập.
+
+        \item Xác thực: RADIUS Server kiểm tra thông tin đăng nhập bằng cách so sánh với cơ sở dữ liệu người dùng. Nếu thông tin hợp lệ, server sẽ gửi lại gói tin Access-Accept; nếu không, nó sẽ gửi gói tin Access-Reject.
+
+        \item \textbf{Kế toán:} Sau khi xác thực thành công, NAS sẽ ghi lại thông tin về phiên làm việc của người dùng và gửi thông tin kế toán đến RADIUS Server.
+
+    \end{itemize}
+    \item Lợi ích:
+    \begin{itemize}
+        \item \textbf{Quản lý tập trung:} RADIUS cho phép quản lý thông tin đăng nhập và quyền truy cập từ một vị trí duy nhất, giúp giảm thiểu rủi ro bảo mật.
+
+        \item \textbf{Bảo mật cao:} Thông tin đăng nhập được mã hóa khi truyền tải qua mạng, bảo vệ khỏi các cuộc tấn công đánh cắp thông tin.
+
+        \item \textbf{Hỗ trợ đa dạng dịch vụ:} RADIUS có thể được sử dụng cho nhiều loại dịch vụ khác nhau như VPN, Wi-Fi, và truy cập từ xa.
+
+    \end{itemize}
+    \item Ứng dụng:
+    \begin{itemize}
+        \item Thích hợp cho mạng doanh nghiệp lớn.
+
+        \item Hỗ trợ nhiều phương pháp xác thực như username-password, OTP.
+
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{LDAP (Lightweight Directory Access Protocol)
+}
+\begin{itemize}
+    \item LDAP, viết tắt của Lightweight Directory Access Protocol, là một giao thức mạng được sử dụng để truy cập và quản lý thông tin trong một thư mục. Giao thức này được phát triển dựa trên tiêu chuẩn X.500 và được thiết kế để hoạt động hiệu quả trên nền tảng TCP/IP, mang lại khả năng truy cập nhanh chóng và nhẹ nhàng hơn so với các giao thức trước đó như DAP (Directory Access Protocol).
+
+    \item Cách hoạt động:
+    \begin{itemize}
+        \item \textbf{Gửi yêu cầu:} Client tạo ra một thông điệp LDAP chứa yêu cầu (như tìm kiếm, thêm mới, sửa đổi hoặc xóa) và gửi đến LDAP Server.
+        \item \textbf{Xử lý yêu cầu:} LDAP Server nhận yêu cầu, xử lý thông tin và truy xuất dữ liệu từ cơ sở dữ liệu.
+
+        \item \textbf{Gửi phản hồi:} Server gửi lại kết quả cho client dưới dạng thông điệp LDAP.
+
+    \end{itemize}
+    \item Lợi ích:
+    \begin{itemize}
+        \item \textbf{Quản lý tập trung:} LDAP cho phép lưu trữ thông tin người dùng, thiết bị và tài nguyên trong một vị trí trung tâm, giúp dễ dàng quản lý và truy cập.
+
+        \item \textbf{Bảo mật:} Giao thức hỗ trợ nhiều phương thức xác thực và ủy quyền, giúp bảo vệ thông tin nhạy cảm.
+
+        \item \textbf{Hỗ trợ cho Single Sign-On (SSO):} LDAP có thể tích hợp với các hệ thống SSO, cho phép người dùng truy cập nhiều ứng dụng chỉ với một lần đăng nhập .
+
+    \end{itemize}
+    \item Ứng dụng:
+    \begin{itemize}
+        \item Được sử dụng trong quản lý danh tính và truy cập (IAM).
+        \item Hỗ trợ tích hợp với các hệ thống xác thực khác như Kerberos hoặc Active Directory.
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\subsection{Chuẩn hỗ trợ}
+\subsubsection{SAML (Security Assertion Markup Language)}
+\begin{itemize}
+    \item SAML, viết tắt của Security Assertion Markup Language, là một tiêu chuẩn mở dựa trên XML được thiết kế để trao đổi dữ liệu xác thực và ủy quyền giữa các bên, chủ yếu giữa nhà cung cấp danh tính (Identity Provider - IdP) và nhà cung cấp dịch vụ (Service Provider - SP). SAML giúp đơn giản hóa quy trình xác thực người dùng, cho phép họ truy cập nhiều ứng dụng với một bộ thông tin đăng nhập duy nhất.
+
+    \item Cách hoạt động:
+    \begin{itemize}
+        \item \textbf{Yêu cầu truy cập:} Khi người dùng cố gắng truy cập vào một dịch vụ, SP sẽ tạo ra một yêu cầu xác thực SAML và chuyển hướng người dùng đến IdP.
+
+        \item \textbf{Xác thực:} IdP xác thực thông tin đăng nhập của người dùng. Nếu thành công, IdP sẽ tạo ra một tài liệu SAML chứa thông tin xác thực và gửi lại cho SP.
+
+        \item \textbf{Cấp quyền truy cập:} SP nhận tài liệu SAML, kiểm tra tính hợp lệ của nó và cấp quyền truy cập cho người dùng nếu thông tin xác thực là hợp lệ.
+
+    \end{itemize}
+    \item Lợi ích:
+    \begin{itemize}
+        \item \textbf{Đăng nhập Một lần (SSO):} Người dùng chỉ cần đăng nhập một lần để truy cập nhiều ứng dụng khác nhau, giảm thiểu sự phiền phức trong việc nhớ nhiều mật khẩu.
+
+        \item \textbf{Bảo mật cao:} SAML sử dụng mã hóa để bảo vệ thông tin nhạy cảm trong quá trình truyền tải.
+
+        \item \textbf{Quản lý tập trung:} Giúp tổ chức quản lý danh tính người dùng và quyền truy cập từ một vị trí trung tâm.
+    \end{itemize}
+    \item Hỗ trợ:
+    \begin{itemize}
+        \item SAML Assertion chứa các thông tin như danh tính người dùng, quyền hạn và xác nhận danh tính.
+        \item Tương thích với các hệ thống doanh nghiệp, giáo dục, và chính phủ.
+
+    \end{itemize}
+    \item Ứng dụng:
+    \begin{itemize}
+        \item Đăng nhập một lần trên các nền tảng như Google Workspace, Microsoft 365.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{FIDO (Fast Identity Online)}
+\begin{itemize}
+    \item FIDO, viết tắt của Fast Identity Online, là một tập hợp các tiêu chuẩn xác thực mở được phát triển bởi FIDO Alliance. Mục tiêu chính của FIDO là loại bỏ sự phụ thuộc vào mật khẩu bằng cách cung cấp các phương pháp xác thực an toàn và tiện lợi hơn. Giao thức này sử dụng công nghệ mã hóa khóa công khai để bảo vệ thông tin xác thực và giảm thiểu rủi ro bị đánh cắp thông tin.
+
+    \item Cách hoạt động:
+    \begin{itemize}
+        \item \textbf{Đăng ký:}
+        \begin{itemize}
+            \item Người dùng đăng ký thiết bị của mình với dịch vụ trực tuyến bằng cách cung cấp thông tin như tên người dùng và mật khẩu (chỉ trong giai đoạn này).
+            \item Một cặp khóa (khóa riêng và khóa công khai) được tạo ra. Khóa riêng được lưu trữ trên thiết bị của người dùng, trong khi khóa công khai được gửi đến dịch vụ trực tuyến.
+
+        \end{itemize}
+
+        \item \textbf{Xác thực:}
+        \begin{itemize}
+            \item Khi người dùng muốn đăng nhập, họ sẽ sử dụng phương pháp xác thực đã chọn (ví dụ: quét vân tay, nhận diện khuôn mặt hoặc nhập PIN).
+
+            \item Thiết bị sẽ chứng minh quyền sở hữu khóa riêng bằng cách ký một thách thức từ dịch vụ trực tuyến mà không cần gửi mật khẩu qua mạng.
+        \end{itemize}
+
+    \end{itemize}
+    \item Lợi ích:
+    \begin{itemize}
+        \item \textbf{Bảo mật cao:} Thông tin nhạy cảm như khóa riêng và dữ liệu sinh trắc học không bao giờ rời khỏi thiết bị của người dùng, làm giảm khả năng bị đánh cắp.
+        \item \textbf{Trải nghiệm người dùng tốt hơn: }Người dùng có thể đăng nhập nhanh chóng mà không cần nhớ mật khẩu, chỉ cần sử dụng phương pháp xác thực đã chọn.
+        \item \textbf{Hỗ trợ đa dạng:} FIDO cho phép sử dụng nhiều phương pháp xác thực khác nhau, từ sinh trắc học đến thiết bị vật lý như USB token.
+    \end{itemize}
+    \item Hỗ trợ:
+    \begin{itemize}
+        \item FIDO2 hỗ trợ đăng nhập không cần mật khẩu.
+        \item Hỗ trợ các thiết bị sinh trắc học như vân tay hoặc nhận diện khuôn mặt.
+    \end{itemize}
+    \item Ứng dụng:
+    \begin{itemize}
+        \item Xác thực trong ngân hàng, ứng dụng di động, và các nền tảng web không cần mật khẩu.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{X.509 (Digital Certificates)}
+\begin{itemize}
+    \item X.509 là một tiêu chuẩn quốc tế được phát triển bởi Liên minh Viễn thông Quốc tế (ITU), định nghĩa định dạng của các chứng chỉ khóa công khai. Chứng chỉ X.509 được sử dụng rộng rãi trong nhiều giao thức Internet, bao gồm TLS/SSL, là nền tảng cho HTTPS, giúp bảo mật việc duyệt web.
+
+    \item Cách hoạt động:
+    \begin{itemize}
+        \item \textbf{Yêu cầu cấp chứng chỉ:} Một tổ chức hoặc cá nhân tạo một cặp khóa (khóa riêng và khóa công khai) và gửi yêu cầu cấp chứng chỉ (Certificate Signing Request - CSR) tới một cơ quan cấp chứng chỉ (CA).
+
+        \item \textbf{Xác thực và cấp phát:} CA xác thực thông tin trong CSR và cấp phát một chứng chỉ X.509, liên kết khóa công khai với danh tính đã xác thực.
+
+        \item \textbf{Sử dụng chứng chỉ:} Chứng chỉ này có thể được sử dụng để thiết lập kết nối an toàn, xác thực danh tính và ký tài liệu số.
+    \end{itemize}
+    \item Lợi ích:
+    \begin{itemize}
+        \item \textbf{Bảo mật cao:} Chứng chỉ X.509 giúp xác thực danh tính và mã hóa dữ liệu, bảo vệ thông tin nhạy cảm khỏi bị đánh cắp.
+        \item \textbf{Xác thực lẫn nhau:} Cung cấp khả năng xác thực giữa các bên tham gia giao dịch, đảm bảo rằng cả hai bên đều là những người mà họ tuyên bố.
+        \item \textbf{Quản lý tập trung:} Hệ thống PKI dựa trên X.509 cho phép quản lý tập trung các chứng chỉ, giúp dễ dàng kiểm soát và theo dõi.
+.
+    \end{itemize}
+    \item Hỗ trợ:
+    \begin{itemize}
+        \item Được dùng để bảo mật giao tiếp trong HTTPS.
+        \item Dùng trong chứng thực danh tính qua các ứng dụng như email, VPN, hoặc ký số tài liệu.
+    \end{itemize}
+    \item Ứng dụng:
+    \begin{itemize}
+        \item Cơ sở hạ tầng mã hóa SSL/TLS, các giao dịch ngân hàng trực tuyến.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{NIST SP 800-63 (Digital Identity Guidelines)}
+\begin{itemize}
+    \item NIST SP 800-63, được phát hành bởi Viện Tiêu chuẩn và Công nghệ Quốc gia Hoa Kỳ (NIST), là bộ hướng dẫn về quản lý danh tính số, cung cấp các yêu cầu cho các cơ quan liên bang trong việc triển khai dịch vụ danh tính số. 
+
+    \item Cách hoạt động:
+    \begin{itemize}
+        \item \textbf{Định nghĩa ba cấp độ xác thực} (IAL, AAL, FAL) dựa trên độ tin cậy của danh tính, phương thức xác thực, và liên kết phiên làm việc.
+        \item \textbf{Mức Độ Đảm Bảo Danh Tính (IAL):}
+        \begin{itemize}
+            \item IAL1: Không yêu cầu liên kết người đăng ký với danh tính thực tế cụ thể.
+            \item IAL2: Cần có bằng chứng hỗ trợ sự tồn tại của danh tính đã được tuyên bố.
+            \item IAL3: Yêu cầu sự hiện diện vật lý để xác minh danh tính.
+        \end{itemize}
+        \item \textbf{Mức Độ Đảm Bảo Xác Thực (AAL):}
+        \begin{itemize}
+            \item AAL1: Cung cấp yêu cầu tối thiểu cho xác thực.
+            \item AAL2: Yêu cầu sử dụng một phương thức xác thực mạnh hơn.
+            \item AAL3: Yêu cầu các phương thức xác thực mạnh nhất, thường bao gồm nhiều yếu tố.
+        \end{itemize}
+
+    \end{itemize}
+    \item Lợi ích:
+    \begin{itemize}
+        \item \textbf{Bảo mật cao hơn:} Các hướng dẫn này giúp các cơ quan xây dựng hệ thống bảo mật mạnh mẽ hơn thông qua việc xác minh danh tính và kiểm soát truy cập.
+        \item \textbf{Khả năng tương tác:} Hỗ trợ việc triển khai các giải pháp danh tính linh hoạt và có thể tích hợp với nhiều hệ thống khác nhau.
+        \item \textbf{Tăng cường quyền riêng tư:} Khuyến khích việc giảm thiểu thông tin cá nhân được thu thập và chia sẻ trong quá trình xác thực.
+    \end{itemize}
+    \item Hỗ trợ:
+    \begin{itemize}
+        \item Xác định các phương pháp bảo mật cần thiết cho từng cấp độ bảo mật.
+        \item Áp dụng mật khẩu, sinh trắc học, hoặc mã hóa token.
+    \end{itemize}
+    \item Ứng dụng:
+    \begin{itemize}
+        \item Cung cấp tiêu chuẩn xác thực cho các cơ quan chính phủ và doanh nghiệp.
+    \end{itemize}
+\end{itemize}

@@ -1,0 +1,252 @@
+\newpage
+\section{Kiểm thử ứng dụng}
+Tất cả hình ảnh kết quả kiểm thử được cập nhật đầy đủ trong \href{https://drive.google.com/drive/folders/1xRaJ4qGiTHa1X5nbth9Pzn4xKZmUR-6U?usp=sharing}{drive sau}
+\subsection*{6.1 Đăng ký tài khoản người dùng (/signup)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} & 
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Đăng ký thành công & Email hợp lệ, Passphrase mạnh, các trường đầy đủ
+ & Thông báo "Registration successful", pop-up \codefile{recovery\_code} \\ \hline
+Email sai định dạng & \codefile{abc@.com} & Báo lỗi "Invalid email format" \\ \hline
+Passphrase yếu & abc12345 & Báo lỗi "Passphrase too weak" \\ \hline
+Trùng email đã đăng ký & Email đã có trong DB & Báo lỗi “Account already exists" \\ \hline
+XSS/SQL injection & \codefile{<script>}, \codefile{" OR "1"="1} & Bị sanitize, không lỗi hệ thống \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.2 Đăng nhập và xác thực đa yếu tố (/login → /verify)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Đăng nhập đúng pass → chờ xác thực OTP & Email và passphrase đúng & Chuyển hướng tới trang \codefile{/verify} để xác thực OTP hoặc TOTP \\ \hline
+Sai pass < 5 lần & Email đúng, passphrase sai & Báo lỗi “Wrong email or password” và tăng \codefile{failed\_attempts} \\ \hline
+Sai pass ≥ 5 lần & Nhập sai liên tiếp 5 lần & Khóa tài khoản 5 phút, thông báo thời gian chờ \\ \hline
+OTP hợp lệ trong thời gian & Mã OTP 6 chữ số từ email (trong vòng 5 phút) & Xác thực thành công, chuyển đến \codefile{/dashboard} hoặc \codefile{/admin\_dashboard} \\ \hline
+OTP sai hoặc hết hạn & Mã OTP sai hoặc quá hạn 5 phút & Báo lỗi “Invalid or expired OTP” \\ \hline
+TOTP đúng từ Google Authenticator & Mã 6 chữ số từ ứng dụng & Xác thực thành công, chuyển trang chính \\ \hline
+TOTP sai & Nhập sai mã TOTP & Báo lỗi “Invalid TOTP code” \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.3 Quản lý khóa RSA cá nhân (/manage\_keys)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} & 
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Tạo cặp khóa thành công & Bấm nút "Tạo khóa RSA" sau khi đăng nhập & Sinh file private và public `.pem`, lưu DB với ngày tạo và hạn 90 ngày \\ \hline
+Kiểm tra trạng thái khóa & Tài khoản đã có khóa & Hiển thị trạng thái: Còn hạn / Gần hết hạn / Hết hạn \\ \hline
+Giải mã private key thành công & Passphrase đúng & Mở được private key để ký / giải mã \\ \hline
+Giải mã private key thất bại & Passphrase sai & Báo lỗi "Unable to decrypt private key" \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.4 QR Code Public Key (/utils/qr)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Tạo QR thành công & Email có public key & Tạo mã QR base64, lưu file PNG \\ \hline
+Quét QR thành công & File ảnh QR đúng định dạng & Hiển thị: email, public key, ngày tạo \\ \hline
+Quét file ảnh sai định dạng & PNG không chứa mã QR hoặc bị lỗi & Thông báo "Không thể đọc mã QR" \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.5 Cập nhật thông tin tài khoản (/update\_account)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Cập nhật thông tin thành công & Họ tên, địa chỉ, SĐT đúng định dạng & Lưu thay đổi thành công, reload dữ liệu \\ \hline
+Đổi passphrase thành công & Pass cũ đúng, pass mới đủ mạnh & Passphrase thay đổi, AES key tự cập nhật \\ \hline
+Pass cũ sai & Nhập sai passphrase hiện tại & Báo lỗi "Passphrase hiện tại không đúng" \\ \hline
+Pass mới yếu & Mới <8 ký tự hoặc không đủ yêu cầu & Báo lỗi "Passphrase mới quá yếu" \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.6 Mã hoá tập tin gửi người khác (/crypto/encrypt)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Mã hoá thành công (gộp file) & Chọn file + email người nhận có public key & Tạo file \codefile{.enc} chứa dữ liệu mã hoá và metadata \\ \hline
+Mã hoá thành công (tách file) & Chọn lưu dạng tách & Sinh file \codefile{.enc} và \codefile{.key} riêng biệt \\ \hline
+Người nhận không có public key & Nhập email chưa có key lưu trữ & Báo lỗi "Không tìm thấy public key của người nhận" \\ \hline
+Metadata đúng định dạng & Sau khi mã hoá & Metadata gồm người gửi, thời gian, thuật toán, định dạng \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.7 Giải mã tập tin (/crypto/decrypt)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Giải mã thành công (file gộp) & File \codefile{.enc} gộp và passphrase đúng & Giải mã thành công, hiển thị file gốc và metadata \\ \hline
+Giải mã thành công (file tách) & \codefile{.enc} + \codefile{.key} + passphrase đúng & Khôi phục file gốc đúng nội dung \\ \hline
+Sai passphrase / khóa sai & Passphrase không đúng hoặc thiếu \codefile{.key} & Báo lỗi "Decryption failed" hoặc "Unable to decrypt key" \\ \hline
+Tự động nhận dạng định dạng file & Dù là gộp hay tách & Tự động phân tích đúng định dạng và giải mã phù hợp \\ \hline
+\end{tabular}
+\end{table}
+
+
+\subsection*{6.8 Ký số tập tin (/crypto/sign)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Ký số thành công & Chọn file bất kỳ + passphrase đúng & Tạo file chữ ký \codefile{.sig} theo định dạng SHA-256 + RSA \\ \hline
+Thiếu private key hoặc passphrase sai & Không giải mã được private key & Báo lỗi "Không thể ký tập tin" \\ \hline
+Log ký số đúng & Sau ký thành công & Ghi log: email người ký, thời gian ký, file đã ký \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.9 Xác minh chữ ký (/crypto/verify)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Xác minh đúng chữ ký & File gốc + file \codefile{.sig} đúng & Hiển thị email người ký, ngày ký, thông báo hợp lệ \\ \hline
+Chữ ký sai hoặc không khớp & File bị thay đổi hoặc \codefile{.sig} giả mạo & Báo lỗi "Invalid signature" hoặc "Verification failed" \\ \hline
+Không có public key người ký & Người ký chưa có key trong danh sách & Báo lỗi "Không tìm thấy public key phù hợp" \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.10 Phân quyền tài khoản}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Admin truy cập trang quản lý & Người dùng có role = admin & Hiển thị danh sách tài khoản, log, nút khóa/mở tài khoản \\ \hline
+Người thường truy cập trang admin & role = user & Báo lỗi "Access denied" và chuyển hướng về login \\ \hline
+Khoá / mở tài khoản người dùng & Bấm nút khóa/mở trong giao diện admin & Cập nhật trạng thái khóa, lưu log thao tác \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.11 Ghi log bảo mật (security.log hoặc bảng log\_activity)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Ghi log đăng nhập thành công & Email + passphrase đúng & Log sự kiện "Login success" với trạng thái "Pending MFA" \\ \hline
+Ghi log đăng nhập sai & Nhập sai passphrase & Ghi vào log với thông tin thất bại, timestamp, email \\ \hline
+Ghi log ký số / cập nhật / mã hoá & Thao tác thành công các chức năng & Ghi đúng hành vi người dùng vào log theo chuẩn đã định \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.12 Chia nhỏ tập tin lớn khi mã hóa (>5MB)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+File >5MB được chia nhỏ & Upload file >5MB & Hệ thống chia thành block 1MB, mã hóa từng block bằng AES-GCM \\ \hline
+File nhỏ <5MB không chia & Upload file 2MB & Hệ thống mã hóa nguyên khối, không chia block \\ \hline
+Kiểm tra toàn vẹn sau khi gộp lại & Giải mã file đã chia & Nội dung khôi phục đúng, không mất dữ liệu \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.13 Kiểm tra trạng thái khóa (/manage\_keys)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Khóa còn hạn & Ngày tạo < 60 ngày & Hiển thị trạng thái “Còn hạn” \\ \hline
+Khóa gần hết hạn & Ngày tạo 80–89 ngày & Hiển thị “Gần hết hạn” \\ \hline
+Khóa hết hạn & Ngày tạo > 90 ngày & Hiển thị “Hết hạn”, cho phép gia hạn hoặc tạo mới \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.14 Tìm kiếm public key (/keys/search)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Tìm thấy public key & Nhập email có public key trong DB & Hiển thị: email, QR code, ngày tạo, hạn dùng \\ \hline
+Không tìm thấy public key & Email không tồn tại trong DB & Thông báo “Không tìm thấy khóa công khai” \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.15 Giới hạn số lần đăng nhập (/login)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Sai 5 lần liên tiếp & Nhập sai passphrase 5 lần trong 2 phút & Khoá tài khoản trong 5 phút, hiển thị thông báo thời gian chờ \\ \hline
+Sau 5 phút thử lại & Đợi hết thời gian khoá & Tài khoản được mở lại và đăng nhập thành công nếu đúng pass \\ \hline
+Log mỗi lần sai & Nhập sai liên tiếp & Ghi log với timestamp, lý do và email liên quan \\ \hline
+\end{tabular}
+\end{table}
+
+
+\subsection*{6.16 Tùy chọn định dạng lưu file (/crypto/encrypt)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Lưu dạng gộp file & Chọn tùy chọn "Gộp \codefile{.enc}" khi mã hoá & Sinh 1 file duy nhất chứa toàn bộ dữ liệu và metadata \\ \hline
+Lưu dạng tách file & Chọn "Tách \codefile{.enc} và \codefile{.key}" khi mã hoá & Sinh 2 file riêng biệt: dữ liệu mã hoá và AES key \\ \hline
+Tự động nhận dạng khi giải mã & Upload file (gộp hoặc tách) khi giải mã & Tự động phân tích định dạng và xử lý phù hợp \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{6.17 Khôi phục tài khoản (/recover\_account, /verify\_recovery)}
+\begin{table}[H]
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}p{4.3cm}|>{\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{7.5cm}|}
+\hline
+\textbf{Mô tả kiểm thử} &
+\multicolumn{1}{>{\centering\arraybackslash}p{5cm}|}{\textbf{Input}} & 
+\textbf{Kết quả mong đợi} \\ \hline
+Khôi phục thành công & Nhập đúng recovery code hiển thị sau đăng ký & Cho phép đổi passphrase mới \\ \hline
+Mã khôi phục sai hoặc hết hiệu lực & Mã recovery không đúng hoặc đã dùng & Báo lỗi "Invalid recovery code" \\ \hline
+Đổi pass thành công sau xác minh & Pass mới đủ mạnh & Lưu pass mới, cập nhật salt mới \\ \hline
+\end{tabular}
+\end{table}

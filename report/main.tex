@@ -1,0 +1,101 @@
+\documentclass[12pt]{article}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage[top=.75in, left=.75in, right=.75in, bottom=1in]{geometry}
+\usepackage[utf8]{vietnam}
+\usepackage{mathabx}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{vietnamese}
+% For algorithm
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% ============ CODE ============
+\usepackage{listings} 
+\usepackage{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Styling for the code.
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+\newcommand{\codefile}[1]{\colorbox{gray!10}{\texttt{#1}}}
+
+% Disable indentation on new paragraphs
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+\usepackage[dvipsnames]{xcolor}
+% Optional: graphic path
+% \graphicspath{PATH_TO_GRAPHIC_FOLDER}
+
+% To use Times font family, uncomment this row
+% \usepackage{mathptmx}
+
+% To use roman section / subsection, uncomment these rows
+% \renewcommand{\thesection}{\Roman{section}}
+% \renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
+
+% Define course name, report name and report title.
+\newcommand{\coursename}{An ninh máy tính}
+\newcommand{\reportname}{ĐỒ ÁN 1}
+\newcommand{\reporttitle}{Báo cáo}
+
+\newcommand{\studentname}{Lê Hoàng Đạt \\ Nguyễn Hồ Đăng Duy \\ Phạm Quang Duy}
+\newcommand{\teachername}{Lê Giang Thanh \\ Lê Hà Minh \\ Phan Quốc Kỳ}
+
+% \newcommand{\leftfooter}{\LaTeX\ by Nguyễn Hồ Đăng Duy}
+% ============ HEADER AND FOOTER ============
+% Header length
+\setlength{\headheight}{29.43912pt}
+
+% Footer page number would be on the lower-right corner
+\pagestyle{fancy}
+\fancyfoot{}
+\fancyfoot[R]{Trang \thepage}
+
+\lhead{\reportname}
+\rhead{VNUHCMUS\\
+\coursename
+}
+
+
+% ============ DOCUMENT ============
+\begin{document}
+\input{content/title.tex}
+\tableofcontents
+\pagebreak
+\input{content/ThongTin}
+\input{content/GioiThieu}
+\input{content/plan}
+\input{content/KienTruc}
+\input{content/ChucNang}
+\input{content/KiemThu}
+\input{content/ref}
+\end{document}

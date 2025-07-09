@@ -1,0 +1,32 @@
+\newpage
+\section{Kiến trúc hệ thống}
+\subsection{Sơ đồ tổng thể}
+
+\subsection{Thư mục và các modules chính}
+Đồ án được tổ chức rõ ràng theo mô hình \textbf{Flask MVC} và phân chia modules theo chức năng bảo mật:
+\begin{itemize}
+    \item \codefile{main.py} - Điểm khởi chạy của ứng dụng \codefile{FLask}
+    \item \codefile{.env} - Tập tin cấu hình (thông tin DB, email, secret key,...)
+    \item \codefile{data/} - Chứa dữ liệu hệ thống
+    \begin{itemize}
+        \item \codefile{key\_manage/} - 
+        \item \codefile{keys/} - 
+        \item \codefile{qr/}
+    \end{itemize}
+    \item \codefile{flaskapi/} - Backend API
+    \begin{itemize}
+        \item \codefile{app.py} - Cấu hình Flask app và đăng ký route
+        \item \codefile{routes/} - Chứa các tệp định nghĩa route theo nhóm chức năng
+    \end{itemize}
+    \item \codefile{frontend/} - Các file HTML render giao diện với Jinja2
+    \item \codefile{log/} - Ghi toàn bộ hành vi quan trọng: đăng nhập, mã hóa, ký số,... kèm thời gian, email, trạng thái
+    \item \codefile{modules/} - Các modules chức năng chính
+    \begin{itemize}
+        \item \codefile{auth/} - Hash passphrase, sinh OTP, xác thực MFA
+        \item \codefile{crypto/} - Mã hóa RSA/AES, ký số và xác minh chữ ký
+        \item \codefile{utils/} - Hàm tiện ích chung: log sự kiện, mail, QR,...
+    \end{itemize}
+    \item \codefile{mySQL/} - Các chương trình để tạo database, table cho cơ sở dữ liệu MySQL
+    \item \codefile{report/} - Báo cáo và video demo
+    \item \codefile{README.md} - Hướng dẫn cài đặt và chạy thử đồ án. Mô tả các chức năng và công nghệ sử dụng.
+\end{itemize}

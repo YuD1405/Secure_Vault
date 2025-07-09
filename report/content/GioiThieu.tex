@@ -1,0 +1,16 @@
+\section{Giới thiệu}
+\textbf{Secure Vault} là một ứng dụng mô phỏng hệ thống bảo mật theo mô hình thực tế, được xây dựng nhằm mục tiêu bảo vệ dữ liệu cá nhân và hỗ trợ truyền tin an toàn giữa người dùng. Ứng dụng tích hợp nhiều kỹ thuật bảo mật hiện đại như mã hóa RSA/AES, xác thực đa yếu tố (MFA), ký số – xác minh chữ ký, QR Code, cùng với cơ chế phân quyền, kiểm tra trạng thái khóa, ghi log bảo mật,...
+Người dùng có thể:
+\begin{itemize}
+    \item Đăng ký, đăng nhập bảo mật với OTP/TOTP
+    \item Tạo và quản lý cặp khóa RSA cá nhân
+    \item Mã hóa và giải mã tập tin với AES + RSA
+    \item Ký số tập tin và xác minh tính toàn vẹn
+    \item Tạo và quét QR chứa public key để chia sẻ
+    \item Theo dõi trạng thái khóa, phân quyền người dùng (admin/user)
+    \item Khôi phục tài khoản khi quên mật khẩu
+\end{itemize}
+
+Hệ thống được xây dựng với ngôn ngữ \codefile{Python}, sử dụng \codefile{Flask} cho backend, kết hợp \codefile{MySQL/JSON} để lưu trữ dữ liệu, cùng các thư viện bảo mật như \codefile{pycryptodome, pyotp, qrcode},...
+
+GitHub Repository: https://github.com/YuD1405/Secure\_Vault
