@@ -53,42 +53,36 @@
                             Admin Dashboard
                         </div>
                                
-        
-                        <h3 style="margin: 30px 0 10px 0;">Security Logs</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="margin: 30px 0 10px 0;">Security Logs</h3>
+                            <button id="reloadBtn" class="reload-btn">⟳ Reload</button>
+                        </div>
+                        
+                        <div class="input-group" style="margin-bottom: 50px; margin-left: 70px;">
+                            <input
+                                type="text"
+                                placeholder="🔍 Tìm kiếm log..."
+                                class="search-input"
+                                id="searchInput"
+                            />
+                        </div>
+
                         <section class="table__body">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>#</th>
-                                        <th>Level</th>
-                                        <th>Time</th>
-                                        <th>Email</th>
-                                        <th>Status</th>
-                                        <th>Message</th>
+                                    <th>#</th>
+                                    <th>Level</th>
+                                    <th>Time</th>
+                                    <th>Email</th>
+                                    <th>Action</th>
+                                    <th>Status</th>
+                                    <th>Message</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    {% for log in logs %}
-                                    <tr>
-                                        <td>{{ loop.index }}</td>
-                                        <td>
-                                            <p class="status 
-                                                {% if log.level == 'INFO' %}delivered
-                                                {% elif log.level == 'WARNING' %}pending
-                                                {% elif log.level == 'ERROR' %}shipped
-                                                {% else %}type1
-                                                {% endif %}">
-                                                {{ log.level }}
-                                            </p>
-                                        </td>
-                                        <td>{{ log.time }}</td>
-                                        <td>{{ log.email }}</td>
-                                        <td>{{ log.status }}</td>
-                                        <td style="white-space: pre-wrap;">{{ log.message }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
+                                <tbody></tbody> <!-- Kết quả sẽ được render vào đây -->
                             </table>
+
                         </section>
                     </div>
                 </div>

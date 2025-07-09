@@ -1,7 +1,0 @@
-[2025-06-21 22:12:09] [INFO] [digital_signature]: Signed sec_bg.png successfully and saved to data/signature.
-[2025-06-21 22:12:47] [INFO] [digital_signature]: Verified signature for sec_bg.png successfully.
-[2025-07-04 09:04:44] [INFO] [digital_signature]: Signed Duy_Resume_official.pdf successfully and saved to data/signature.
-[2025-07-04 09:30:49] [INFO] [digital_signature]: Signed Duy_Resume_official.pdf successfully and saved to data/signature.
-[2025-07-04 09:31:51] [WARNING] [digital_signature]: Failed to verify signature for Duy_Resume_official.pdf.
-[2025-07-04 09:33:49] [INFO] [digital_signature]: Verified signature for Duy_Resume_official.pdf successfully.
-[2025-07-04 09:35:17] [INFO] [digital_signature]: Verified signature for Duy_Resume_official.pdf successfully.

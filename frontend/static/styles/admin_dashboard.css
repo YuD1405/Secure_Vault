@@ -519,15 +519,14 @@ main.table {
 }
 
 .table__body {
-    width: 95%;
-    max-height: 550px;
-    background-color: #fffb;
-
-    margin: .8rem auto;
-    border-radius: .6rem;
-
-    overflow: scroll;
+  width: 95%;
+  max-height: 550px;
+  background-color: #fffb;
+  margin: .8rem auto;
+  border-radius: .6rem;
+  overflow: scroll;
 }
+
 
 
 .table__body::-webkit-scrollbar {
@@ -1056,18 +1055,136 @@ tbody td.active {
     background-color: #777;
 }
 
-/* Cột STT (#) */
+/* ===== CẤU TRÚC BẢNG: CỘT ===== */
+
+/* Cột 1: STT (#) */
 table th:nth-child(1),
 table td:nth-child(1) {
-    width: 50px;
-    text-align: center;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+  width: 40px;
+  text-align: center;
+  padding: 0.5rem;
 }
 
-/* Cột Fullname – thêm margin trái */
+/* Cột 2: Level */
 table th:nth-child(2),
 table td:nth-child(2) {
-    padding-left: 1.5rem;
-    /* 👉 tạo khoảng cách thoáng hơn với cột STT */
+  width: 100px;
+  text-align: center;
+}
+
+/* Cột 3: Time */
+table th:nth-child(3),
+table td:nth-child(3) {
+  width: 170px;
+  white-space: nowrap;
+}
+
+/* Cột 4: Email */
+table th:nth-child(4),
+table td:nth-child(4) {
+  width: 200px;
+  padding-left: 1.5rem;
+  word-break: break-word;
+}
+
+/* Cột 5: Action */
+table th:nth-child(5),
+table td:nth-child(5) {
+  width: 120px;
+  text-align: center;
+}
+
+/* Cột 6: Status */
+table th:nth-child(6),
+table td:nth-child(6) {
+  width: 100px;
+  text-align: center;
+}
+
+/* Cột 7: Message / Details */
+table th:nth-child(7),
+table td:nth-child(7) {
+  min-width: 400px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+
+/* ===== STATUS BADGE BY LEVEL ===== */
+
+.status {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 1rem;
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-align: center;
+  text-transform: uppercase;
+
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+}
+
+/* INFO – xanh nhạt */
+.status.info {
+  background-color: #e0f7e9;
+  color: #2e7d32;
+}
+
+/* WARNING – vàng nhạt */
+.status.warning {
+  background-color: #fff8e1;
+  color: #f57c00;
+}
+
+/* ERROR – đỏ nhạt */
+.status.error {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+/* OTHER – mặc định */
+.status.other {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+
+.input-group {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+}
+
+.reload-btn {
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.reload-btn:hover {
+  background-color: #4f46e5;
+}
+
+.search-input {
+  padding: 10px 16px;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }

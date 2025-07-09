@@ -80,7 +80,6 @@ def process_login(email, passphrase):
 
     now = datetime.now()
     if not user:
-        log_user_action(email, "Login failed - No such user", "Failed")
         return {"success": False, "message": "Wrong email or password"}
 
     # Đếm sai trong 2 phút
@@ -115,7 +114,6 @@ def process_login(email, passphrase):
             WHERE email = %s
         """, (failed, now, is_locked, email))
         mysql.connection.commit()
-        log_user_action(email, "Login failed - wrong pass", "Failed")
         return {"success": False, "message": "Wrong email or password"}
 
     # Đúng pass → reset
@@ -123,7 +121,6 @@ def process_login(email, passphrase):
         UPDATE users SET failed_attempts = 0, last_failed_login = NULL WHERE email = %s
     """, (email,))
     mysql.connection.commit()
-    log_user_action(email, "Login success", "Pending MFA")
 
     return {"success": True, "role": user['role']}
 

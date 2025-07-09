@@ -2,12 +2,30 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from modules.auth.logic import register_user, process_login, get_user_by_email, update_user_info_in_db, verify_recovery_code_from_db, reset_password_in_db
 from modules.auth.mfa import (verify_otp_code, verify_totp_code,
                               generate_and_send_otp, generate_qr_code, expire_otp_code)
-from modules.utils.logger import read_security_logs
+from modules.utils.logger import read_security_logs, log_user_action
 from modules.utils.manage_account import fetch_all_users, toggle_user_lock
 from modules.crypto.key_management import re_encrypt_private_key_with_new_passphrase
+from modules.auth.validator import sanitize_input
 
 auth_bp = Blueprint('auth', __name__)
 
+# Requirement 1 – Sign up
+@auth_bp.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        success, message, recovery_code = register_user(request.form)
+        email = sanitize_input(request.form.get("email", ""))
+        if success:
+            log_user_action(email, "Register", "Success", message)
+            return render_template("signup.html", success=message, recovery_code=recovery_code)
+        else:
+            log_user_action(email, "Register", "Fail", message, 'error')
+            return render_template("signup.html", error=message)
+    return render_template("signup.html")
+
+
+# Requirement 2 - Log in - MFA
+# Requirement 15 - Limit login
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if session.get('user_id'):
@@ -22,30 +40,25 @@ def login():
             session['email'] = email
             session['role'] = result.get("role")
             session.pop('otp_sent', None)
+            log_user_action(email, "Login", "Success", "Login successfully")
             return redirect(url_for('auth.verify'))
         elif result.get("locked_by_admin"):
+            log_user_action(email, "Login", "Fail", "Account locked by admin")
             return render_template("login.html", locked_by_admin=True)
         elif result.get("locked"):
+            log_user_action(email, "Login", "Fail", "Account locked by admin")
             return render_template("login.html", locked=True)
         else:
+            log_user_action(email, "Login", "Fail", result.get("message"), 'error')
             return render_template("login.html", error=result.get("message"))
     return render_template('login.html', error=None)
-
-@auth_bp.route("/signup", methods=["GET", "POST"])
-def signup():
-    if request.method == "POST":
-        success, message, recovery_code = register_user(request.form)
-        if success:
-            return render_template("signup.html", success=message, recovery_code=recovery_code)
-        else:
-            return render_template("signup.html", error=message)
-    return render_template("signup.html")
 
 @auth_bp.route('/verify', methods=['GET', 'POST'])
 def verify():
     email = session.get('email')
     if not email:
         flash("Session expired. Please login again.", "error")
+        log_user_action("Unknown", "MFA Verify", "Fail", "Session expired", level="warning")
         return redirect(url_for('auth.login'))
 
     selected_method = session.get("selected_method", "email")
@@ -55,6 +68,7 @@ def verify():
     if request.method == 'GET' and 'otp_sent' not in session:
         generate_and_send_otp(email)
         session['otp_sent'] = True
+        log_user_action(email, "Send OTP", "Success", "OTP sent via email")
 
     if request.method == 'POST':
         method = request.form.get('method')
@@ -66,38 +80,53 @@ def verify():
         if is_resend == '1' and method == 'email':
             generate_and_send_otp(email)
             flash("A new OTP has been sent to your email.", "success")
+            log_user_action(email, "Resend OTP", "Success")
             return redirect(url_for('auth.verify'))
 
         if method == 'email':
             if verify_otp_code(email, otp_input):
                 session.pop('otp_sent', None)
                 session['user_id'] = email
+                log_user_action(email, "OTP Verify", "Success")
                 if session.get("role") == "admin":
                     return redirect(url_for("auth.admin_dashboard"))
                 return redirect(url_for('auth.dashboard'))
             else:
                 flash("Invalid or expired OTP", "email_error")
+                log_user_action(email, "OTP Verify", "Fail", "Invalid or expired OTP", level="warning")
 
         elif method == 'totp':
             expire_otp_code(email)
             if verify_totp_code(email, otp_input):
                 session.pop('otp_sent', None)
                 session['user_id'] = email
+                log_user_action(email, "TOTP Verify", "Success")
                 if session.get("role") == "admin":
                     return redirect(url_for("auth.admin_dashboard"))
                 return redirect(url_for('auth.dashboard'))
             else:
                 flash("Invalid TOTP code", "totp_error")
+                log_user_action(email, "TOTP Verify", "Fail", "Wrong 6-digit TOTP", level="warning")
 
     return render_template("verify.html",
                            email=email,
                            qr_code=qr_code,
                            selected_method=session.get("selected_method", "email"))
 
+@auth_bp.route("/logout")
+def logout():
+    email = session.get("email", "Unknown")
+    log_user_action(email, "Logout","Success", "Logout successfully")
+    session.clear()
+    return redirect(url_for("auth.login"))
+
+
+# Requirement 10 - Divide roles
 @auth_bp.route("/dashboard")
-def dashboard():
+def dashboard():    
     if not session.get("user_id"):
         return redirect(url_for("auth.login"))
+    
     return render_template("user_dashboard.html", email=session.get("email"))
 
 @auth_bp.route("/admin_dashboard")
@@ -123,10 +152,6 @@ def admin_manage_account():
     users = fetch_all_users()
     return render_template("admin_manage_account.html", email=session.get("email"), users=users)
 
-@auth_bp.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("auth.login"))
 
 # Requirement 17 – update info
 @auth_bp.route("/recover_account")
@@ -142,8 +167,10 @@ def verify_recovery_code():
     success, error = verify_recovery_code_from_db(email, recovery_code)
 
     if success:
+        log_user_action(email, "Verify Recovery Code", "Success","Recovery code matched. Proceed to password reset.")
         return jsonify({'success': True})
     else:
+        log_user_action(email, "Verify Recovery Code", "Fail", error, level="warning")
         return jsonify({'success': False, 'message': error}), 400
     
 @auth_bp.route('/reset_password', methods=['POST'])
@@ -154,7 +181,8 @@ def reset_password():
     old_password = session.get["passphrase"]
     
     success_1, message = re_encrypt_private_key_with_new_passphrase(email, old_password, new_password)
-    if success_1 == False:
+    if not success_1:
+        log_user_action(email, "Reset Password", "Fail", f"Re-encrypt RSA failed: {message}", level="error")
         return jsonify({'success': False, 'message': message})
     
     session["passphrase"] = new_password
@@ -162,21 +190,27 @@ def reset_password():
     success, error = reset_password_in_db(email, new_password)
 
     if success:
+        log_user_action(email, "Reset Password", "Success", "New passphrase saved, private key re-encrypted.")
         return jsonify({'success': True})
     else:
+        log_user_action(email, "Reset Password", "Fail", error or "DB update failed", level="error")
         return jsonify({'success': False, 'message': error or 'Failed to reset password'}), 400
-    
+
+
 # Requirement 5 – update info
 @auth_bp.route("/user_info")
 def api_user_info():
     email = session.get("email")
     if not email:
+        log_user_action(email, "Get User Info", "Fail", "Not logged in", level="warning")
         return jsonify({"error": "Not logged in"}), 401
 
     user = get_user_by_email(email)
     if not user:
+        log_user_action(email, "Get User Info", "Fail", "User not found", level="warning")
         return jsonify({"error": "User not found"}), 404
 
+    log_user_action(email, "Get User Info", "Success", "User profile returned")
     return jsonify(user)
 
 @auth_bp.route('/render_update_account', methods=['GET'])
@@ -186,6 +220,7 @@ def render_update_account():
 @auth_bp.route("/update_account", methods=["POST"])
 def update_account():
     if 'email' not in session:
+        log_user_action("Unknown", "Update Account", "Fail", "No session", level="warning")
         return redirect(url_for('auth.login'))
 
     email = session['email']
@@ -196,11 +231,17 @@ def update_account():
     pass1 = request.form.get('old_pass')
     pass2 = request.form.get('new_pass')
 
-    success_1, message = re_encrypt_private_key_with_new_passphrase(email, pass1, pass2)
+    success_1, msg1 = re_encrypt_private_key_with_new_passphrase(email, pass1, pass2)
     if success_1 == False:
-        return jsonify({'success': False, 'message': message})
+        log_user_action(email, "Change Passphrase", "Fail", f"RSA re-encryption failed: {msg1}", level="error")
+        return jsonify({'success': False, 'message': msg1})
     session["passphrase"] = pass2
     
     success, message = update_user_info_in_db(email, full_name, phone, address, dob, pass1, pass2)
     
+    if success:
+        log_user_action(email, "Update Account Info", "Success", "User info updated")
+    else:
+        log_user_action(email, "Update Account Info", "Fail", message or "Unknown error", level="warning")
+        
     return jsonify({"success": success, "message": message})

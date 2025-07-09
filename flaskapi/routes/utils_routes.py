@@ -22,17 +22,18 @@ def render_sign_file():
 @utils_bp.route('/sign_file', methods=['POST'])
 def signing_file_route():
     if 'user_id' not in session:
+        log_user_action("Unknown", "Sign File", "Fail", "Session expired", level="warning")
         return {"success": False, "message": "You must be logged in to access this page."}, 401
     
     file = request.files.get('file_to_sign')
-
-    if not file or file.filename == '':
-        log_user_action("anonymous", "Sign file", "Failure", "Missing file", level="warning")
-        return jsonify({'error': "No file provided."}), 400
-
     email = session["email"]
+    if not file or file.filename == '':
+        log_user_action(email, "Sign File", "Fail", "Missing file", level="warning")
+        return jsonify({'error': "No file provided."}), 400
+    
     passphrase = session.get("passphrase")  
     if not passphrase:
+        log_user_action(email, "Sign File", "Fail", "Missing passphrase", level="warning")
         return {"success": False, "message": "Passphrase not found."}, 401
     try:
         salt = get_salt_from_db(email)
@@ -46,7 +47,7 @@ def signing_file_route():
         signature_stream = io.BytesIO(signature_bytes)
         signature_stream.seek(0)
         
-        log_user_action(email, "Sign file", "Success", f"File: {file.filename}", level="info")
+        log_user_action(email, "Sign File", "Success", f"File={file.filename}")
         return send_file(
             signature_stream,
             as_attachment=True,
@@ -54,7 +55,7 @@ def signing_file_route():
             mimetype="application/octet-stream"
         )
     except Exception as e:
-        log_user_action(email, "Sign file", "Failure", f"Error: {e}", level="error")
+        log_user_action(email, "Sign File", "Fail", f"Error: {e}", level="error")
         return jsonify({"success": False, "message": f"Error during digital signing: {e}"}), 500
 
 
@@ -66,36 +67,38 @@ def render_verify_signature():
 @utils_bp.route('/verify_signature', methods=['POST'])
 def verify_signature_route():
     if 'user_id' not in session:
+        log_user_action("Unknown", "Verify Signature", "Fail", "Session expired", level="warning")
         return {"success": False, "message": "Bạn cần phải đăng nhập để truy cập trang này."}, 401
     
     file = request.files.get('file_to_verify')
     signature_file = request.files.get('signature')
-
+    email = session["email"]
+    
     if not file or not signature_file:
-        log_user_action("anonymous", "Verify signature", "Failure", "Missing file or signature", level="warning")
+        log_user_action(email, "Verify Signature", "Fail", "Missing file or signature", level="warning")
         return jsonify({"success": False, "message": "No file or signature provided"}), 400
 
     if file.filename == '':
-        log_user_action("anonymous", "Verify signature", "Failure", "Empty filename", level="warning")
+        log_user_action(email, "Verify Signature", "Fail", "Empty filename", level="warning")
         return jsonify({'error': 'Tên file trống'}), 400
 
     signature = signature_file.read()
     
-    email = session["email"]
+    
     contacts_public_key_path = get_user_dir(email) / "contact_public_key.json"
 
     if not os.path.exists(contacts_public_key_path):
-        log_user_action("anonymous", "Verify signature", "Failure", "Public key not found", level="error")
+        log_user_action(email, "Verify Signature", "Fail", "Public key file not found", level="error")
         return jsonify({"success": False, "message":  "Public key does not exist."}), 400
 
     # Thực hiện xác minh
     signer = verify_signature(file, signature, contacts_public_key_path)
 
     if signer:
-        log_user_action("anonymous", "Verify signature", "Success", f"File: {file.filename}", level="info")
+        log_user_action(email, "Verify Signature", "Success", f"Valid signature. Signed by: {signer}, File={file.filename}", level="info")
         return jsonify({"success": True, "message": "Signature is valid.", "signer_email": signer}), 200
     else:
-        log_user_action("anonymous", "Verify signature", "Failure", f"File: {file.filename}", level="warning")
+        log_user_action(email, "Verify Signature", "Fail", f"Invalid signature, File={file.filename}", level="warning")
         return jsonify({"success": False, "message": "Signature is invalid."}), 400
 
 
@@ -126,6 +129,7 @@ def upload_qr():
     if not email:
         # Nếu bạn có trang lỗi, có thể render nó.
         # Hoặc trả về lỗi JSON.
+        log_user_action("Unknown", "Generate QR", "Fail", "Missing email in session", level="warning")
         return "Error: Please provide an email address in the URL (e.g., ?email=user@example.com)", 400
 
     try:
@@ -143,16 +147,18 @@ def upload_qr():
             # Nếu hàm tạo QR thất bại (ví dụ không tìm thấy public key)
             print(f"Lỗi khi tạo QR", message)
             # Có thể trả về một ảnh placeholder "lỗi"
+            log_user_action(email, "Generate QR", "Fail", message or "QR generation failed", level="error")
             return f"Unable to generate QR code.", 500
 
         # 5. Gửi file ảnh vừa tạo về cho trình duyệt
+        log_user_action(email, "Generate QR", "Success", f"QR generated at: {qr_output_path.name}")
         return send_file(
             ".." / qr_output_path,
             mimetype='image/png'
         )
 
     except Exception as e:
-        print(f"Lỗi nghiêm trọng khi tạo QR code cho {email}: {e}")
+        log_user_action(email, "Generate QR", "Fail", f"Exception: {e}", level="error")
         return "An unknown error occurred on the server.", 500
 
 @utils_bp.route("/qr_image/<email_hash>")
@@ -161,10 +167,12 @@ def serve_qr_image(email_hash):
     base_path = current_app.root_path  # VD: /Secure_Vault/flaskapi
     qr_path = os.path.join(base_path, "..", "data", "qr", email_hash, "my_qr.png")
     qr_path = os.path.abspath(qr_path)
-
+    user_email = session.get("email", "Unknown")
+    
     if not os.path.exists(qr_path):
+        log_user_action(user_email, "View QR Image", "Fail", f"QR not found for hash={email_hash}", level="warning")
         return "QR code not found", 404
-
+    log_user_action(user_email, "View QR Image", "Success", f"Served my_qr.png for hash={email_hash}")
     return send_file(qr_path, mimetype="image/png")
 
 @utils_bp.route("/my_qr_url")
@@ -189,6 +197,7 @@ def decode_qr():
     # 1. Bắt đầu khối kiểm tra session
     # Kiểm tra xem người dùng đã đăng nhập hoàn toàn chưa
     if 'email' not in session:
+        log_user_action("Unknown", "Decode QR", "Fail", "Not logged in", level="warning")
         return jsonify({"success": False, "message": "You are not logged in."}), 401
 
     # Lấy email trực tiếp từ session
@@ -196,16 +205,19 @@ def decode_qr():
 
     if not current_user_email:
         # Trường hợp hi hữu session có user_id nhưng không có email
+        log_user_action("Unknown", "Decode QR", "Fail", "Session error: missing email", level="warning")
         return jsonify({"success": False, "message": "Session error."}), 401
 
     # --- Kết thúc khối kiểm tra session ---
 
     # 2. Kiểm tra file upload
     if 'qr_code_file' not in request.files:
+        log_user_action(current_user_email, "Decode QR", "Fail", "No file uploaded", level="warning")
         return jsonify({"success": False, "message": "QR image not found."}), 400
 
     file = request.files['qr_code_file']
     if file.filename == '':
+        log_user_action(current_user_email, "Decode QR", "Fail", "Empty filename", level="warning")
         return jsonify({"success": False, "message": "No file selected."}), 400
 
     # 3. Gọi hàm xử lý logic
@@ -217,21 +229,30 @@ def decode_qr():
 
         # 4. Flash thông báo kết quả
         if success:
+            log_user_action(current_user_email, "Decode QR", "Success", f"Added contact: {message}")
             return jsonify({"success": True, "message": message}), 200
         else:
+            log_user_action(current_user_email, "Decode QR", "Fail", message, level="error")
             return jsonify({"success": False, "message": message}), 400
 
+
+# Requirement 13 – Check key status
+# Requirement 14 – Find pub keys
 @utils_bp.route("/owned_keys", methods=["GET"])
 def api_get_owned_keys():
     if 'email' not in session:
+        log_user_action("Unknown", "View Owned Public Keys", "Fail", "Not logged in", level="warning")
         return jsonify({"error": True, "message": "Not logged in"}), 401
 
     email = session['email']
     contacts = get_all_contacts(email)
 
     if contacts: 
+        log_user_action(email, "View Owned Public Keys", "Success", f"Found {len(contacts)} keys")
         return jsonify({"success": True, "data": contacts})
+    log_user_action(email, "View Owned Public Keys", "Success", "No keys found")
     return jsonify({"success": False, "data": contacts})
+
 
 # Requirement 11 – Security logging
 @utils_bp.route("/log_security")
@@ -240,35 +261,30 @@ def log_security():
     logs = []
 
     if os.path.exists(log_file_path):
-        with open(log_file_path, 'r') as f:
+        with open(log_file_path, 'r', encoding='utf-8') as f:
             for line in f:
                 try:
-                    # Format: [timestamp] [LEVEL]: [user] Action: ... | Status: ... | File: ...
-                    time_start = line.find('[') + 1
-                    time_end = line.find(']')
-                    timestamp = line[time_start:time_end]
+                    parts = line.strip().split(']')
+                    timestamp = parts[0][1:].strip()
+                    level = parts[1][2:].strip().strip('[]')
+                    user = parts[2][2:].strip().strip('[]')
 
-                    level_start = line.find('[', time_end + 1) + 1
-                    level_end = line.find(']', level_start)
-                    level = line[level_start:level_end]
+                    # Cắt phần nội dung Action, Status, Details
+                    rest = ']'.join(parts[3:]).strip()
+                    action = status = details = ""
 
-                    user_start = line.find('[', level_end + 1) + 1
-                    user_end = line.find(']', user_start)
-                    user = line[user_start:user_end]
+                    for token in rest.split('|'):
+                        if '=' in token:
+                            key, val = token.strip().split('=', 1)
+                            key = key.strip().lower()
+                            val = val.strip()
 
-                    # Nội dung còn lại
-                    rest = line[user_end + 2:].strip()
-
-                    # Tách các trường còn lại
-                    action = status = file = ""
-                    parts = [p.strip() for p in rest.split('|')]
-                    for part in parts:
-                        if part.startswith("Action:"):
-                            action = part.replace("Action:", "").strip()
-                        elif part.startswith("Status:"):
-                            status = part.replace("Status:", "").strip()
-                        elif part.startswith("File:"):
-                            file = part.replace("File:", "").strip()
+                            if key == 'action':
+                                action = val
+                            elif key == 'status':
+                                status = val
+                            elif key == 'details':
+                                details = val
 
                     logs.append({
                         "timestamp": timestamp,
@@ -276,11 +292,15 @@ def log_security():
                         "user": user,
                         "action": action,
                         "status": status,
-                        "file": file
+                        "details": details
                     })
 
-                except:
-                    pass  
+                except Exception as e:
+                    print(f"Error parsing log line: {line}")
+                    continue
+    
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return jsonify(logs)
 
+    # Còn lại thì trả template bình thường
     return render_template("log_security.html", logs=logs)
-

@@ -1,84 +1,9 @@
-[2025-06-21 22:06:11] [INFO]: [hihihi@gmail.com] Action: Register | Status: Success
-[2025-06-21 22:06:37] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-21 22:08:15] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-21 22:09:58] [ERROR]: [anonymous] Action: Sign file | Status: Failure | Private key not found
-[2025-06-21 22:12:09] [INFO]: [anonymous] Action: Sign file | Status: Success | File: sec_bg.png
-[2025-06-21 22:12:47] [INFO]: [anonymous] Action: Verify signature | Status: Success | File: sec_bg.png
-[2025-06-25 09:32:31] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-25 09:32:43] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-25 09:34:47] [INFO]: [testmail@gmail.com] Action: Register | Status: Success
-[2025-06-25 09:34:56] [INFO]: [testmail@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-26 08:06:41] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-26 09:11:56] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-26 09:12:17] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-26 09:12:25] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-26 09:12:32] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-26 10:05:13] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-26 13:03:26] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-26 13:20:05] [INFO]: [micode2744@gmail.com] Action: Register | Status: Success
-[2025-06-26 13:20:39] [INFO]: [micode2744@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-26 13:28:48] [INFO]: [admin@fitus.edu.vn] Action: Login success | Status: Pending MFA
-[2025-06-26 20:06:20] [INFO]: [yuddydoo1405@gmail.com] Action: Register | Status: Success
-[2025-06-26 20:06:35] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-26 20:20:15] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-26 20:20:21] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-26 20:20:24] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-26 20:20:31] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-26 20:20:33] [INFO]: [hihihi@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-26 20:31:12] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-26 21:07:21] [INFO]: [admin@fitus.edu.vn] Action: Login success | Status: Pending MFA
-[2025-06-26 21:31:37] [INFO]: [admin@fitus.edu.vn] Action: Login success | Status: Pending MFA
-[2025-06-26 21:35:30] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-26 21:39:26] [INFO]: [yuddydoo1405@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-26 21:39:30] [INFO]: [yuddydoo1405@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-26 21:39:34] [INFO]: [yuddydoo1405@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-26 21:39:37] [INFO]: [yuddydoo1405@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-26 21:39:40] [INFO]: [yuddydoo1405@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-06-26 21:52:16] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-26 22:26:00] [INFO]: [admin@fitus.edu.vn] Action: Login success | Status: Pending MFA
-[2025-06-26 22:26:44] [INFO]: [hihihi@gmail.com] Action: Lock Account | Status: Success
-[2025-06-26 22:27:23] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-26 22:33:42] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-06-30 09:07:43] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 07:56:41] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 08:22:26] [INFO]: [yuddydoo1405@gmail.com] Action: Register | Status: Success
-[2025-07-02 08:22:37] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 08:23:45] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 08:24:52] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 08:25:43] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 08:28:58] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 08:30:39] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 08:33:59] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 08:36:55] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 08:44:56] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 08:48:32] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 08:54:06] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 09:04:22] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 09:11:38] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 09:13:11] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 09:17:49] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 09:25:42] [INFO]: [testmail@gmail.com] Action: Register | Status: Success
-[2025-07-02 09:26:03] [INFO]: [testmail@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 09:28:22] [INFO]: [testmail@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 09:29:02] [INFO]: [testmail@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 09:37:33] [INFO]: [testmail@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 09:58:53] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-02 10:51:20] [INFO]: [hihihi@gmail.com] Action: Register | Status: Success
-[2025-07-02 10:51:28] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-04 08:10:17] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-04 09:04:44] [INFO]: [yuddydoo1405@gmail.com] Action: Sign file | Status: Success | File: Duy_Resume_official.pdf
-[2025-07-04 09:30:03] [INFO]: [yuddydoo1405@gmail.com] Action: Login failed - wrong pass | Status: Failed
-[2025-07-04 09:30:09] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-04 09:30:49] [INFO]: [yuddydoo1405@gmail.com] Action: Sign file | Status: Success | File: Duy_Resume_official.pdf
-[2025-07-04 09:31:51] [WARNING]: [anonymous] Action: Verify signature | Status: Failure | File: Duy_Resume_official.pdf
-[2025-07-04 09:32:23] [INFO]: [hihihi@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-04 09:33:22] [INFO]: [testmail@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-04 09:33:49] [INFO]: [anonymous] Action: Verify signature | Status: Success | File: Duy_Resume_official.pdf
-[2025-07-04 09:35:17] [INFO]: [anonymous] Action: Verify signature | Status: Success | File: Duy_Resume_official.pdf
-[2025-07-04 15:48:36] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-04 16:27:55] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-08 08:19:38] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-08 10:19:33] [INFO]: [yuddydoo1405@gmail.com] Action: Register | Status: Success
-[2025-07-08 10:19:43] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-08 10:25:23] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
-[2025-07-08 19:57:02] [INFO]: [yuddydoo1405@gmail.com] Action: Login success | Status: Pending MFA
+[2025-07-09 10:54:14] [INFO] [yuddydoo1405@gmail.com] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-09 14:13:28] [INFO] [yuddydoo1405@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-09 14:13:32] [INFO] [yuddydoo1405@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-09 14:13:50] [INFO] [admin@fitus.edu.vn] Action=Login | Status=Success | Details=Login successfully
+[2025-07-09 14:14:02] [INFO] [admin@fitus.edu.vn] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-09 14:14:18] [INFO] [admin@fitus.edu.vn] Action=TOTP Verify | Status=Success
+[2025-07-09 14:13:50] [INFO] [admin@fitus.edu.vn] Action=Login | Status=Success | Details=Login successfully
+[2025-07-09 14:14:02] [INFO] [admin@fitus.edu.vn] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-09 14:14:18] [INFO] [admin@fitus.edu.vn] Action=TOTP Verify | Status=Success\[2025-07-09 15:05:33] [INFO] [admin@fitus.edu.vn] Action=Logout | Status=Success | Details=Logout successfully

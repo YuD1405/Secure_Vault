@@ -16,27 +16,28 @@
     <table id="logTable">
       <thead>
         <tr>
-          <th>Time</th>
+          <th>#</th>
           <th>Level</th>
-          <th>User</th>
-          <th>Action</th>
+          <th>Time</th>
+          <th>Email</th>
           <th>Status</th>
-          <th>File</th>
+          <th>Message</th>
         </tr>
       </thead>
       <tbody>
         {% for log in logs %}
-        <tr>
+        <tr class="{{ loop.index % 2 == 0 and 'alt-row' or '' }}">
+          <td>{{ loop.index }}</td>
+          <td><span class="level-label level-{{ log.level|lower }}">{{ log.level }}</span></td>
           <td>{{ log.timestamp }}</td>
-          <td>{{ log.level }}</td>
           <td>{{ log.user }}</td>
-          <td>{{ log.action }}</td>
           <td>{{ log.status }}</td>
-          <td>{{ log.file }}</td>
+          <td>{{ log.details }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+
   </div>
 
   <script src="{{ url_for('static', filename='scripts/log_security.js') }}"></script>
