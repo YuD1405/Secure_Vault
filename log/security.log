@@ -139,3 +139,26 @@
 [2025-07-11 09:02:26] [INFO] [1@gmail.com] Action=View Owned Public Keys | Status=Success | Details=No keys found
 [2025-07-11 09:02:32] [INFO] [1@gmail.com] Action=Get User Info | Status=Success | Details=User profile returned
 [2025-07-11 09:02:34] [WARNING] [1@gmail.com] Action=Update Account Info | Status=Fail | Details=No changes were made.
+[2025-07-11 10:06:09] [INFO] [1@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-11 10:06:13] [INFO] [1@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-11 10:06:26] [WARNING] [1@gmail.com] Action=TOTP Verify | Status=Fail | Details=Wrong 6-digit TOTP
+[2025-07-11 10:06:33] [INFO] [1@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-11 10:06:39] [INFO] [1@gmail.com] Action=Get User Info | Status=Success | Details=User profile returned
+[2025-07-11 10:09:37] [INFO] [1@gmail.com] Action=Update Account Info | Status=Success | Details=User info updated
+[2025-07-11 10:09:37] [ERROR] [1@gmail.com] Action=Change Passphrase | Status=Fail | Details=RSA re-encryption failed: Old password is incorrect.
+[2025-07-11 10:09:44] [WARNING] [1@gmail.com] Action=Update Account Info | Status=Fail | Details=No changes were made.
+[2025-07-11 10:09:57] [INFO] [1@gmail.com] Action=Get User Info | Status=Success | Details=User profile returned
+[2025-07-11 10:09:58] [INFO] [1@gmail.com] Action=Get User Info | Status=Success | Details=User profile returned
+[2025-07-11 10:10:00] [INFO] [1@gmail.com] Action=Update Account Info | Status=Success | Details=User info updated
+[2025-07-11 10:10:00] [ERROR] [1@gmail.com] Action=Change Passphrase | Status=Fail | Details=RSA re-encryption failed: Old password is incorrect.
+[2025-07-11 10:10:01] [INFO] [1@gmail.com] Action=Get User Info | Status=Success | Details=User profile returned
+[2025-07-11 10:12:57] [INFO] [1@gmail.com] Action=Update Account Info | Status=Success | Details=User info updated
+[2025-07-11 10:12:57] [ERROR] [1@gmail.com] Action=Change Passphrase | Status=Fail | Details=RSA re-encryption failed: Old password is incorrect.
+[2025-07-11 10:15:51] [INFO] [1@gmail.com] Action=Get User Info | Status=Success | Details=User profile returned
+[2025-07-11 10:15:53] [WARNING] [1@gmail.com] Action=Update Account Info | Status=Fail | Details=No changes were made.
+[2025-07-11 10:15:57] [INFO] [1@gmail.com] Action=Update Account Info | Status=Success | Details=User info updated
+[2025-07-11 10:15:57] [INFO] [1@gmail.com] Action=Get User Info | Status=Success | Details=User profile returned
+[2025-07-11 10:16:04] [INFO] [1@gmail.com] Action=Update Account Info | Status=Success | Details=User info updated
+[2025-07-11 10:16:04] [INFO] [1@gmail.com] Action=Get User Info | Status=Success | Details=User profile returned
+[2025-07-11 10:17:11] [INFO] [1@gmail.com] Action=Get User Info | Status=Success | Details=User profile returned
+[2025-07-11 10:17:15] [WARNING] [1@gmail.com] Action=Update Account Info | Status=Fail | Details=New passphrase is too weak. It must contain at least 8 characters, an uppercase letter, a number, and a special symbol.

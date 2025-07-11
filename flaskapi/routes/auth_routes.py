@@ -235,11 +235,12 @@ def update_account():
     success, message = update_user_info_in_db(email, full_name, phone, address, dob, pass1, pass2)
     if success:
         log_user_action(email, "Update Account Info", "Success", "User info updated")
-        success_1, msg1 = re_encrypt_private_key_with_new_passphrase(email, pass1, pass2)
-        if success_1 == False:
-            log_user_action(email, "Change Passphrase", "Fail", f"RSA re-encryption failed: {msg1}", level="error")
-            return jsonify({'success': False, 'message': msg1})
-        session["passphrase"] = pass2
+        if(pass1 and pass2):
+            success_1, msg1 = re_encrypt_private_key_with_new_passphrase(email, pass1, pass2)
+            if success_1 == False:
+                log_user_action(email, "Change Passphrase", "Fail", f"RSA re-encryption failed: {msg1}", level="error")
+                return jsonify({'success': False, 'message': msg1})
+            session["passphrase"] = pass2
     else:
         log_user_action(email, "Update Account Info", "Fail", message or "Unknown error", level="warning")
 
