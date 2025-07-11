@@ -67,7 +67,7 @@ Sau khi đăng nhập thành công, người dùng được chuyển đến \cod
     \end{itemize}
     \item Nếu chọn TOTP:
     \begin{itemize}
-        \item Sinh mã QR từ \codefile{generate\_qr\_code(email)} $\rightarrow$ dùng cho ứng dụng Google Authenticator.
+        \item Sinh mã QR từ \codefile{generate\_qr\_code(email)} \textrightarrow{} dùng cho ứng dụng Google Authenticator.
         \item Kiểm tra bằng \codefile{verify\_totp\_code(email, input\_code)}.
     \end{itemize}
     \item Nếu đúng $\rightarrow$ Lưu \codefile{session['user\_id]} và chuyển đến \codefile{auth/dashboard}

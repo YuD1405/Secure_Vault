@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.4) (preloaded format=xelatex 2025.7.9)  9 JUL 2025 09:14
+This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.4) (preloaded format=xelatex 2025.7.9)  11 JUL 2025 13:37
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -779,88 +779,240 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 [1] (content/ThongTin.tex) (content/GioiThieu.tex) (content/plan.tex
 
 [2]
-Underfull \hbox (badness 4608) in paragraph at lines 33--33
-[]|\TU/lmr/m/n/12 Frontend: Form accounts, menu -
- []
 
+[3]) (content/technologies.tex
 
+[4]
 
-[3]) (content/KienTruc.tex
+[5]
 
-[4]) (content/ChucNang.tex
+[6]) (content/KienTruc.tex
 
-[5] (content/1-DangKy.tex
+[7]) (content/ChucNang.tex
+
+[8] (content/1-DangKy.tex
 File: img/sign-up.png Graphic file (type bmp)
 <img/sign-up.png>
 File: img/recovery-key.png Graphic file (type bmp)
 <img/recovery-key.png>
 
 
-[6]
+[9]
 
-[7]) (content/2-DangNhap.tex
+[10]) (content/2-DangNhap.tex
 
-[8]
+[11]
 File: img/login.png Graphic file (type bmp)
 <img/login.png>
 File: img/MFA-OTP.png Graphic file (type bmp)
 <img/MFA-OTP.png>
 
 
-[9]
+[12]
 File: img/MFA-TOTP.png Graphic file (type bmp)
 <img/MFA-TOTP.png>
 
 
-[10]
+[13]
 File: img/mail-otp.png Graphic file (type bmp)
 <img/mail-otp.png>
 
-Overfull \hbox (4.09186pt too wide) in paragraph at lines 70--71
-[]\TU/lmr/m/n/12 Sinh mã QR từ [][][][][][] $\U/matha/m/n/12 Ñ$ \TU/lmr/m/n/12 
-dùng cho ứng dụng Google Authenticator. 
+Overfull \hbox (4.09273pt too wide) in paragraph at lines 70--71
+[]\TU/lmr/m/n/12 Sinh mã QR từ [][][][][][] → dùng cho ứng dụng Google Authenti
+cator. 
  []
 
 
 
-[11]
+[14]
 Overfull \hbox (1.09271pt too wide) in paragraph at lines 112--113
 []\TU/lmr/m/n/12 Dùng [][][][][][] để tạo ra URI định dạng chuẩn
  []
 
 ) (content/3-QuanLyKhoa.tex
 
-[12]) (content/4-QRpubkey.tex
+[15]) (content/4-QRpubkey.tex
 
-[13]) (content/5-CapNhatTK.tex
+[16]) (content/5-CapNhatTK.tex
 
-[14]) (content/6-MaHoaTapTin.tex
+[17]
+File: img/5_update/5_update_form.png Graphic file (type bmp)
+<img/5_update/5_update_form.png>
 
-[15]) (content/7-GiaiMaTapTin.tex
 
-[16]) (content/8-KySoTapTin.tex
+[18]
+File: img/5_update/5_update_success.png Graphic file (type bmp)
+<img/5_update/5_update_success.png>
 
-[17]) (content/9-XacMinhChuKy.tex
+Overfull \hbox (78.92197pt too wide) in paragraph at lines 73--74
+[]\TU/lmr/m/n/12 Hàm \TU/lmtt/m/n/12 re_encrypt_private_key_with_new_passphrase
+()
+ []
 
-[18]) (content/10-PhanQuyen.tex
+File: img/5_update/5_update_re_enc.png Graphic file (type bmp)
+<img/5_update/5_update_re_enc.png>
 
-[19]) (content/11-Log.tex
 
-[20]) (content/12-ChiaNhoTapTin.tex
+[19]
+Overfull \hbox (88.5017pt too wide) in paragraph at lines 104--105
+[]\TU/lmr/m/n/12 Mọi thao tác đều được log bằng \TU/lmtt/m/n/12 log_user_action
+(..., "Fail", ...) \TU/lmr/m/n/12 hoặc \TU/lmtt/m/n/12 log_internal_event()
+ []
 
-[21]) (content/13-TrangThaiKhoa.tex
+File: img/5_update/5_update_fail_1.png Graphic file (type bmp)
+<img/5_update/5_update_fail_1.png>
 
-[22]) (content/14-TimKiemPubkey.tex
 
-[23]) (content/15-GioiHanDangNhap.tex
+[20]
+File: img/5_update/5_update_fail_2.png Graphic file (type bmp)
+<img/5_update/5_update_fail_2.png>
+File: img/5_update/5_update_no_changes.png Graphic file (type bmp)
+<img/5_update/5_update_no_changes.png>
 
-[24]) (content/16-TuyChonLuuFile.tex
 
-[25]) (content/17-KhoiPhucTK.tex
+[21]) (content/6-MaHoaTapTin.tex
 
-[26])) (content/KiemThu.tex
+[22]) (content/7-GiaiMaTapTin.tex
+
+[23]) (content/8-KySoTapTin.tex
+
+[24]
+File: img/8_sign/8_sign_form.png Graphic file (type bmp)
+<img/8_sign/8_sign_form.png>
+File: img/8_sign/8_sign_success.png Graphic file (type bmp)
+<img/8_sign/8_sign_success.png>
+
+
+[25]
+File: img/8_sign/8_sign_down.png Graphic file (type bmp)
+<img/8_sign/8_sign_down.png>
+
+Overfull \hbox (8.4558pt too wide) in paragraph at lines 59--60
+[]\TU/lmr/m/n/12 Base64 hóa chữ ký $\U/matha/m/n/12 Ñ$ \TU/lmr/m/n/12 tạo JSON 
+\TU/lmtt/m/n/12 {"filename": ..., "signature": ..., "timestamp":
+ []
+
+File: img/8_sign/8_sign_json.png Graphic file (type bmp)
+<img/8_sign/8_sign_json.png>
+
+
+[26]
 
 [27]
+File: img/8_sign/8_sign_fail.png Graphic file (type bmp)
+<img/8_sign/8_sign_fail.png>
+) (content/9-XacMinhChuKy.tex
+
+[28]
+File: img/9_verify/9_verify_form.png Graphic file (type bmp)
+<img/9_verify/9_verify_form.png>
+File: img/9_verify/9_verify_success.png Graphic file (type bmp)
+<img/9_verify/9_verify_success.png>
+
+
+[29]
+File: img/9_verify/9_verify_invalid.png Graphic file (type bmp)
+<img/9_verify/9_verify_invalid.png>
+
+
+[30]
+Overfull \hbox (13.09799pt too wide) in paragraph at lines 81--82
+[]\TU/lmr/m/n/12 Public key lưu dưới dạng PEM, được parse bằng \TU/lmtt/m/n/12 
+serialization.load_pem_public_key()\TU/lmr/m/n/12 . 
+ []
+
+
+Overfull \hbox (6.19131pt too wide) in paragraph at lines 97--98
+[]\TU/lmr/m/n/12 Ghi log bằng \TU/lmtt/m/n/12 log_user_action() \TU/lmr/m/n/12 
+và \TU/lmtt/m/n/12 log_internal_event() \TU/lmr/m/n/12 theo mức độ \TU/lmtt/m/n
+/12 info\TU/lmr/m/n/12 , \TU/lmtt/m/n/12 warning\TU/lmr/m/n/12 ,
+ []
+
+
+
+[31]
+File: img/9_verify/9_verify_no_files.png Graphic file (type bmp)
+<img/9_verify/9_verify_no_files.png>
+) (content/10-PhanQuyen.tex
+
+[32]) (content/11-Log.tex
+
+[33]
+File: img/11_logger/11_logger_table.png Graphic file (type bmp)
+<img/11_logger/11_logger_table.png>
+File: img/11_logger/11_logger_file.png Graphic file (type bmp)
+<img/11_logger/11_logger_file.png>
+
+
+[34]
+File: img/11_logger/11_logger_debug.png Graphic file (type bmp)
+<img/11_logger/11_logger_debug.png>
+
+Overfull \hbox (5.41397pt too wide) in paragraph at lines 60--61
+[]\TU/lmtt/m/n/12 log_user_action(email, action, status, details, level) \TU/lm
+r/m/n/12 ghi log
+ []
+
+
+
+[35]
+Overfull \hbox (3.35118pt too wide) in paragraph at lines 76--77
+[]\TU/lmr/m/n/12 Đọc file \TU/lmtt/m/n/12 log/security.log\TU/lmr/m/n/12 , tách
+ thành các trường: \TU/lmtt/m/n/12 timestamp, level, user, action,
+ []
+
+) (content/12-ChiaNhoTapTin.tex
+
+[36]) (content/13-TrangThaiKhoa.tex
+
+[37]) (content/14-TimKiemPubkey.tex
+
+[38]
+File: img/14_pubkey/14_pubkey_ui.png Graphic file (type bmp)
+<img/14_pubkey/14_pubkey_ui.png>
+
+Overfull \hbox (71.68991pt too wide) in paragraph at lines 46--47
+[]\TU/lmr/m/n/12 Mỗi người dùng có một file riêng: \TU/lmtt/m/n/12 <user_email>
+/contact_public_key.json 
+ []
+
+
+
+[39]
+File: img/14_pubkey/14_pubkey_qr.png Graphic file (type bmp)
+<img/14_pubkey/14_pubkey_qr.png>
+
+
+[40]) (content/15-GioiHanDangNhap.tex
+
+[41]) (content/16-TuyChonLuuFile.tex
+
+[42]) (content/17-KhoiPhucTK.tex
+
+[43]
+File: img/17_recover/17_recover_recovery_code.png Graphic file (type bmp)
+<img/17_recover/17_recover_recovery_code.png>
+File: img/17_recover/17_recovery_pw.png Graphic file (type bmp)
+<img/17_recover/17_recovery_pw.png>
+
+
+[44]
+Overfull \hbox (30.158pt too wide) in paragraph at lines 44--45
+[]\TU/lmr/m/n/12 Hash passphrase mới và cập nhật vào cột \TU/lmtt/m/n/12 hashed
+_passphrase\TU/lmr/m/n/12 . 
+ []
+
+
+Overfull \hbox (140.48059pt too wide) in paragraph at lines 61--62
+[]\TU/lmr/m/n/12 Dùng recovery code derive AES key: \TU/lmtt/m/n/12 derive_aes_
+key(recovery_code)\TU/lmr/m/n/12 . 
+ []
+
+
+
+[45])) (content/KiemThu.tex
+
+[46]
 Underfull \hbox (badness 1210) in paragraph at lines 12--13
 []|\TU/lmr/m/n/12 Email hợp lệ, Passphrase
  []
@@ -882,6 +1034,8 @@ Overfull \hbox (9.71634pt too wide) in paragraph at lines 42--52
  []
 
 
+
+[47]
 Underfull \hbox (badness 2269) in paragraph at lines 63--63
 []|\TU/lmr/m/n/12 File ảnh QR đúng định
  []
@@ -892,8 +1046,6 @@ Overfull \hbox (9.71634pt too wide) in paragraph at lines 57--66
  []
 
 
-
-[28]
 Overfull \hbox (9.71634pt too wide) in paragraph at lines 71--81
  [][] 
  []
@@ -909,6 +1061,8 @@ Overfull \hbox (9.71634pt too wide) in paragraph at lines 86--96
  []
 
 
+
+[48]
 Underfull \hbox (badness 10000) in paragraph at lines 106--106
 []|\TU/lmr/m/n/12 File [][][][][][] gộp và
  []
@@ -939,13 +1093,13 @@ Overfull \hbox (9.71634pt too wide) in paragraph at lines 117--126
  []
 
 
-
-[29]
 Overfull \hbox (9.71634pt too wide) in paragraph at lines 131--140
  [][] 
  []
 
 
+
+[49]
 Underfull \hbox (badness 1939) in paragraph at lines 152--152
 []|\TU/lmr/m/n/12 Bấm nút khóa/mở trong
  []
@@ -967,7 +1121,7 @@ Overfull \hbox (9.71634pt too wide) in paragraph at lines 173--182
 
 
 
-[30]
+[50]
 Overfull \hbox (9.71634pt too wide) in paragraph at lines 187--196
  [][] 
  []
@@ -999,7 +1153,7 @@ Overfull \hbox (9.71634pt too wide) in paragraph at lines 229--238
 
 
 
-[31]
+[51]
 Underfull \hbox (badness 1648) in paragraph at lines 249--249
 []|\TU/lmr/m/n/12 Mã recovery không đúng
  []
@@ -1011,7 +1165,7 @@ Overfull \hbox (9.71634pt too wide) in paragraph at lines 243--252
 
 ) (content/ref.tex
 
-[32]
+[52]
 Underfull \hbox (badness 10000) in paragraph at lines 9--10
 [][]\TU/lmr/m/n/12 The five different types of authentication — WorkOS. (n.d.).
  WorkOS.
@@ -1054,25 +1208,21 @@ ol). Wikipedia.
 
 )
 
-[33] (main.aux)
+[53] (main.aux)
  ***********
 LaTeX2e <2025-06-01> patch level 1
 L3 programming layer <2025-06-09>
  ***********
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: C157D05980942733DD59B37FCB78F952;5286.
+(rerunfilecheck)             Checksum: 911F3F428B3C09F11CE8CEED244DBA04;7159.
  ) 
 Here is how much of TeX's memory you used:
- 16910 strings out of 403337
- 306397 string characters out of 5468008
- 781583 words of memory out of 5000000
- 44971 multiletter control sequences out of 15000+600000
+ 17125 strings out of 403337
+ 313764 string characters out of 5468008
+ 776535 words of memory out of 5000000
+ 45155 multiletter control sequences out of 15000+600000
  640374 words of font info for 87 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  73i,12n,79p,526b,1084s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (34 pages).
+Output written on main.pdf (54 pages).

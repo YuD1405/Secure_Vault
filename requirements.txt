@@ -6,3 +6,5 @@ qrcode
 cryptography
 python-dotenv
 pillow
+logger
+smtplib

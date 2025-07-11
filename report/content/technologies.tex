@@ -1,0 +1,43 @@
+\newpage
+\section{Công nghệ sử dụng}
+
+Dưới đây là danh sách các công nghệ và thư viện được sử dụng trong quá trình phát triển ứng dụng \textbf{Secure Vault}, một hệ thống mô phỏng bảo mật gồm xác thực đa yếu tố, mã hóa tập tin, ký số và phân quyền người dùng.
+
+\subsection{Ngôn ngữ lập trình}
+\begin{itemize}
+    \item \textbf{Python}: Ngôn ngữ chính được sử dụng cho toàn bộ backend của hệ thống.
+\end{itemize}
+
+\subsection{Framework}
+\begin{itemize}
+    \item \textbf{Flask}: Framework web nhẹ, hỗ trợ xây dựng REST API, routing và tích hợp giao diện HTML.
+\end{itemize}
+
+\subsection{Thư viện và gói mở rộng}
+\begin{itemize}
+    \item \texttt{flask}: Framework core cho backend Python.
+    \item \texttt{flask-cors}: Cho phép giao tiếp giữa frontend và backend khác nguồn.
+    \item \texttt{flask-mysqldb}: Kết nối MySQL với Flask.
+    \item \texttt{pyotp}: Tạo và xác minh mã TOTP (Google Authenticator).
+    \item \texttt{qrcode}: Tạo mã QR chứa public key hoặc URI xác thực.
+    \item \texttt{pillow}: Hỗ trợ xử lý ảnh (dùng kết hợp với QR code).
+    \item \texttt{cryptography}: Cung cấp các primitive bảo mật như AES, RSA, SHA-256.
+    \item \texttt{python-dotenv}: Quản lý biến môi trường từ file \texttt{.env}.
+    \item \texttt{logging} (built-in): Ghi log các hành vi bảo mật, bao gồm đăng nhập, xác thực, mã hóa và các thao tác hệ thống khác    
+    \item \texttt{smtplib} (built-in): Giao tiếp với SMTP server để gửi mã OTP qua email.
+    \item \texttt{email.mime}: Dùng các class như \texttt{MIMEText}, \texttt{MIMEMultipart} để định dạng nội dung email HTML hoặc plain text.
+\end{itemize}
+
+\subsection{Hệ quản trị cơ sở dữ liệu}
+\begin{itemize}
+    \item \textbf{MySQL}: Lưu trữ thông tin người dùng, khóa, mã OTP và log hành vi bảo mật.
+\end{itemize}
+
+\subsection{Công cụ và công nghệ hỗ trợ}
+\begin{itemize}
+    \item \textbf{Git}: Quản lý phiên bản mã nguồn.
+    \item \texttt{.env file}: Lưu cấu hình bảo mật như SMTP, thông tin DB, app secret.
+    \item \textbf{SMTP (Gmail App Password)}: Gửi mã OTP qua email.
+    \item \textbf{Jinja2}: Template engine giúp render giao diện HTML từ backend Flask.
+    \item \textbf{HTML/CSS}: Xây dựng giao diện người dùng cơ bản.
+\end{itemize}
