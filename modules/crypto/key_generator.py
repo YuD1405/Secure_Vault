@@ -82,6 +82,8 @@ def create_new_key(email: str, aes_key: bytes):
     encrypted_private_key = aesgcm.encrypt(nonce, private_pem, None)
     encrypted_private_key_b64 = base64.b64encode(nonce + encrypted_private_key).decode('utf-8')
 
+    # Tạo 1 file lưu private key mã hóa bằng aes key derive từ recovery code và lưu file trong folder hash email với tên "key_recovery"
+    
     # 5. Xây dựng cấu trúc dữ liệu JSON
     now, expiry = datetime.now(), datetime.now() + timedelta(days=KEY_EXPIRATION_DAYS)
     new_key_data = {

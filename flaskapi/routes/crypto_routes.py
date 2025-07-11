@@ -70,6 +70,10 @@ def regenerate_key():
         return {"success": False, "message": f"Error during key generation: {e}"}, 400
 
     success = create_new_key(email, aes_key)
+    
+    # Hàm để giải mã recovery code đó mỗi lần tạo khóa mới -> mã hóa private key mới bằng aes derive từ recovery code và lưu mới cả 2 bản mã hóa đó
+    
+    
     if success:
         log_user_action(email, "Regenerate RSA Key", "Success", "New RSA key pair generated and stored")
         return {"success": True, "message":  "New key pair generated successfully."}

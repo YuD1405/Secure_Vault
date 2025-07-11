@@ -7,10 +7,12 @@ from modules.auth.logic import get_salt_from_db
 from modules.crypto.key_generator import derive_aes_key
 from modules.crypto.key_management import get_active_private_key
 
+import json
 import hashlib
 import os
 import io
 from pathlib import Path
+from datetime import datetime
 
 utils_bp = Blueprint('utils', __name__)
 
@@ -41,10 +43,10 @@ def signing_file_route():
         private_key = get_active_private_key(email, aes_key)
 
         # Ký file và tạo file chữ ký
-        signature_bytes = digital_sign_file(file, private_key)
+        sig_dict = digital_sign_file(file, private_key)
+        sig_bytes = json.dumps(sig_dict, indent=2).encode('utf-8')
 
-        # Tạo file signature dạng memory stream
-        signature_stream = io.BytesIO(signature_bytes)
+        signature_stream = io.BytesIO(sig_bytes)
         signature_stream.seek(0)
         
         log_user_action(email, "Sign File", "Success", f"File={file.filename}")
@@ -68,7 +70,7 @@ def render_verify_signature():
 def verify_signature_route():
     if 'user_id' not in session:
         log_user_action("Unknown", "Verify Signature", "Fail", "Session expired", level="warning")
-        return {"success": False, "message": "Bạn cần phải đăng nhập để truy cập trang này."}, 401
+        return {"success": False, "message": "You must be logged in to access this page."}, 401
     
     file = request.files.get('file_to_verify')
     signature_file = request.files.get('signature')
@@ -82,8 +84,11 @@ def verify_signature_route():
         log_user_action(email, "Verify Signature", "Fail", "Empty filename", level="warning")
         return jsonify({'error': 'Tên file trống'}), 400
 
-    signature = signature_file.read()
-    
+    try:
+        signature_json = signature_file.read().decode('utf-8')
+    except Exception as e:
+        log_user_action(email, "Verify Signature", "Fail", "Cannot decode signature file", level="error")
+        return jsonify({"success": False, "message": "Invalid signature file format"}), 400
     
     contacts_public_key_path = get_user_dir(email) / "contact_public_key.json"
 
@@ -92,11 +97,19 @@ def verify_signature_route():
         return jsonify({"success": False, "message":  "Public key does not exist."}), 400
 
     # Thực hiện xác minh
-    signer = verify_signature(file, signature, contacts_public_key_path)
+    signer, signed_at = verify_signature(file, signature_json, contacts_public_key_path)
+    
+    dt_obj = datetime.fromisoformat(signed_at)
+    formatted_timestamp = dt_obj.strftime("%Y-%m-%d %H:%M:%S") 
 
     if signer:
-        log_user_action(email, "Verify Signature", "Success", f"Valid signature. Signed by: {signer}, File={file.filename}", level="info")
-        return jsonify({"success": True, "message": "Signature is valid.", "signer_email": signer}), 200
+        log_user_action(email, "Verify Signature", "Success", f"Valid signature. Signed by: {signer} at {formatted_timestamp}, File={file.filename}", level="info")
+        return jsonify({
+            "success": True,
+            "message": "Signature is valid.",
+            "signer_email": signer,
+            "signed_at": formatted_timestamp
+        }), 200
     else:
         log_user_action(email, "Verify Signature", "Fail", f"Invalid signature, File={file.filename}", level="warning")
         return jsonify({"success": False, "message": "Signature is invalid."}), 400

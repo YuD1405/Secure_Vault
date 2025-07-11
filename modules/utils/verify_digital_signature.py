@@ -5,12 +5,21 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from modules.utils.logger import log_internal_event
 
+import base64
 
-def verify_signature(file, signature: bytes, contacts_json_path: str):
+def verify_signature(file, signature_json, contacts_json_path: str):
     """
     Dò toàn bộ public key từ file JSON và xác minh chữ ký.
     Trả về True nếu hợp lệ với bất kỳ key nào.
     """
+    try:
+        sig_data = json.loads(signature_json)
+        signature = base64.b64decode(sig_data["signature"])
+        timestamp = sig_data["timestamp"]
+    except Exception as e:
+        print("[verify_signature] Lỗi khi đọc JSON:", e)
+        return None, None
+    
     try:
         with open(contacts_json_path, "r", encoding="utf-8") as f:
             contact_data = json.load(f)
@@ -40,7 +49,7 @@ def verify_signature(file, signature: bytes, contacts_json_path: str):
 
             print(f"[verify_signature] Chữ ký hợp lệ. Người ký: {email}")
             log_internal_event("digital_signature", f"Verified signature for {file.filename} successfully.")
-            return email
+            return email, timestamp
 
         except Exception as e:
             # Tiếp tục thử key khác

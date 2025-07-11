@@ -1,5 +1,4 @@
 from flaskapi.extensions import mysql
-from modules.utils.logger import log_user_action
 
 def fetch_all_users():
     cur = mysql.connection.cursor()
@@ -19,6 +18,6 @@ def toggle_user_lock(email, lock: bool):
         UPDATE users SET is_locked = %s WHERE email = %s
     """, (lock, email))
     mysql.connection.commit()
-    log_user_action(
-        email, "Lock Account" if lock else "Unlock Account", "Success")
+    # log_user_action(
+    #     email, "Lock Account" if lock else "Unlock Account", "Success")
     cur.close()

@@ -108,6 +108,8 @@ function loadOwnedKeys() {
   fetch("/utils/owned_keys")
     .then(res => res.json())
     .then(data => {
+      const qrWrapper = document.getElementById("scanned-qr-wrapper");
+      const qrImg = document.getElementById("scanned-qr-img");
       tbody.innerHTML = "";
       const container = document.getElementById("active-key-info");
 
@@ -120,17 +122,66 @@ function loadOwnedKeys() {
       data.data.forEach((key, index) => {
         const email = key.owner_email || "-";
         const created = key.creation_date?.split("T")[0] || "-";
-        //const expiry = key.expiry_date?.split("T")[0] || "Chưa có";
-       const trimmedKey = trimPublicKey(key.public_key_pem || key.public_key || "");
+        const expiry = key.expiry_date?.split("T")[0] || "-";
+        const trimmedKey = trimPublicKey(key.public_key_pem || key.public_key || "");
+        const qrImage = key.qr_image || null;
+
+        let status = "Unknown";
+        if (expiry !== "-") {
+          const today = new Date();
+          const expiryDate = new Date(expiry);
+          const diffMs = expiryDate - today;
+          const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+          if (diffDays < 0) {
+            status = "Expired";
+          } else if (diffDays <= 1) {
+            status = "Expiring Soon";
+          } else {
+            status = "Valid";
+          }
+        }
 
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${index + 1}</td>
           <td>${email}</td>
           <td>${created}</td>
+          <td>${expiry}</td>
           <td><pre title="${trimmedKey}">${trimmedKey.slice(0, 40)}...</pre></td>
         `;
+        const statusCell = document.createElement("td");
+        const statusSpan = document.createElement("span");
+        statusSpan.classList.add("status-label");
+
+        if (status === "Expired") {
+          statusSpan.classList.add("status-expired");
+          statusSpan.textContent = "Expired";
+        } else if (status === "Expiring Soon") {
+          statusSpan.classList.add("status-warning");
+          statusSpan.textContent = "Expiring Soon";
+        } else {
+          statusSpan.classList.add("status-valid");
+          statusSpan.textContent = "Valid";
+        }
+
+        statusCell.appendChild(statusSpan);
+        row.appendChild(statusCell);
         tbody.appendChild(row);
+
+        row.addEventListener("click", () => {
+          if (qrImage) {
+            document.getElementById("qr-modal-img").src = qrImage;
+            document.getElementById("qr-modal").style.display = "flex";
+
+            // ✅ cập nhật href cho nút download
+            const downloadBtn = document.getElementById("download-qr-btn");
+            downloadBtn.href = qrImage;
+            downloadBtn.download = `${email}_qr.png`;  // optional: đổi tên file theo email
+          } else {
+            showToast("QR code not available for this key.", "warning");
+          }
+        });
       });
     })
     .catch(error => {
@@ -147,7 +198,7 @@ function filterPublicKeys() {
 
   rows.forEach(row => {
     const email = row.children[1].textContent.toLowerCase();
-    const pubkey = row.children[3].textContent.toLowerCase();
+    const pubkey = row.children[4].textContent.toLowerCase();
     const match = email.includes(keyword) || pubkey.includes(keyword);
     row.style.display = match ? '' : 'none';
   });
@@ -159,4 +210,8 @@ function trimPublicKey(pem) {
     .split('\n')
     .filter(line => !line.includes("-----"))
     .join('');
+}
+
+function closeQRModal() {
+  document.getElementById("qr-modal").style.display = "none";
 }

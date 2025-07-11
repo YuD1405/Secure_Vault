@@ -16,6 +16,7 @@ def signup():
         success, message, recovery_code = register_user(request.form)
         email = sanitize_input(request.form.get("email", ""))
         if success:
+            # Gọi hàm check_and_manage_own_keys để tạo khóa đầu tiên (thêm parementer recovery code)
             log_user_action(email, "Register", "Success", message)
             return render_template("signup.html", success=message, recovery_code=recovery_code)
         else:
@@ -46,10 +47,10 @@ def login():
             log_user_action(email, "Login", "Fail", "Account locked by admin")
             return render_template("login.html", locked_by_admin=True)
         elif result.get("locked"):
-            log_user_action(email, "Login", "Fail", "Account locked by admin")
+            log_user_action(email, "Login", "Fail", "Account locked")
             return render_template("login.html", locked=True)
         else:
-            log_user_action(email, "Login", "Fail", result.get("message"), 'error')
+            log_user_action(email, "Login", "Fail", result.get("message"))
             return render_template("login.html", error=result.get("message"))
     return render_template('login.html', error=None)
 
@@ -178,9 +179,9 @@ def reset_password():
     data = request.get_json()
     email = data.get('email')
     new_password = data.get('new_password')
-    old_password = session.get["passphrase"]
     
-    success_1, message = re_encrypt_private_key_with_new_passphrase(email, old_password, new_password)
+    success_1, message = ""
+    
     if not success_1:
         log_user_action(email, "Reset Password", "Fail", f"Re-encrypt RSA failed: {message}", level="error")
         return jsonify({'success': False, 'message': message})
@@ -230,18 +231,16 @@ def update_account():
     dob = request.form.get('dob')
     pass1 = request.form.get('old_pass')
     pass2 = request.form.get('new_pass')
-
-    success_1, msg1 = re_encrypt_private_key_with_new_passphrase(email, pass1, pass2)
-    if success_1 == False:
-        log_user_action(email, "Change Passphrase", "Fail", f"RSA re-encryption failed: {msg1}", level="error")
-        return jsonify({'success': False, 'message': msg1})
-    session["passphrase"] = pass2
     
     success, message = update_user_info_in_db(email, full_name, phone, address, dob, pass1, pass2)
-    
     if success:
         log_user_action(email, "Update Account Info", "Success", "User info updated")
+        success_1, msg1 = re_encrypt_private_key_with_new_passphrase(email, pass1, pass2)
+        if success_1 == False:
+            log_user_action(email, "Change Passphrase", "Fail", f"RSA re-encryption failed: {msg1}", level="error")
+            return jsonify({'success': False, 'message': msg1})
+        session["passphrase"] = pass2
     else:
         log_user_action(email, "Update Account Info", "Fail", message or "Unknown error", level="warning")
-        
+
     return jsonify({"success": success, "message": message})

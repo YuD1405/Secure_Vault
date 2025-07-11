@@ -46,7 +46,10 @@ def process_qr_code_and_add_contact(current_user_email: str, qr_image_stream) ->
     try:
         import numpy as np
 
-        image_array = np.frombuffer(qr_image_stream.read(), np.uint8)
+        qr_image_stream.seek(0)
+        qr_image_bytes = qr_image_stream.read()
+
+        image_array = np.frombuffer(qr_image_bytes, np.uint8)
         img = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
         if img is None:
             return False, "Unable to read the image file. Please try again with a different format (PNG, JPG)."
@@ -56,6 +59,7 @@ def process_qr_code_and_add_contact(current_user_email: str, qr_image_stream) ->
             return False, "No QR code found in the image."
 
         # 3. Lấy dữ liệu và phân tích cú pháp JSON
+        qr_image_base64 = "data:image/png;base64," + base64.b64encode(qr_image_bytes).decode('utf-8')
         qr_data_string = decoded_objects[0].data.decode('utf-8')
         qr_data = json.loads(qr_data_string)
 
@@ -84,7 +88,8 @@ def process_qr_code_and_add_contact(current_user_email: str, qr_image_stream) ->
             "owner_email": contact_email,
             "public_key_pem": public_key_pem,
             "creation_date": creation_date,
-            "expiry_date": expiry_date  # Không có thông tin này từ QR
+            "expiry_date": expiry_date,
+            "qr_image": qr_image_base64 
         }
 
         # 7. Lấy thư mục của người dùng hiện tại và lưu contact

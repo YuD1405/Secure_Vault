@@ -6,7 +6,7 @@ logger_user = logging.getLogger("SecureVaultUser")
 logger_user.setLevel(logging.INFO)
 
 user_handler = logging.FileHandler('log/security.log')
-user_formatter = logging.Formatter('\%(message)s', '%Y-%m-%d %H:%M:%S')
+user_formatter = logging.Formatter('%(message)s', '%Y-%m-%d %H:%M:%S')
 user_handler.setFormatter(user_formatter)
 
 console_user_handler = logging.StreamHandler()

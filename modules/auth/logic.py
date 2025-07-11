@@ -3,7 +3,6 @@ from modules.auth.validator import (
     is_valid_email, is_valid_date, is_valid_phone,
     is_strong_passphrase, sanitize_input
 )
-from modules.utils.logger import log_user_action
 import os
 import random
 import string
@@ -60,12 +59,10 @@ def register_user(data: dict) -> tuple:
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (email, name, dob, phone, address, salt, hashed, 'user', mfa_secret, recovery_code))
         mysql.connection.commit()
-        log_user_action(email, "Register", "Success")
         return True, f"Registration successful!", recovery_code
     except Exception as e:
         mysql.connection.rollback()
         print(f"Error during registration: {e}")  # Log the error for debugging
-        log_user_action(email, "Register", "Fail")
         return False, "An error occurred during registration.", None
     finally:
         cur.close()
@@ -179,7 +176,7 @@ def update_user_info_in_db(email: str, full_name: str, phone: str, address: str,
 
         # Nếu không có thay đổi gì
         if no_info_change and not (pass1 or pass2):
-            return False,  "No changes were made."
+            return False, "No changes were made."
 
         # --- Cập nhật thông tin cá nhân nếu có thay đổi ---
         if not no_info_change:

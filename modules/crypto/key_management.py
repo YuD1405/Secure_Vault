@@ -137,11 +137,11 @@ def re_encrypt_private_key_with_new_passphrase(
         latest_key_path = get_latest_key_path(user_dir)
 
         if not latest_key_path:
-            return False, "Không tìm thấy khoá nào để thực hiện. Vui lòng tạo khoá trước."
+            return False, "No key found to proceed. Please create a key first."
 
         key_data = read_json_file(latest_key_path)
         if key_data.get('status') != 'active':
-            return False, "Khoá mới nhất không ở trạng thái hoạt động."
+            return False, "The latest key is not in active status."
             
         # Suy diễn khoá AES từ passphrase CŨ
         try:
@@ -162,7 +162,7 @@ def re_encrypt_private_key_with_new_passphrase(
             decrypted_private_key_pem_bytes = aesgcm_old.decrypt(nonce, ciphertext, None)
             print("Giải mã thành công private key bằng passphrase cũ.")
         except Exception: # Thường là InvalidTag
-            return False, "Mật khẩu cũ không chính xác."
+            return False, "Old password is incorrect."
 
         # --- BƯỚC 3: MÃ HOÁ LẠI PRIVATE KEY BẰNG KHÓA MỚI ---
         # Suy diễn khoá AES từ passphrase MỚI
@@ -187,8 +187,8 @@ def re_encrypt_private_key_with_new_passphrase(
         write_json_file(latest_key_path, key_data)
         
         print(f"Đã cập nhật thành công file {latest_key_path.name}.")
-        return True, "Đổi mật khẩu và tái mã hoá khoá thành công!"
+        return True, "Password changed and keys re-encrypted successfully!"
 
     except Exception as e:
         print(f"Lỗi nghiêm trọng trong quá trình tái mã hoá: {e}")
-        return False, f"Đã xảy ra lỗi không xác định: {e}"
+        return False, f"An unknown error occurred: {e}"

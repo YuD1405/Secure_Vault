@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (result.success) {
         showToast(result.message || "Verification successful!", "success");
-        signerElem.innerText = `Người ký: ${result.signer_email || "Undefined"}`;
+        signerElem.innerText = `Signer: ${result.signer_email || "Undefined"} | Signed at: ${result.signed_at || "Undefined"}`;
         signerElem.classList.add("success");
       } else {
         showToast(result.message || "Invalid signature!", "error");
