@@ -99,10 +99,9 @@ def verify_signature_route():
     # Thực hiện xác minh
     signer, signed_at = verify_signature(file, signature_json, contacts_public_key_path)
     
-    dt_obj = datetime.fromisoformat(signed_at)
-    formatted_timestamp = dt_obj.strftime("%Y-%m-%d %H:%M:%S") 
-
     if signer:
+        dt_obj = datetime.fromisoformat(signed_at)
+        formatted_timestamp = dt_obj.strftime("%Y-%m-%d %H:%M:%S") 
         log_user_action(email, "Verify Signature", "Success", f"Valid signature. Signed by: {signer} at {formatted_timestamp}, File={file.filename}", level="info")
         return jsonify({
             "success": True,

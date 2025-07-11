@@ -25,7 +25,7 @@ def verify_signature(file, signature_json, contacts_json_path: str):
             contact_data = json.load(f)
     except Exception as e:
         print(f"[verify_signature] Lỗi khi đọc JSON: {e}")
-        return False
+        return None, None
 
     file.seek(0)
     file_data = file.read()
@@ -56,4 +56,4 @@ def verify_signature(file, signature_json, contacts_json_path: str):
             continue
     
     log_internal_event("digital_signature", f"Failed to verify signature for {file.filename}.", level="warning")
-    return None
+    return None, None

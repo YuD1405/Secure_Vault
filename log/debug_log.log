@@ -1,3 +1,16 @@
 [2025-07-10 07:54:37] [INFO] [digital_signature]: Signed Duy_Resume_official.pdf successfully and saved to data/signature\Duy_Resume_official.pdf.sig.
 [2025-07-10 07:56:39] [INFO] [digital_signature]: Verified signature for Duy_Resume_official.pdf successfully.
 [2025-07-10 07:59:23] [INFO] [digital_signature]: Verified signature for Duy_Resume_official.pdf successfully.
+[2025-07-11 10:50:51] [INFO] [digital_signature]: Signed Duy_Resume_official.pdf successfully and saved to data/signature\Duy_Resume_official.pdf.sig.
+[2025-07-11 10:50:59] [INFO] [digital_signature]: Signed Duy_Resume_official.pdf successfully and saved to data/signature\Duy_Resume_official.pdf.sig.
+[2025-07-11 10:51:15] [INFO] [digital_signature]: Signed Duy_Resume_official.pdf successfully and saved to data/signature\Duy_Resume_official.pdf.sig.
+[2025-07-11 10:51:36] [INFO] [digital_signature]: Signed Duy_Resume_official.pdf successfully and saved to data/signature\Duy_Resume_official.pdf.sig.
+[2025-07-11 11:02:56] [INFO] [digital_signature]: Verified signature for Duy_Resume_official.pdf successfully.
+[2025-07-11 11:03:02] [INFO] [digital_signature]: Verified signature for Duy_Resume_official.pdf successfully.
+[2025-07-11 11:03:40] [WARNING] [digital_signature]: Failed to verify signature for AIoT-Group5-Slide.pptx.pdf.
+[2025-07-11 11:03:44] [WARNING] [digital_signature]: Failed to verify signature for AIoT-Group5-Slide.pptx.pdf.
+[2025-07-11 11:03:46] [WARNING] [digital_signature]: Failed to verify signature for AIoT-Group5-Slide.pptx.pdf.
+[2025-07-11 11:04:23] [WARNING] [digital_signature]: Failed to verify signature for Secure_Vault.pdf.
+[2025-07-11 11:06:49] [WARNING] [digital_signature]: Failed to verify signature for Secure_Vault.pdf.
+[2025-07-11 11:07:06] [WARNING] [digital_signature]: Failed to verify signature for Secure_Vault.pdf.
+[2025-07-11 11:07:36] [WARNING] [digital_signature]: Failed to verify signature for Secure_Vault.pdf.
