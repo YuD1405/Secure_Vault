@@ -7,6 +7,8 @@
     <title>Signup</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/signup.css') }}">
     <script src="{{ url_for('static', filename='scripts/validation.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/toast.css') }}">
+    <script src="{{ url_for('static', filename='scripts/toast.js') }}"></script>
 </head>
 
 <body>
@@ -103,6 +105,8 @@
         };
     </script>
     {% endif %}
+        <div id="toast-container" class="toast-container"></div>
+
 </body>
 
 </html>

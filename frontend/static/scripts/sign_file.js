@@ -38,9 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const file = fileInput.files[0];
 
     if (!file) {
-      // resultDisplay.innerText = "Please select a file first!";
-      // resultDisplay.classList.remove("success");
-      // resultDisplay.classList.add("error");
       showToast("Please select a file first!", "error");
       return;
     }
@@ -53,25 +50,32 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         body: formData
       });
-      const result = await res.json();
-      resultDisplay.classList.remove("error", "success");
+      console.log(res);
+      const contentType = res.headers.get("Content-Type");
 
-      if (result.error) {
-        // resultDisplay.innerText = result.error;
-        // resultDisplay.classList.add("error");
-        showToast(result.error, "error");
-      } else if (result.message) {
-        // resultDisplay.innerText = result.message;
-        // resultDisplay.classList.add("success");
-        showToast(result.message, "success");
+      if (res.ok && contentType === "application/octet-stream") {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name + ".sig";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+
+        showToast("Digital signature successful! Your file is being downloaded.", "success");
       } else {
-        // resultDisplay.innerText = "Đã gửi!";
-        showToast("Đã gửi!", "success");
+        // ❌ Trường hợp lỗi - trả về JSON
+        const result = await res.json();
+        const message = result.message || result.error || "Error occured.";
+        showToast(message, "error");
       }
     } catch (err) {
-      // resultDisplay.innerText = "Lỗi khi gửi file.";
       console.error(err);
-      showToast("Lỗi khi gửi file", "error");
+      showToast("Failed to upload file", "error");
     }
   });
 
@@ -111,17 +115,36 @@ function formatFileSize(bytes) {
   else return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
 
+// 🧠 Icon theo loại file
 function getFileIcon(fileName) {
   const ext = fileName.split('.').pop().toLowerCase();
   switch (ext) {
     case 'pdf':
       return '/static/icons/pdf.png';
-    case 'doc':
     case 'docx':
+    case 'doc':
       return '/static/icons/doc.png';
     case 'txt':
       return '/static/icons/txt.png';
+    case 'key':
+      return '/static/icons/key.png';         // 🔑 file key AES
+    case 'enc':
+      return '/static/icons/locked.png';        // 🔒 file mã hóa
+    case 'zip':
+      return '/static/icons/zip.png';
+    case 'mp4':
+    case 'avi':
+    case 'mov':
+    case 'mkv':
+      return '/static/icons/video.png';       // 🎞️ video file
+    case 'png':
+    case 'jpg':
+    case 'jpeg':
+    case 'gif':
+    case 'webp':
+    case 'bmp':
+      return '/static/icons/gallery.png'; 
     default:
-      return '/static/icons/file.png';
+      return '/static/icons/file.png';        // 📄 mặc định
   }
 }

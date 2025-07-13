@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Manage Accounts - Secure Vault</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/admin_dashboard.css') }}">
+    <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container" style="width: 100%;">
+        <aside class="sidebar" style="z-index: 50">
+            <ul class="sidebar-links">
+                <li>
+                    <a href="{{ url_for('auth.admin_dashboard') }}">
+                        <span class="material-icons" style="font-size: 28px">security</span> Dashboard
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="{{ url_for('auth.admin_manage_account') }}">
+                        <span class="material-icons" style="font-size: 28px">manage_accounts</span> List Users
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('auth.logout') }}">
+                        <span class="material-icons" style="font-size: 28px">logout</span> Logout
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <div class="main">
+            <div class="content" id="Report">
+                <div class="tab-content">
+                    <div class="tab-pane active">
+                        <div class="topbar-report">Manage Accounts</div>
+
+                        <section class="table__body">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Fullname</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>DOB</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users %}
+                                    <tr class="user-row" data-user='{{ user | tojson | safe }}'>
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ user.fullname }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.phone }}</td>
+                                        <td>{{ user.dob }}</td>
+                                        <td>
+                                            <p class="status {{ 'pending' if user.is_locked else 'delivered' }}">
+                                                {{ 'Locked' if user.is_locked else 'Active' }}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ POPUP THÔNG TIN -->
+    <div id="popup" class="popup" style="display: none;">
+        <div class="popup-content">
+            <h3>User Details</h3>
+            <p><strong>Email:</strong> <span id="popup-email"></span></p>
+            <p><strong>Fullname:</strong> <span id="popup-name"></span></p>
+            <p><strong>DOB:</strong> <span id="popup-dob"></span></p>
+            <p><strong>Phone:</strong> <span id="popup-phone"></span></p>
+            <p><strong>Address:</strong> <span id="popup-address"></span></p>
+            <p><strong>Created At:</strong> <span id="popup-created"></span></p>
+            <p><strong>Failed Attempts:</strong> <span id="popup-failed"></span></p>
+            <p><strong>Last Failed Login:</strong> <span id="popup-last"></span></p>
+    
+            <form method="POST">
+                <input type="hidden" id="popup-email-input" name="email">
+                <button name="action" value="lock" class="lock-btn" id="btn-lock">🔒 Lock</button>
+                <button name="action" value="unlock" class="unlock-btn" id="btn-unlock">✅ Unlock</button>
+                <button type="button" onclick="closePopup()" class="close-btn">❌ Close</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ✅ SCRIPT -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+                const rows = document.querySelectorAll(".user-row");
+                rows.forEach(row => {
+                    row.addEventListener("click", () => {
+                        const user = JSON.parse(row.dataset.user);
+                        document.getElementById('popup-email').textContent = user.email;
+                        document.getElementById('popup-name').textContent = user.fullname;
+                        document.getElementById('popup-dob').textContent = user.dob;
+                        document.getElementById('popup-phone').textContent = user.phone;
+                        document.getElementById('popup-address').textContent = user.address;
+                        document.getElementById('popup-created').textContent = user.created_at;
+                        document.getElementById('popup-failed').textContent = user.failed_attempts;
+                        document.getElementById('popup-last').textContent = user.last_failed_login || 'Never';
+                        document.getElementById('popup-email-input').value = user.email;
+
+                        // Hiển thị nút phù hợp
+                        document.getElementById('btn-lock').style.display = user.is_locked ? 'none' : 'inline-block';
+                        document.getElementById('btn-unlock').style.display = user.is_locked ? 'inline-block' : 'none';
+
+                        document.getElementById('popup').style.display = 'block';
+                    });
+                });
+            });
+
+            function closePopup() {
+                document.getElementById('popup').style.display = 'none';
+            }
+          
+    </script>
+</body>
+
+</html>

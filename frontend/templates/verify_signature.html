@@ -102,7 +102,7 @@
                                 <p><strong>Drag & drop file</strong></p>
                                 <p>or <label for="file-upload" class="custom-file-upload">Upload</label></p>
                                 <input type="file" name="file_to_verify" id="file-upload" hidden>
-                                <p class="upload-hint">Only PDF, DOCX supported</p>
+                                <p class="upload-hint">All file types are supported.</p>
                             </div>
                             <div class="form-group file-preview-top">
                                 <div id="file-info" class="file-info">
@@ -121,7 +121,7 @@
                                 <p><strong>Drag & drop signature</strong></p>
                                 <p>or <label for="sig-upload" class="custom-file-upload">Upload</label></p>
                                 <input type="file" name="signature" id="sig-upload" hidden>
-                                <p class="upload-hint">Only .sig files</p>
+                                <p class="upload-hint">Only .sig files supported.</p>
                             </div>
                             
                             <div class="form-group file-preview-top">
@@ -134,15 +134,9 @@
                         </div>
                     </div>
 
-                    <!-- 🔑 Chọn người xác minh -->
                     <div class="form-group" style="margin-top: 30px; width: 100%;">
-                        <label for="public_key_selector" class="verify-label">Select public key to verify</label>
-                        <select id="public_key_selector" name="public_key_path" class="verify-select">
-                        <option value="">-- Select Public Key --</option>
-                        {% for user in users %}
-                        <option value="{{ user.public_key_path }}">{{ user.email }}</option>
-                        {% endfor %}
-                        </select>
+                        <label class="verify-label">Signer</label>
+                        <p id="signerInfo" class="verify-result error">Undefined</p>
                     </div>
 
                     <!-- ✅ Submit -->

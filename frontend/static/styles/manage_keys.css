@@ -479,13 +479,154 @@ content {
   font-style: italic;
 }
 
-/* Button */
-.deactivate-btn {
-  background-color: crimson;
+.status-badge.status-soon {
+  background-color: #facc15;  /* cam cảnh báo */
+  color: rgb(1, 0, 0);
+  padding: 2px 6px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.primary-btn {
+  background-color: #3176f7;
   color: white;
   border: none;
-  padding: 6px 10px;
-  border-radius: 10px;
-  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
 }
+
+.primary-btn:hover {
+  background-color: #303f9f;
+}
+
+.key-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.copy-btn {
+  margin-left: 8px;
+  padding: 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.copy-btn:hover {
+  color: #4a5fe4;
+}
+
+.copy-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* === Overlay Background === */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* === Main Content Box === */
+.popup-content {
+  background-color: #ffffff;
+  color: #1a1a1a;
+  border-radius: 16px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+  animation: fadeInPop 0.3s ease-out;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* === Hide when inactive === */
+.hidden {
+  display: none;
+}
+
+/* === Input Section === */
+#extend-section {
+  margin-top: 18px;
+}
+
+#extend-section label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+#extend-section input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  outline-color: #007bff;
+}
+
+/* === Buttons === */
+.primary-btn-extend {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.primary-btn-extend:hover {
+  background-color: #0056b3;
+}
+
+.close-btn {
+  margin-top: 12px;
+  background-color: #eee;
+  color: #333;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s ease;
+}
+
+.close-btn:hover {
+  background-color: #ddd;
+}
+
+/* === Entry Animation === */
+@keyframes fadeInPop {
+  from {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+

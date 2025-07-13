@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Account Recovery</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/recover_account.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/toast.css') }}">
+  <script src="{{ url_for('static', filename='scripts/toast.js') }}"></script>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Form 1: Nhập mã khôi phục -->
+    <div id="step-recovery">
+      <h1>Recover Account</h1>
+      <form id="recovery-form">
+        <div class="input-group">
+          <label for="email">📧</label>
+          <input type="email" id="email" placeholder="Email" required />
+        </div>
+
+        <div class="input-group">
+          <label for="recovery-code">🔐</label>
+          <input type="text" id="recovery-code" placeholder="Recovery Code" required />
+        </div>
+        <button type="submit">Verify</button>
+      </form>
+    </div>
+
+    <!-- Form 2: Nhập mật khẩu mới -->
+    <div id="step-reset" style="display: none;">
+      <h1>Reset Password</h1>
+      <form id="reset-form">
+        <div class="input-group">
+          <label for="new-password">🔑</label>
+          <input type="password" id="new-password" placeholder="New Password" required />
+        </div>
+
+        <div class="input-group">
+          <label for="confirm-password">🔑</label>
+          <input type="password" id="confirm-password" placeholder="Confirm Password" required />
+        </div>
+
+        <button type="submit">Reset</button>
+      </form>
+    </div>
+  </div>
+  
+  <div id="toast-container" class="toast-container"></div>
+  <script src="{{ url_for('static', filename='scripts/recover_account.js') }}"></script>
+
+</body>
+</html>

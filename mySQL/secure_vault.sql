@@ -15,7 +15,7 @@ CREATE TABLE users (
     hashed_passphrase VARCHAR(128),
     role ENUM('admin', 'user') DEFAULT 'user',
     mfa_secret VARCHAR(64),
-    recovery_code VARCHAR(64),
+    encrypted_recovery_code TEXT,
     is_locked BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     failed_attempts INT DEFAULT 0,
@@ -24,7 +24,7 @@ CREATE TABLE users (
 
 INSERT INTO users (
     email, fullname, dob, phone, address,
-    salt, hashed_passphrase, recovery_code, role
+    salt, hashed_passphrase, encrypted_recovery_code, role
 )
 VALUES (
     'admin@fitus.edu.vn',
@@ -34,7 +34,7 @@ VALUES (
     'System HQ',
     'a1b2c3d4e5f6g7h8',
     'eb83a5fbfe4f6b9857f7e08013852afced14b172b05f2407b50bc6fb6d42d2f2',
-    'ADMIN_DEPTRAI_123@@',
+    NULL,
     'admin'
 );
 

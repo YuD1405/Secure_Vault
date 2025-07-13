@@ -93,6 +93,20 @@
                 <div class="topbar topbar--set-padding">Encrypt File</div>
 
                 <form id="uploadForm" method="POST" enctype="multipart/form-data" class="sign-file-wrapper-v2">
+                    <!-- Tùy chọn lưu định dạng -->
+                    <div class="form-group file-preview-top">
+                        <label>Select file save format:</label>
+                        <label style="display: flex; align-items: center; gap: 10px;">
+                            <input type="radio" name="save_format" value="combined" checked />
+                               Combine into a single file
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px;">
+                            <input type="radio" name="save_format" value="split" />
+                            Save encrypted file and key separately
+                        </label>
+                        <p class="upload-hint">The format affects how the file will be decrypted later</p>
+                    </div>
+
                     <!-- Select Receipt -->
                     <div class="form-group file-preview-top">
                         <label for="recipient-email">Select Recipient:</label>
@@ -124,7 +138,7 @@
                         <p><strong>Drag & drop to upload</strong></p>
                         <p>or <label for="file-upload" class="custom-file-upload">Upload</label></p>
                         <input type="file" name="file_to_encrypt" id="file-upload" hidden>
-                        <p class="upload-hint">Only PDF, DOCX supported</p>
+                        <p class="upload-hint">All file types are supported.</p>
                     </div>
 
                     <!-- Submit Button -->

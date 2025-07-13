@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  loadRecipientEmails();
   // 🔒 1. Chặn mặc định hành vi kéo file vào toàn trang (mở PDF)
   window.addEventListener("dragover", e => e.preventDefault());
   window.addEventListener("drop", e => e.preventDefault());
@@ -35,45 +36,81 @@ document.addEventListener("DOMContentLoaded", () => {
   // 📤 5. Gửi form qua fetch
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const file = fileInput.files[0];
 
+    const file = fileInput.files[0];
+    const recipientEmail = document.getElementById("recipient-email")?.value || "hihihi@gmail.com";
+    const encryptMode = document.querySelector('input[name="save_format"]:checked')?.value || "combined";
+
+    // ✅ Kiểm tra đủ thông tin
     if (!file) {
-      // resultDisplay.innerText = "Please select a file first!";
-      // resultDisplay.classList.remove("success");
-      // resultDisplay.classList.add("error");
-      showToast("Please select a file first!", "error");
+      showToast("Please select a file to encrypt!", "error");
       return;
     }
 
+    if (!recipientEmail) {
+      showToast("Please select a recipient!", "error");
+      return;
+    }
+
+    // ✅ Tạo formData
     const formData = new FormData();
     formData.append("file_to_encrypt", file);
+    formData.append("output_option", encryptMode);
+    formData.append("recipient_email", recipientEmail);
 
     try {
-      const res = await fetch("/crypto/encrypt", {
+      const res = await fetch("/crypto/encrypt_file", {
         method: "POST",
         body: formData
       });
-      const result = await res.json();
-      resultDisplay.classList.remove("error", "success");
 
-      if (result.error) {
-        // resultDisplay.innerText = result.error;
-        // resultDisplay.classList.add("error");
-        showToast(result.error, "error");
-      } else if (result.message) {
-        // resultDisplay.innerText = result.message;
-        // resultDisplay.classList.add("success");
-        showToast(result.message, "success");
-      } else {
-        // resultDisplay.innerText = "Đã gửi!";
-        showToast("Đã gửi!", "success");
+      if (!res.ok) {
+        const errorText = await res.text();
+        showToast("Encryption error: " + errorText, "error");
+        return;
       }
+
+      // 📥 Lấy tên file từ header (nếu có)
+      const disposition = res.headers.get("Content-Disposition");
+      let filename = "encrypted_file";
+
+      if (disposition && disposition.includes("filename=")) {
+        const match = disposition.match(/filename="?([^"]+)"?/);
+        if (match) {
+          filename = match[1];
+        }
+      }
+
+      // 📦 Lấy phần mở rộng
+      const fileExt = filename.split('.').pop().toLowerCase();
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      // ✅ Tuỳ theo định dạng file → hiển thị Toast tương ứng
+      if (fileExt === "zip") {
+        showToast(`File has been encrypted and the key has been separated. Downloaded: ${filename}`, "success");
+      } else if (fileExt === "enc") {
+        showToast(`File has been encrypted and merged into a single file. Downloaded: ${filename}`, "success");
+      } else {
+        showToast(`Encrypted file has been downloaded: ${filename}`, "success");
+      }
+
     } catch (err) {
-      // resultDisplay.innerText = "Lỗi khi gửi file.";
       console.error(err);
-      showToast("Lỗi khi gửi file", "error");
+      showToast("Error while sending the file.", "error");
     }
+
   });
+
 
   // 🎯 6. Drag & drop vào drop-area
   ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
@@ -116,12 +153,67 @@ function getFileIcon(fileName) {
   switch (ext) {
     case 'pdf':
       return '/static/icons/pdf.png';
-    case 'doc':
     case 'docx':
+    case 'doc':
       return '/static/icons/doc.png';
     case 'txt':
       return '/static/icons/txt.png';
+    case 'key':
+      return '/static/icons/key.png';         
+    case 'enc':
+      return '/static/icons/locked.png';     
+    case 'zip':
+      return '/static/icons/zip.png';  
+    case 'mp4':
+    case 'avi':
+    case 'mov':
+    case 'mkv':
+      return '/static/icons/video.png';       // 🎞️ video file
+    case 'png':
+    case 'jpg':
+    case 'jpeg':
+    case 'gif':
+    case 'webp':
+    case 'bmp':
+      return '/static/icons/gallery.png'; 
     default:
-      return '/static/icons/file.png';
+      return '/static/icons/file.png';        // 📄 mặc định
   }
+}
+
+
+function loadRecipientEmails() {
+  const select = document.getElementById("recipient-email");
+  if (!select) {
+    console.log("Không tìm thấy #recipient-email để render contact.");
+    return;
+  }
+
+  fetch("/utils/owned_keys")
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success || !data.data || data.data.length === 0) {
+        showToast("No users found in your contact list.", "info");
+        return;
+      }
+
+      // Xoá hết options cũ, giữ lại option đầu tiên
+      const placeholder = select.querySelector("option[value='']");
+      select.innerHTML = "";
+      if (placeholder) select.appendChild(placeholder);
+
+      data.data.forEach((key) => {
+        const email = key.owner_email || key.email;
+        if (!email) return;
+
+        const option = document.createElement("option");
+        option.value = email;
+        option.textContent = email;
+        select.appendChild(option);
+      });
+    })
+    .catch(error => {
+      console.error("Lỗi khi load recipient emails:", error);
+      showToast("Unable to load contact list.", "error");
+    });
 }

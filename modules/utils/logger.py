@@ -1,11 +1,12 @@
 import logging
-
+from datetime import datetime
 # Logger cho ROUTE / GIAO DIỆN
+
 logger_user = logging.getLogger("SecureVaultUser")
 logger_user.setLevel(logging.INFO)
 
 user_handler = logging.FileHandler('log/security.log')
-user_formatter = logging.Formatter('[%(asctime)s] [%(levelname)s]: %(message)s', '%Y-%m-%d %H:%M:%S')
+user_formatter = logging.Formatter('%(message)s', '%Y-%m-%d %H:%M:%S')
 user_handler.setFormatter(user_formatter)
 
 console_user_handler = logging.StreamHandler()
@@ -16,30 +17,35 @@ logger_user.addHandler(console_user_handler)
 
 def log_user_action(user_email: str, action: str, status: str, details: str = "", level: str = "info"):
     """
-    Logs a user-level action in the Flask route.
+    Ghi log hành động người dùng theo định dạng thống nhất.
 
     Args:
-        user_email (str): Email of the user performing the action.
-        action (str): Description of the action (e.g., "Sign file").
-        status (str): Action result ("Success" or "Failure").
-        details (str, optional): Extra info (e.g., filename or error).
-
-    Example log:
-        [2025-06-19 14:20:00] [user@example.com] Action: Sign file | Status: Success | File: doc.pdf
+        user_email (str): Email người dùng thực hiện hành động.
+        action (str): Hành động cụ thể (VD: "Đăng ký", "Đăng nhập", "Ký số", ...).
+        status (str): Kết quả ("Success", "Fail", "Pending MFA", ...).
+        details (str, optional): Thông tin chi tiết (tên file, lỗi, IP, ...).
+        level (str, optional): Mức độ log (debug/info/warning/error). Mặc định là "info".
+    
+    Format chuẩn:
+        [2025-07-09 10:15:23] [INFO] [user@example.com] Action=Sign File | Status=Success | Details=file=report.pdf
     """
 
-    msg = f"[{user_email}] Action: {action} | Status: {status}"
-    if details:
-        msg += f" | {details}"
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    level = level.upper()
 
-    level = level.lower()
-    if level == "debug":
+    # Xây dựng thông điệp log chi tiết và nhất quán
+    msg = f"[{timestamp}] [{level}] [{user_email}] Action={action} | Status={status}"
+    if details:
+        msg += f" | Details={details}"
+
+    # Gửi về logger phù hợp
+    if level == "DEBUG":
         logger_user.debug(msg)
-    elif level == "warning":
+    elif level == "WARNING":
         logger_user.warning(msg)
-    elif level == "error":
+    elif level == "ERROR":
         logger_user.error(msg)
-    else: 
+    else:  # mặc định là INFO
         logger_user.info(msg)
 
 # Logger cho MODULE NỘI BỘ
@@ -78,3 +84,38 @@ def log_internal_event(module_name: str, message: str, level: str = "info"):
         logger_module.error(msg)
     else:
         logger_module.info(msg)
+
+def read_security_logs() -> list:
+    logs = []
+    try:
+        with open("log/security.log", "r") as f:
+            for line in f:
+                try:
+                    # VD: [2025-06-19 14:20:00] [INFO]: [user@example.com] Action: Sign file | Status: Success | File: abc.pdf
+                    time_part, rest = line.strip().split("] [", 1)
+                    timestamp = time_part.strip("[")
+                    level, msg = rest.split("]: ", 1)
+                    level = level.strip()
+
+                    # Tách email
+                    email_start = msg.find('[') + 1
+                    email_end = msg.find(']')
+                    email = msg[email_start:email_end] if email_start > 0 and email_end > email_start else "Unknown"
+
+                    # Tách status
+                    status = "Unknown"
+                    if "Status:" in msg:
+                        status = msg.split("Status:")[1].split("|")[0].strip()
+
+                    logs.append({
+                        "time": timestamp,
+                        "level": level,
+                        "email": email,
+                        "status": status,
+                        "message": msg
+                    })
+                except Exception:
+                    continue
+    except FileNotFoundError:
+        pass
+    return logs

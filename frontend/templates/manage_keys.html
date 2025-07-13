@@ -97,6 +97,9 @@
                 <!-- Keys table -->
                 <div class="card-wrapper">
                     <div class="card-box">
+                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <button id="create-key-btn" class="primary-btn">+ Create new key</button>
+                        </div>
                         <table class="styled-table" id="rsa-key-table">
                         <thead>
                             <tr>
@@ -105,7 +108,6 @@
                             <th>Public Key</th>
                             <th>Expiration</th>
                             <th>Status</th>
-                            <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="rsa-key-table-body">
@@ -113,10 +115,27 @@
                         </tbody>
                         </table>
                     </div>
+                </div>
+                <!-- 🔐 Key Details Popup -->
+                <div id="key-popup" class="popup-overlay hidden">
+                    <div class="popup-content">
+                        <h3>Key Details</h3>
+                        <p><strong>Key status:</strong> <span id="popup-status"></span></p>
+                        <p><strong>Expiration Date:</strong> <span id="popup-expiry"></span></p>
+
+                        <div id="extend-section">
+                        <label for="days-to-extend">Extend by (days):</label>
+                        <input type="number" id="days-to-extend" min="1" placeholder="e.g. 30" />
+                        <button id="confirm-extend-btn" class="primary-btn-extend">Confirm Extension</button>
+                        </div>
+
+                        <button class="close-btn" onclick="closePopup()">Close</button>
                     </div>
+                </div>
             </div>
         </div>
     </div>
+    <div id="toast-container" class="toast-container"></div>
 </body>
 
 </html>

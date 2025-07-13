@@ -49,6 +49,8 @@ form {
   display: flex;
   flex-direction: column;
   position: relative;
+  height: 55px;
+  margin-bottom: 10px;
 }
 
 .input-group>label {

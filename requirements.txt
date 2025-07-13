@@ -6,3 +6,4 @@ qrcode
 cryptography
 python-dotenv
 pillow
+secrets

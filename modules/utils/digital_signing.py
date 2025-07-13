@@ -1,11 +1,11 @@
-import hashlib
+import hashlib, base64, json, os
+from datetime import datetime
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import rsa
 from modules.utils.logger import log_internal_event
-import os
 
-def digital_sign_file(file, private_key_path):
+def digital_sign_file(file, private_key):
     """
     Function: digital_sign_file(file, private_key_path)
 
@@ -34,13 +34,6 @@ def digital_sign_file(file, private_key_path):
     # Tính SHA-256 hash của file
     sha256 = hashlib.sha256(file_bytes).digest()
 
-    # Đọc private key từ file
-    with open(private_key_path, 'rb') as key_file:
-        private_key = serialization.load_pem_private_key(
-            key_file.read(),
-            password=None,
-        )
-
     # Ký hash của file với private key RSA
     signature = private_key.sign(
         sha256,
@@ -48,13 +41,21 @@ def digital_sign_file(file, private_key_path):
         hashes.SHA256()
     )
     
-        # Ghi file chữ ký
+    # Tạo nội dung metadata
+    sig_data = {
+        "timestamp": datetime.now().isoformat(),
+        "filename": file.filename,
+        "signature": base64.b64encode(signature).decode()
+    }
+
+    # Ghi file chữ ký
     sig_folder = "data/signature"
     os.makedirs(sig_folder, exist_ok=True)
     sig_path = os.path.join(sig_folder, file.filename + ".sig")
-    with open(sig_path, 'wb') as sig_file:
-        sig_file.write(signature)
+
+    with open(sig_path, 'w', encoding='utf-8') as f:
+        json.dump(sig_data, f, indent=2)
         
-    log_internal_event("digital_signature", f"Signed {file.filename} successfully and saved to {sig_folder}.")
+    log_internal_event("digital_signature", f"Signed {file.filename} successfully and saved to {sig_path}.")
     
-    return signature
+    return sig_data
