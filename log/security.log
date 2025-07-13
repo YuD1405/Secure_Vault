@@ -605,3 +605,48 @@
 [2025-07-13 14:58:57] [WARNING] [1@gmail.com] Action=TOTP Verify | Status=Fail | Details=Wrong 6-digit TOTP
 [2025-07-13 14:59:03] [INFO] [1@gmail.com] Action=TOTP Verify | Status=Success
 [2025-07-13 14:59:10] [INFO] [1@gmail.com] Action=Decrypt File | Status=Success | Details=Decrypted file: Secure_Vault.pdf
+[2025-07-13 15:05:52] [INFO] [1@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-13 15:05:56] [INFO] [1@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-13 15:06:04] [INFO] [1@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-13 15:06:08] [INFO] [1@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=abd3d36dd4c74d9a115b5d2a9c915a96655d2fade0c8c757744d4c4b0cab4de9
+[2025-07-13 15:06:09] [INFO] [1@gmail.com] Action=Get User Info | Status=Success | Details=User profile returned
+[2025-07-13 20:08:59] [INFO] [1@gmail.com] Action=Register | Status=Success | Details=Registration successful!
+[2025-07-13 20:10:01] [INFO] [2@gmail.com] Action=Register | Status=Success | Details=Registration successful!
+[2025-07-13 20:10:43] [INFO] [3@gmail.com] Action=Register | Status=Success | Details=Registration successful!
+[2025-07-13 20:11:43] [INFO] [1@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-13 20:11:47] [INFO] [1@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-13 20:12:16] [INFO] [1@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-13 20:12:18] [INFO] [1@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=abd3d36dd4c74d9a115b5d2a9c915a96655d2fade0c8c757744d4c4b0cab4de9
+[2025-07-13 20:12:21] [INFO] [1@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=abd3d36dd4c74d9a115b5d2a9c915a96655d2fade0c8c757744d4c4b0cab4de9
+[2025-07-13 20:12:25] [INFO] [1@gmail.com] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-13 20:12:33] [INFO] [2@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-13 20:12:36] [INFO] [2@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-13 20:12:44] [INFO] [2@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-13 20:12:46] [INFO] [2@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=fdd62e83ea6b9fa423c65686b4af480183709fcb2f08dffb8954e26a3ee309aa
+[2025-07-13 20:12:47] [INFO] [2@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=fdd62e83ea6b9fa423c65686b4af480183709fcb2f08dffb8954e26a3ee309aa
+[2025-07-13 20:12:48] [INFO] [2@gmail.com] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-13 20:12:57] [INFO] [3@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-13 20:13:02] [INFO] [3@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-13 20:13:09] [INFO] [3@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-13 20:13:11] [INFO] [3@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=1ea2d6582b181202e8768e514bbcdf6976adb553dd2a87175f5d2a6fe843ee65
+[2025-07-13 20:13:17] [INFO] [3@gmail.com] Action=Decode QR | Status=Success | Details=Added contact: Successfully added 1@gmail.com to your contact list!
+[2025-07-13 20:13:17] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 1 keys
+[2025-07-13 20:13:20] [INFO] [3@gmail.com] Action=Decode QR | Status=Success | Details=Added contact: Successfully added 2@gmail.com to your contact list!
+[2025-07-13 20:13:20] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-13 20:13:21] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-13 20:17:45] [INFO] [3@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=1ea2d6582b181202e8768e514bbcdf6976adb553dd2a87175f5d2a6fe843ee65
+[2025-07-13 20:17:46] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-13 20:18:39] [INFO] [3@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=1ea2d6582b181202e8768e514bbcdf6976adb553dd2a87175f5d2a6fe843ee65
+[2025-07-13 20:18:40] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-13 20:19:27] [INFO] [3@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=1ea2d6582b181202e8768e514bbcdf6976adb553dd2a87175f5d2a6fe843ee65
+[2025-07-13 20:19:27] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-13 20:20:04] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-13 20:20:04] [INFO] [3@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=1ea2d6582b181202e8768e514bbcdf6976adb553dd2a87175f5d2a6fe843ee65
+[2025-07-13 20:20:04] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-13 20:20:04] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-13 20:22:02] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-13 20:22:02] [INFO] [3@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=1ea2d6582b181202e8768e514bbcdf6976adb553dd2a87175f5d2a6fe843ee65
+[2025-07-13 20:38:57] [INFO] [3@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=1ea2d6582b181202e8768e514bbcdf6976adb553dd2a87175f5d2a6fe843ee65
+[2025-07-13 20:38:57] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-13 20:51:06] [INFO] [3@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=1ea2d6582b181202e8768e514bbcdf6976adb553dd2a87175f5d2a6fe843ee65
+[2025-07-13 20:51:07] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys

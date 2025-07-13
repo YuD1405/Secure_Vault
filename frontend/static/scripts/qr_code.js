@@ -148,7 +148,7 @@ function loadOwnedKeys() {
           <td>${email}</td>
           <td>${created}</td>
           <td>${expiry}</td>
-          <td><pre title="${trimmedKey}">${trimmedKey.slice(0, 40)}...</pre></td>
+          <td><pre title="${trimmedKey}" data-pubkey="${trimmedKey}">${trimmedKey.slice(0, 40)}...</pre></td>
         `;
         const statusCell = document.createElement("td");
         const statusSpan = document.createElement("span");
@@ -194,11 +194,10 @@ function loadOwnedKeys() {
 
 function filterPublicKeys() {
   const keyword = document.getElementById('search-publickey').value.toLowerCase();
-  const rows = document.querySelectorAll('#owned-keys-tbody tr');
-
+  const rows = document.querySelectorAll('#owned-keys-tbody tr');  
   rows.forEach(row => {
     const email = row.children[1].textContent.toLowerCase();
-    const pubkey = row.children[4].textContent.toLowerCase();
+    const pubkey = row.children[4].querySelector('pre').dataset.pubkey.toLowerCase();
     const match = email.includes(keyword) || pubkey.includes(keyword);
     row.style.display = match ? '' : 'none';
   });
