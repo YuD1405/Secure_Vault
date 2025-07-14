@@ -16,6 +16,7 @@ document.getElementById('recovery-form').addEventListener('submit', async functi
     if (response.ok && result.success) {
       document.getElementById('step-recovery').style.display = 'none';
       document.getElementById('step-reset').style.display = 'block';
+      showToast('Valid recovery code', "success");
     } else {
       showToast(result.message || 'Invalid recovery code', "error");
       // alert(result.message || 'Invalid recovery code');
@@ -54,7 +55,9 @@ document.getElementById('reset-form').addEventListener('submit', async function 
     if (response.ok && result.success) {
       showToast('Passwords reset successfully!', "success");
       // alert('Password reset successfully!');
-      window.location.href = "/auth/login";  // redirect nếu cần
+      setTimeout(() => {
+        window.location.href = "/auth/login";
+      }, 3000);
     } else {
       showToast(result.message || 'Reset failed', "error");
       // alert(result.message || 'Reset failed');

@@ -338,6 +338,8 @@ def verify_recovery_code_from_db(email, recovery_code_input):
     
 def reset_password_and_update_recovery_code_in_db(email, new_password):
     try:
+        if not is_strong_passphrase(new_password):
+            return False,  "New passphrase is too weak. It must contain at least 8 characters, an uppercase letter, a number, and a special symbol."
         recovery_code = read_temp_recovery_code(email)
         
         cursor = mysql.connection.cursor()

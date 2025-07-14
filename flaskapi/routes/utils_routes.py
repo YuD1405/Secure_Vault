@@ -82,7 +82,7 @@ def verify_signature_route():
 
     if file.filename == '':
         log_user_action(email, "Verify Signature", "Fail", "Empty filename", level="warning")
-        return jsonify({'error': 'Tên file trống'}), 400
+        return jsonify({'error': 'Empty filename'}), 400
 
     try:
         signature_json = signature_file.read().decode('utf-8')

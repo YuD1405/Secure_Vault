@@ -650,3 +650,109 @@
 [2025-07-13 20:38:57] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
 [2025-07-13 20:51:06] [INFO] [3@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=1ea2d6582b181202e8768e514bbcdf6976adb553dd2a87175f5d2a6fe843ee65
 [2025-07-13 20:51:07] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-14 08:00:59] [INFO] [1@gmail.com] Action=Login | Status=Fail | Details=Wrong email or password
+[2025-07-14 08:01:08] [INFO] [1@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-14 08:01:13] [INFO] [1@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-14 08:01:20] [INFO] [1@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-14 08:01:22] [INFO] [1@gmail.com] Action=View Owned Public Keys | Status=Success | Details=No keys found
+[2025-07-14 08:01:22] [INFO] [1@gmail.com] Action=Access Manage Keys | Status=Success | Details=Loaded 1 keys
+[2025-07-14 08:01:23] [INFO] [1@gmail.com] Action=Access Manage Keys | Status=Success | Details=Loaded 1 keys
+[2025-07-14 08:05:22] [INFO] [1@gmail.com] Action=Extend Key | Status=Success | Details=Extend Key by 10 days
+[2025-07-14 08:05:22] [INFO] [1@gmail.com] Action=Access Manage Keys | Status=Success | Details=Loaded 1 keys
+[2025-07-14 08:06:07] [INFO] [1@gmail.com] Action=Extend Key | Status=Success | Details=Extend Key by 10 days
+[2025-07-14 08:06:07] [INFO] [1@gmail.com] Action=Access Manage Keys | Status=Success | Details=Loaded 1 keys
+[2025-07-14 08:08:45] [INFO] [1@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=abd3d36dd4c74d9a115b5d2a9c915a96655d2fade0c8c757744d4c4b0cab4de9
+[2025-07-14 08:08:47] [INFO] [1@gmail.com] Action=View Owned Public Keys | Status=Success | Details=No keys found
+[2025-07-14 08:19:55] [ERROR] [1@gmail.com] Action=Decode QR | Status=Fail | Details=Unable to read the image file. Please try again with a different format (PNG, JPG).
+[2025-07-14 08:26:37] [INFO] [1@gmail.com] Action=Get User Info | Status=Success | Details=User profile returned
+[2025-07-14 08:26:38] [WARNING] [1@gmail.com] Action=Update Account Info | Status=Fail | Details=No changes were made.
+[2025-07-14 08:27:33] [INFO] [1@gmail.com] Action=Update Account Info | Status=Success | Details=User info updated
+[2025-07-14 08:27:33] [INFO] [1@gmail.com] Action=Get User Info | Status=Success | Details=User profile returned
+[2025-07-14 08:29:16] [WARNING] [1@gmail.com] Action=Update Account Info | Status=Fail | Details=Phone number must be exactly 10 digits.
+[2025-07-14 08:31:51] [WARNING] [1@gmail.com] Action=Update Account Info | Status=Fail | Details=Phone number must be exactly 10 digits.
+[2025-07-14 08:31:55] [WARNING] [1@gmail.com] Action=Update Account Info | Status=Fail | Details=Current passphrase is incorrect.
+[2025-07-14 08:33:13] [WARNING] [1@gmail.com] Action=Update Account Info | Status=Fail | Details=The new passphrase must be different from the current one.
+[2025-07-14 08:33:54] [WARNING] [1@gmail.com] Action=Update Account Info | Status=Fail | Details=New passphrase is too weak. It must contain at least 8 characters, an uppercase letter, a number, and a special symbol.
+[2025-07-14 08:35:20] [WARNING] [1@gmail.com] Action=Update Account Info | Status=Fail | Details=Please enter both your current and new passphrase to change your password.
+[2025-07-14 08:39:41] [INFO] [1@gmail.com] Action=View Owned Public Keys | Status=Success | Details=No keys found
+[2025-07-14 08:40:02] [INFO] [1@gmail.com] Action=View Owned Public Keys | Status=Success | Details=No keys found
+[2025-07-14 08:41:13] [INFO] [1@gmail.com] Action=View Owned Public Keys | Status=Success | Details=No keys found
+[2025-07-14 08:49:13] [INFO] [1@gmail.com] Action=Sign File | Status=Success | Details=File=Secure_Vault.pdf
+[2025-07-14 08:49:34] [ERROR] [1@gmail.com] Action=Verify Signature | Status=Fail | Details=Public key file not found
+[2025-07-14 08:50:33] [INFO] [1@gmail.com] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-14 08:50:42] [INFO] [3@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-14 08:50:45] [INFO] [3@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-14 08:50:51] [INFO] [3@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-14 08:51:00] [INFO] [3@gmail.com] Action=Verify Signature | Status=Success | Details=Valid signature. Signed by: 1@gmail.com at 2025-07-14 08:49:13, File=Secure_Vault.pdf
+[2025-07-14 08:51:18] [WARNING] [3@gmail.com] Action=Verify Signature | Status=Fail | Details=Invalid signature, File=Duy_Resume_official.pdf
+[2025-07-14 08:54:10] [ERROR] [3@gmail.com] Action=Verify Signature | Status=Fail | Details=Cannot decode signature file
+[2025-07-14 09:00:17] [INFO] [3@gmail.com] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-14 09:00:29] [INFO] [admin@fitus.edu.vn] Action=Login | Status=Success | Details=Login successfully
+[2025-07-14 09:00:32] [INFO] [admin@fitus.edu.vn] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-14 09:00:42] [INFO] [admin@fitus.edu.vn] Action=TOTP Verify | Status=Success
+[2025-07-14 09:11:54] [INFO] [admin@fitus.edu.vn] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-14 09:12:02] [INFO] [1@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-14 09:12:06] [INFO] [1@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-14 09:12:12] [WARNING] [1@gmail.com] Action=OTP Verify | Status=Fail | Details=Invalid or expired OTP
+[2025-07-14 09:12:16] [INFO] [1@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-14 09:13:40] [INFO] [1@gmail.com] Action=Login | Status=Fail | Details=Wrong email or password
+[2025-07-14 09:13:47] [INFO] [1@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-14 09:13:50] [INFO] [1@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-14 09:13:56] [INFO] [1@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-14 09:14:01] [INFO] [1@gmail.com] Action=Access Manage Keys | Status=Success | Details=Loaded 1 keys
+[2025-07-14 09:18:11] [INFO] [1@gmail.com] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-14 09:18:19] [INFO] [3@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-14 09:18:22] [INFO] [3@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-14 09:18:32] [INFO] [3@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-14 09:18:35] [INFO] [3@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=1ea2d6582b181202e8768e514bbcdf6976adb553dd2a87175f5d2a6fe843ee65
+[2025-07-14 09:18:36] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-14 09:20:47] [INFO] [3@gmail.com] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-14 09:20:53] [INFO] [1@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-14 09:20:56] [INFO] [1@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-14 09:21:04] [INFO] [1@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-14 09:21:05] [INFO] [1@gmail.com] Action=View QR Image | Status=Success | Details=Served my_qr.png for hash=abd3d36dd4c74d9a115b5d2a9c915a96655d2fade0c8c757744d4c4b0cab4de9
+[2025-07-14 09:21:06] [INFO] [1@gmail.com] Action=View Owned Public Keys | Status=Success | Details=No keys found
+[2025-07-14 09:27:00] [INFO] [1@gmail.com] Action=View Owned Public Keys | Status=Success | Details=No keys found
+[2025-07-14 09:29:03] [INFO] [1@gmail.com] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-14 09:29:13] [INFO] [3@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-14 09:29:16] [INFO] [3@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-14 09:29:45] [INFO] [3@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-14 09:29:47] [INFO] [3@gmail.com] Action=View Owned Public Keys | Status=Success | Details=Found 2 keys
+[2025-07-14 09:29:58] [INFO] [3@gmail.com] Action=Encrypt File | Status=Success | Details=To=1@gmail.com, File=Secure_Vault.pdf, Format=combined (.enc)
+[2025-07-14 09:30:16] [INFO] [3@gmail.com] Action=Encrypt File | Status=Success | Details=To=1@gmail.com, File=Secure_Vault.pdf, Format=separate (.enc + .key)
+[2025-07-14 09:32:41] [INFO] [3@gmail.com] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-14 09:32:50] [INFO] [1@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-14 09:32:53] [INFO] [1@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-14 09:32:58] [INFO] [1@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-14 09:33:00] [INFO] [1@gmail.com] Action=View Owned Public Keys | Status=Success | Details=No keys found
+[2025-07-14 09:34:42] [INFO] [1@gmail.com] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-14 09:36:38] [WARNING] [1@gmail.com] Action=Verify Recovery Code | Status=Fail | Details=Invalid recovery code or corrupted key file.
+[2025-07-14 09:38:06] [ERROR] [4@gmail.com] Action=Register | Status=Fail | Details=Account already exists.
+[2025-07-14 09:38:48] [INFO] [4@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-14 09:38:52] [INFO] [4@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-14 09:39:03] [INFO] [4@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-14 09:40:50] [INFO] [5@gmail.com] Action=Register | Status=Success | Details=Registration successful!
+[2025-07-14 09:41:00] [INFO] [4@gmail.com] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-14 09:41:39] [INFO] [5@gmail.com] Action=Verify Recovery Code | Status=Success | Details=Recovery code matched. Proceed to password reset.
+[2025-07-14 09:42:10] [INFO] [5@gmail.com] Action=Reset Password | Status=Success | Details=New passphrase and private key updated successfully.
+[2025-07-14 09:42:22] [INFO] [5@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-14 09:42:25] [INFO] [5@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-14 09:44:54] [INFO] [5@gmail.com] Action=Verify Recovery Code | Status=Success | Details=Recovery code matched. Proceed to password reset.
+[2025-07-14 09:45:03] [ERROR] [5@gmail.com] Action=Reset Password | Status=Fail | Details=New passphrase is too weak. It must contain at least 8 characters, an uppercase letter, a number, and a special symbol.
+[2025-07-14 09:45:24] [INFO] [5@gmail.com] Action=Verify Recovery Code | Status=Success | Details=Recovery code matched. Proceed to password reset.
+[2025-07-14 09:45:40] [INFO] [5@gmail.com] Action=Reset Password | Status=Success | Details=New passphrase and private key updated successfully.
+[2025-07-14 09:46:03] [INFO] [5@gmail.com] Action=Login | Status=Success | Details=Login successfully
+[2025-07-14 09:46:06] [INFO] [5@gmail.com] Action=Send OTP | Status=Success | Details=OTP sent via email
+[2025-07-14 09:46:16] [INFO] [5@gmail.com] Action=TOTP Verify | Status=Success
+[2025-07-14 09:48:14] [INFO] [5@gmail.com] Action=Logout | Status=Success | Details=Logout successfully
+[2025-07-14 09:49:48] [INFO] [5@gmail.com] Action=Verify Recovery Code | Status=Success | Details=Recovery code matched. Proceed to password reset.
+[2025-07-14 09:50:02] [INFO] [5@gmail.com] Action=Reset Password | Status=Success | Details=New passphrase and private key updated successfully.
+[2025-07-14 09:51:53] [INFO] [5@gmail.com] Action=Verify Recovery Code | Status=Success | Details=Recovery code matched. Proceed to password reset.
+[2025-07-14 09:52:06] [INFO] [5@gmail.com] Action=Reset Password | Status=Success | Details=New passphrase and private key updated successfully.
+[2025-07-14 09:54:07] [INFO] [1@gmail.com] Action=Login | Status=Fail | Details=Wrong email or password
+[2025-07-14 09:54:14] [INFO] [1@gmail.com] Action=Login | Status=Fail | Details=Wrong email or password
+[2025-07-14 09:54:17] [INFO] [1@gmail.com] Action=Login | Status=Fail | Details=Wrong email or password
+[2025-07-14 09:54:20] [INFO] [1@gmail.com] Action=Login | Status=Fail | Details=Wrong email or password
+[2025-07-14 09:54:22] [INFO] [1@gmail.com] Action=Login | Status=Fail | Details=Wrong email or password
+[2025-07-14 09:54:28] [INFO] [1@gmail.com] Action=Login | Status=Fail | Details=Account locked
+[2025-07-14 10:00:56] [INFO] [1@gmail.com] Action=Login | Status=Fail | Details=Wrong email or password
