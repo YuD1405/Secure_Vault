@@ -1,152 +1,230 @@
-# 🔐 SecureVault – Computer Security Final Project
+<a id="readme-top"></a>
 
-## 📌 Overview
+<div align="center">
+  <h1 align="center">Secure Vault – Secure File System & Digital Signing </h1>
+  <p align="center">
+    A first project for the Computer Security course (CSC15001 - HCMUS). <br> 
+  Secure Vault simulates a secure file system with features such as multi-factor authentication, AES-RSA encryption, digital signature, account roles, and recovery.
+  </p>
+</div>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/macchiato.png" width="400" />
+</p>
 
-**SecureVault** is a Flask-based security system developed for the *Computer Security* course. The system simulates real-world secure file operations and user authentication workflows, including:
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
 
-- ✅ User registration, login, and multi-factor authentication (OTP/TOTP)
-- ✅ File encryption/decryption using AES and RSA
-- ✅ Digital signature & signature verification
-- ✅ Public key sharing via QR code
-- ✅ Role-based access control (admin/user)
-- ✅ Security activity logging
-
----
-
-## 🧩 Project Structure
-
-```
-
-/SecureVault/
-├── main.py                     # Entry point to launch the Flask app
-├── .env                        # Configuration file (DB credentials, email)
-├── data/
-│   ├── db/
-│   │   └── secure\_vault.sql    # SQL script to initialize MySQL database
-│   ├── public\_keys/            # Saved public keys (for sharing)
-│   ├── encrypted\_files/        # Encrypted file storage
-│   └── temp/                   # Temp folder for processing files
-├── flaskapi/
-│   ├── app.py                  # Flask app setup & route registration
-│   ├── routes/
-│   │   ├── auth\_routes.py      # Routes for login, MFA, account
-│   │   ├── crypto\_routes.py    # File encryption, decryption, signing
-│   │   └── utils\_routes.py     # Logs, QR, status checks
-│   └── templates/              # HTML pages (Jinja2)
-│       └── ...                 # login.html, dashboard.html, etc.
-├── modules/
-│   ├── auth/                   # MFA, OTP, password hashing
-│   ├── crypto/                 # RSA, AES, digital signature functions
-│   ├── db/                     # MySQL connection, queries
-│   ├── qr/                     # QR code generation & scanning
-│   └── utils/                  # Shared utilities: logging, validators
-├── static/
-│   ├── styles/                 # CSS files
-│   ├── scripts/                # JS files
-│   └── images/                 # Logo, background, QR images
-├── logs/
-│   └── security.log            # Security log file for all activities
-├── report/
-│   ├── final\_report.pdf        # Project report
-│   └── screenshots/            # Interface images for documentation
-└── README.md                   # This file
-
-````
+- [1. Project Overview](#1-project-overview)
+- [2. Setup and Execution](#2-setup-and-execution)
+  - [2.1. Requirements](#21-requirements)
+  - [2.2. Database Initialization](#22-database-initialization)
+    - [Option 1 – Using MySQL Command Line](#option-1--using-mysql-command-line)
+    - [Option 2 – Using GUI](#option-2--using-gui)
+  - [2.3. Environment Variables](#23-environment-variables)
+  - [2.4. Running the App](#24-running-the-app)
+- [3. System Architecture](#3-system-architecture)
+  - [3.1. Overall Design](#31-overall-design)
+  - [3.2. Project Structure](#32-project-structure)
+- [4. Features \& Security Techniques](#4-features--security-techniques)
+- [5. Technologies Used](#5-technologies-used)
+- [6. Demo \& Testing](#6-demo--testing)
+</details>
 
 ---
 
-## ⚙️ Setup Instructions
+## 1. Project Overview
 
-### 1. 🧱 Create and Configure Database
+**Secure Vault** is a secure Flask-based platform allowing users to:
+- Register/login with OTP via email or TOTP via Google Authenticator
+- Encrypt/decrypt files using AES (GCM) + RSA
+- Digitally sign and verify files
+- Share public keys via QR code
+- Manage role-based access (admin/user), lock accounts
+- View full security logs
+- Support file format options: combined `.enc` or split `.enc` + `.key`
+- Auto-split large files for secure encryption
+- Recover accounts using a one-time recovery code
 
-- Create a **MySQL database** named `secure_vault`
-- Run the SQL script to initialize schema:
+---
+
+## 2. Setup and Execution
+
+### 2.1. Requirements
 
 ```bash
-mysql -u root -p secure_vault < data/db/secure_vault.sql
-````
-
-* Update the database credentials in `.env` file:
-
+pip install -r requirements.txt
 ```
-FLASK_SECRET_KEY=02db9b7b9f3a42f6886cf95d91d7e3be0fa96a26d3b8655b8752d2d81e6b1e2 #random secret key
-SMTP_USER= <sender mail>
-SMTP_PASS= create at https://myaccount.google.com/apppasswords with 2FA account
 
+### 2.2. Database Initialization
+
+You can create the `secure_vault` database using either **command-line** or **GUI tools**:
+
+#### Option 1 – Using MySQL Command Line
+```bash
+mysql -u root -p
+> CREATE DATABASE secure_vault;
+> EXIT
+```
+Then import the schema:
+```bash
+mysql -u root -p secure_vault < mySQL/secure_vault.sql
+```
+
+#### Option 2 – Using GUI
+
+With **phpMyAdmin** (XAMPP, MAMP...):
+1. Open your browser and go to `http://localhost/phpmyadmin`
+2. Click on **"New"** in the left sidebar
+3. Enter `secure_vault` as database name, choose **utf8_general_ci** collation
+4. Click **Create**
+5. Click on the `secure_vault` database in the left panel
+6. Go to **Import** tab at the top
+7. Upload the file: `mySQL/secure_vault.sql`
+8. Click **Go**
+
+With **MySQL Workbench**:
+1. Open MySQL Workbench and connect to your local server
+2. Click **File > Open SQL Script**, select `mySQL/secure_vault.sql`
+3. Click the **Execute** button
+4. The database `secure_vault` will be created automatically with all necessary tables
+
+> Make sure your `.env` file contains matching credentials for MySQL (`root` user or your custom user).
+
+
+### 2.3. Environment Variables
+
+Create a `.env` file with the following content:
+
+```dotenv
+FLASK_SECRET_KEY= <your_secret>
 MYSQL_HOST=localhost
 MYSQL_USER=root
-MYSQL_DB = secure_vault
-MYSQL_PASSWORD= <your database password>
-MYSQL_CURSORCLASS=DictCursor
+MYSQL_PASSWORD= <your_password>
+MYSQL_DB=secure_vault
+SMTP_USER= <your_gmail>
+SMTP_PASS= <google_app_password>
 ```
 
-> ⚠️ Don't commit `.env` to public repositories.
-
----
-
-### 2. ▶️ Run the Flask App
-
-In your terminal:
+### 2.4. Running the App
 
 ```bash
 python main.py
 ```
 
-Then open your browser at:
+Then open: http://127.0.0.1:5000/
 
-```
-http://127.0.0.1:5000/
+---
+
+## 3. System Architecture
+
+### 3.1. Overall Design
+
+The system is divided into 3 main functional groups:
+
+- **Group 1 – Account & MFA**: register, login, lockout, recovery, role-based access
+- **Group 2 – File Encryption/Decryption**: key management, AES + RSA, QR code
+- **Group 3 – Signing & Logs**: digital signing, verification, logging, key lookup
+
+### 3.2. Project Structure
+
+```bash
+/SECURE_VAULT/
+├── data/
+│   ├── key_manage/            # Encrypted RSA private/public keys (per user folder)
+│   │   └── <user_id_hash>/    # Contains key_<n>.json and contact_public_key.json.
+│   ├── qr/                    # QR codes for public keys (grouped by user)
+│   │   └── <user_id_hash>/    # Contains qr image
+│   └── signature/             # Output folder for digital signatures
+├── flaskapi/
+│   ├── app.py                 # Flask app initialization
+│   ├── extensions.py          # MySQL connector and app extensions
+│   └── routes/                # API route handlers (auth, crypto, utils)
+├── frontend/
+│   ├── static/                # CSS, JS, images
+│   └── templates/             # HTML templates (Jinja2)
+├── log/
+│   ├── security.log           # Log of all security-related actions
+│   └── debug_log.log          # Optional debug log
+├── modules/
+│   ├── auth/                  # Login, MFA, registration, recovery
+│   ├── crypto/                # AES, RSA, signing, decryption
+│   └── utils/                 # Logging, validators, mail utilities
+├── mySQL/
+│   ├── secure_vault.sql       # Main DB schema
+│   └── test.sql               # Sample test data
+├── report/                    # Final report & screenshots
+├── .env                       # Environment variables
+├── .gitignore
+├── ComputerSecurity_PRJ1.pdf  # Assignment description
+├── guide_flask.txt            # Flask guide or notes
+├── main.py                    # Entry point to run the app
+├── README.md
+└── requirements.txt
 ```
 
 ---
 
-## 🧪 Features and How It Works
+## 4. Features & Security Techniques
 
-### 👤 Authentication & MFA
-
-* Users register with email, password, and basic info.
-* Passwords are salted and hashed using SHA-256.
-* On login, users choose between:
-
-  * OTP via email (expires in 5 minutes)
-  * TOTP via Google Authenticator
-* Wrong login attempts are limited (lockout for 5 minutes after 5 failures).
-
-### 🔐 RSA Key Management
-
-* Each user can generate 2048-bit RSA key pairs.
-* Private key is AES-encrypted with the user's password.
-* Public key is saved for sharing and signature verification.
-
-### 🗂 File Encryption & Signature
-
-* Files are encrypted using:
-
-  * AES (for data)
-  * RSA (to encrypt AES session key)
-* Signed files are created with `.sig` extension.
-* Verification checks signatures using public keys in the system.
-
-### 📷 QR Code
-
-* QR codes encode public key + metadata.
-* Can be scanned to auto-import public keys.
-
-### 👮‍♂️ Admin Role
-
-* Admin can view all users and activity logs.
-* User accounts can be locked/unlocked.
-* Activity logs include timestamps, user, action, status.
+- **Registration**: input validation, SHA-256 hashing with random salt, recovery code generation
+- **Login & MFA**:
+  - Lock account after 5 wrong attempts (within 2 minutes)
+  - OTP (6 digits via email, valid for 5 minutes)
+  - TOTP with QR code for Google Authenticator
+- **RSA Key Management**:
+  - Generate 2048-bit keypair
+  - Encrypt private key using AES (derived from passphrase)
+  - Set expiration (90 days), allow renewal
+- **File Encryption**:
+  - Use AES-GCM for file chunks (1MB blocks if >5MB)
+  - Encrypt AES session key with recipient’s RSA public key
+  - Save format: either combined `.enc` or split `.enc` and `.key`
+- **Digital Signing**:
+  - Sign file using SHA-256 hash and RSA private key
+  - Verify signature using any stored public key
+- **QR Code**:
+  - Generate/scan QR to import public key
+- **Role Management**:
+  - Role = `admin` or `user`
+  - Admin can lock/unlock users, view system logs
+- **Security Logs**:
+  - Every event (register, login, encrypt, sign...) logged to `security.log`
+- **Account Recovery**:
+  - One-time recovery code shown on registration
+  - Used to reset password + re-encrypt RSA key
 
 ---
 
-## 🗃 Notes
+## 5. Technologies Used
 
-* All logs are saved in `logs/security.log`
-* Encrypted files go into `data/encrypted_files/`
-* Public keys are stored in `data/public_keys/`
-* QR codes are saved in `static/images/` or user-specific folders
+| Component | Technology / Library        |
+| --------- | --------------------------- |
+| Backend   | Python Flask                |
+| MFA       | pyotp, qrcode, smtplib      |
+| Crypto    | pycryptodome (AES-GCM, RSA) |
+| Database  | MySQL, Flask-MySQLdb        |
+| Frontend  | HTML + CSS + Vanilla JS     |
+| Logging   | Custom logger (file-based)  |
 
+---
+
+## 6. Demo & Testing
+
+- Full test cases for:
+  - Registration, login, OTP/TOTP verification
+  - File encryption/decryption
+  - Signing and signature verification
+  - Key expiration and renewal
+  - Role permissions
+  - Account recovery
+- Two file storage formats: `.enc` combined or `.enc + .key` split
+- Logs all security events with timestamp and status
+
+🔗 [Demo Screenshots & Video](https://drive.google.com/drive/folders/1xRaJ4qGiTHa1X5nbth9Pzn4xKZmUR-6U?usp=sharing)
+
+---
+<p align="right">(<a href="#readme-top">Back to top ⬆</a>)</p>
 
 
 
