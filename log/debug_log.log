@@ -33,3 +33,5 @@
 [2025-07-14 08:49:13] [INFO] [digital_signature]: Signed Secure_Vault.pdf successfully and saved to data/signature\Secure_Vault.pdf.sig.
 [2025-07-14 08:51:00] [INFO] [digital_signature]: Verified signature for Secure_Vault.pdf successfully.
 [2025-07-14 08:51:18] [WARNING] [digital_signature]: Failed to verify signature for Duy_Resume_official.pdf.
+[2025-07-15 08:47:03] [INFO] [digital_signature]: Signed Duy_Resume_official.pdf successfully and saved to data/signature\Duy_Resume_official.pdf.sig.
+[2025-07-15 08:49:09] [INFO] [digital_signature]: Verified signature for Duy_Resume_official.pdf successfully.
